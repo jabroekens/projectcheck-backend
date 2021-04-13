@@ -4,6 +4,12 @@ Op www.deprojectcheck.nl is te zien hoe het eruit ziet, en hoe het in zijn werk 
 moet niet noodzakelijk zijn dat de deelnemers fysiek bijeenkomen. Met De ProjectCheck kunnen evaluaties worden voorbereid, waarna de
 deelnemers via bijvoorbeeld Zoom of Microsoft Teams bijeenkomen en hun bevindingen via het scherm delen.
 
+[![Build Status](https://jenkins.aimsites.nl/buildStatus/icon?job=%28OOSE+2020-2021-s2+Buizerd%29+De+ProjectCheck+%E2%80%94+Back-end)](https://jenkins.aimsites.nl/job/(OOSE%202020-2021-s2%20Buizerd)%20De%20ProjectCheck%20%E2%80%94%20Back-end/)
+[![Quality Gate Status](https://sonarqube.aimsites.nl/api/project_badges/measure?project=nl.han.oose.buizerd%3Aprojectcheck-backend&metric=alert_status)](https://sonarqube.aimsites.nl/dashboard?id=nl.han.oose.buizerd%3Aprojectcheck-backend)
+[![Coverage](https://sonarqube.aimsites.nl/api/project_badges/measure?project=nl.han.oose.buizerd%3Aprojectcheck-backend&metric=coverage)](https://sonarqube.aimsites.nl/dashboard?id=nl.han.oose.buizerd%3Aprojectcheck-backend)
+[![Code Smells](https://sonarqube.aimsites.nl/api/project_badges/measure?project=nl.han.oose.buizerd%3Aprojectcheck-backend&metric=code_smells)](https://sonarqube.aimsites.nl/dashboard?id=nl.han.oose.buizerd%3Aprojectcheck-backend)
+[![Bugs](https://sonarqube.aimsites.nl/api/project_badges/measure?project=nl.han.oose.buizerd%3Aprojectcheck-backend&metric=bugs)](https://sonarqube.aimsites.nl/dashboard?id=nl.han.oose.buizerd%3Aprojectcheck-backend)
+
 ## Opdrachtgevers
 - Antonie Reichling (De ProjectCheck) <Antonie@reichling.nl>
 - Tineke Jacobs (De ProjectCheck) <Tineke.Jacobs@han.nl>
