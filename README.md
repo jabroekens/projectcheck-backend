@@ -11,17 +11,17 @@ deelnemers via bijvoorbeeld Zoom of Microsoft Teams bijeenkomen en hun bevinding
 [![Bugs](https://sonarqube.aimsites.nl/api/project_badges/measure?project=nl.han.oose.buizerd%3Aprojectcheck-backend&metric=bugs)](https://sonarqube.aimsites.nl/dashboard?id=nl.han.oose.buizerd%3Aprojectcheck-backend)
 
 ## Opdrachtgevers
-- Antonie Reichling (De ProjectCheck) <Antonie@reichling.nl>
-- Tineke Jacobs (De ProjectCheck) <Tineke.Jacobs@han.nl>
+- Antonie Reichling (<Antonie@reichling.nl>)
+- Tineke Jacobs (<Tineke.Jacobs@han.nl>)
 
-## Scrum Team
-- Daan van Vugt (636474) <D.vanVugt@student.han.nl>
-- Daniël Vervloed (619918) <DJ.Vervloed@student.han.nl>
-- Hugo Verweij (630824) <HM.Verweij@student.han.nl>
-- Jens Broekens (618608) <JA.Broekens@student.han.nl>
-- Luka van Ringelstein (631717) <L.vanRingelestein@student.han.nl>
-- Nathan Wijnberg (634577) <NAA.Wijnberg@student.han.nl>
+## Scrum team
+- Daan van Vugt (<D.vanVugt@student.han.nl>)
+- Daniël Vervloed (<DJ.Vervloed@student.han.nl>)
+- Hugo Verweij (<HM.Verweij@student.han.nl>)
+- Jens Broekens (<JA.Broekens@student.han.nl>)
+- Luka van Ringelstein (<L.vanRingelestein@student.han.nl>)
+- Nathan Wijnberg (<NAA.Wijnberg@student.han.nl>)
 
 ## Docenten
-- Mark Achten (begeleider) <Mark.Achten@han.nl>
-- Miranda Kampers (professional skills) <Miranda.Kampers@han.nl>
+- Mark Achten (<Mark.Achten@han.nl>)
+- Miranda Kampers (<Miranda.Kampers@han.nl>)
