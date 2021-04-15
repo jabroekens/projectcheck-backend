@@ -51,6 +51,31 @@
 								<goal>report</goal>
 							</goals>
 						</execution>
+						<execution>
+							<id>check</id>
+							<goals>
+								<goal>check</goal>
+							</goals>
+							<configuration>
+								<rules>
+									<rule>
+										<element>BUNDLE</element>
+										<limits>
+											<limit>
+												<counter>LINE</counter>
+												<value>COVEREDRATIO</value>
+												<minimum>0.8</minimum>
+											</limit>
+											<limit>
+												<counter>CLASS</counter>
+												<value>MISSEDCOUNT</value>
+												<maximum>0</maximum>
+											</limit>
+										</limits>
+									</rule>
+								</rules>
+							</configuration>
+						</execution>
 					</executions>
 				</plugin>
 				<plugin>
@@ -63,11 +88,11 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+
 		<plugins>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.6</version>
 			</plugin>
 		</plugins>
 	</build>
