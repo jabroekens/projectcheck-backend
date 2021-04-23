@@ -57,7 +57,7 @@ public abstract class DAO<T> {
 	}
 
 	/**
-	 * Deletes the saved state of the instance with {@code UUID} equal to {@uuid}.
+	 * Deletes the saved state of the instance with {@code UUID} equal to {@code uuid}.
 	 *
 	 * @param uuid The UUID of the saved state to delete.
 	 * @see javax.persistence.EntityManager#remove(Object)
