@@ -1,5 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend;
 
+import nl.han.oose.buizerd.projectcheck_backend.exceptions.InvalidRoomException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +16,14 @@ public class RoomFactory {
 
 
     public static Room getRoom(String roomCode) {
-        return rooms.get(roomCode);
+        Room roomToGet = rooms.get(roomCode);
+        if(roomToGet != null) {
+            return rooms.get(roomCode);
+        }
+        else{
+            throw new InvalidRoomException();
+
+        }
     }
 
 }

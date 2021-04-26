@@ -14,8 +14,8 @@ public class RoomEndPoint {
     @Path("{roomcode}/join/{username}")
     public Response joinRoom(@PathParam("roomcode") String roomCode,@PathParam("username") String username){
       Room roomToJoin =  RoomFactory.getRoom(roomCode);
-        roomToJoin.joinRoom(username);
-        return Response.ok().build();
+      Participant addedParticipant = roomToJoin.addPaticipant(username);
+        return Response.ok().entity(addedParticipant).build();
 
 
 
