@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 public class Begeleider extends Deelnemer {
 
 	public Begeleider() {
-		// An empty constructor is required by JPA
+		// Een lege constructor is vereist door JPA.
 	}
 
 	public Begeleider(@NotNull DeelnemerId deelnemerId, @NotNull String naam) {
