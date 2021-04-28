@@ -1,21 +1,18 @@
 package nl.han.oose.buizerd.projectcheck_backend.repository;
 
 import java.util.Optional;
-import nl.han.oose.buizerd.projectcheck_backend.dao.BegeleiderDAO;
-import nl.han.oose.buizerd.projectcheck_backend.dao.SpelDAO;
+import javax.inject.Inject;
+import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Spel;
 
-public class SpelRepository implements Repository<Spel, Long> {
+public class SpelRepository implements Repository<Spel, String> {
 
-	private SpelDAO spelDAO;
-	private BegeleiderDAO begeleiderDAO;
-
-	public SpelRepository(SpelDAO spelDAO, BegeleiderDAO begeleiderDAO) {
-		this.spelDAO = spelDAO;
-		this.begeleiderDAO = begeleiderDAO;
-	}
+	@Inject
+	DAO<Spel, String> spelDAO;
+	@Inject
+	DAO<Begeleider, DeelnemerId> begeleiderDAO;
 
 	/**
 	 * Produces a managed room with a {@code Begeleider} named {@code begeleiderNaam}.
@@ -27,7 +24,7 @@ public class SpelRepository implements Repository<Spel, Long> {
 		Spel spel = new Spel();
 		add(spel);
 
-		Begeleider begeleider = new Begeleider(new DeelnemerId(spel.getSpelId()), begeleiderNaam);
+		Begeleider begeleider = new Begeleider(new DeelnemerId(spel.getSpelCode()), begeleiderNaam);
 		begeleiderDAO.create(begeleider);
 
 		spel.setBegeleider(begeleider);
@@ -40,8 +37,8 @@ public class SpelRepository implements Repository<Spel, Long> {
 	}
 
 	@Override
-	public Optional<Spel> get(Long spelId) {
-		return spelDAO.read(spelId);
+	public Optional<Spel> get(String spelCode) {
+		return spelDAO.read(Spel.class, spelCode);
 	}
 
 	@Override
@@ -50,8 +47,8 @@ public class SpelRepository implements Repository<Spel, Long> {
 	}
 
 	@Override
-	public void remove(Long spelId) {
-		spelDAO.delete(spelId);
+	public void remove(String spelCode) {
+		spelDAO.delete(spelCode);
 	}
 
 }
