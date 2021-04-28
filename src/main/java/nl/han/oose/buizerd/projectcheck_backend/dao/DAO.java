@@ -4,42 +4,43 @@ import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
 /**
- * A generic DAO following the DAO Pattern.
+ * Een DAO volgens het DAO pattern.
  *
- * @param <T> The domain class to be operated on.
- * @param <K> The identifier class of the domain class.
+ * @param <T> De domeinklasse waarmee gewerkt moet worden.
+ * @param <K> De identifier van de domeinklasse.
  */
 public interface DAO<T, K> {
 
 	/**
-	 * Saves the state of {@code t}.
+	 * Sla de staat van {@code t} op.
 	 *
-	 * @param t The instance to be saved.
+	 * @param t De instantie die opgeslagen moet worden.
 	 * @see javax.persistence.EntityManager#persist(Object)
 	 */
 	void create(@NotNull T t);
 
 	/**
-	 * Retrieves an instantiated state of {@code T}.
+	 * Haal een instantie van {@code T} op met de identifier {@code k}.
 	 *
-	 * @param k The identifier of the state to retrieve.
-	 * @return A nullable instance of {@code T} wrapped in {@link Optional}.
+	 * @param klasseType Het klassetype van {@link T}.
+	 * @param k De identifier van de op te halen instantie.
+	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional<T>}.
 	 * @see javax.persistence.EntityManager#find(Class, Object)
 	 */
-	Optional<T> read(@NotNull Class<T> entityClass, @NotNull K k);
+	Optional<T> read(@NotNull Class<T> klasseType, @NotNull K k);
 
 	/**
-	 * Updates an existing state of {@code T}.
+	 * Update de opgeslagen staat van {@code t}.
 	 *
-	 * @param t The instance to update.
+	 * @param t De instantie waarmee de opgeslagen instantie van {@link T} vervangen moet worden.
 	 * @see javax.persistence.EntityManager#merge(Object)
 	 */
 	void update(@NotNull T t);
 
 	/**
-	 * Deletes the saved state of the instance with {@code K} equal to {@code k}.
+	 * Verwijder de opgeslagen staat van een instantie van {@code T} met de identifier {@code k}.
 	 *
-	 * @param k The identifier of the saved state to delete.
+	 * @param k De identifier van de opgeslagen staat die verwijderd moet worden.
 	 * @see javax.persistence.EntityManager#remove(Object)
 	 */
 	void delete(@NotNull K k);

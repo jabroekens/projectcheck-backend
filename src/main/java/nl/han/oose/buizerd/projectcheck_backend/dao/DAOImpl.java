@@ -11,17 +11,17 @@ import javax.transaction.UserTransaction;
 public class DAOImpl<T, K> implements DAO<T, K> {
 
 	@PersistenceContext
-	EntityManager entityManager;
+	private EntityManager entityManager;
 
 	@Resource
-	UserTransaction transaction;
+	private UserTransaction transaction;
 
 	public void create(T t) {
 		doTransaction(entityManager -> entityManager.persist(t));
 	}
 
-	public Optional<T> read(Class<T> entityClass, K k) {
-		return Optional.ofNullable(entityManager.find(entityClass, k));
+	public Optional<T> read(Class<T> klasseType, K k) {
+		return Optional.ofNullable(entityManager.find(klasseType, k));
 	}
 
 	public void update(T t) {
