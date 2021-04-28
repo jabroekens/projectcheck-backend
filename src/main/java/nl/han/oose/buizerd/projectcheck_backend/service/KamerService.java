@@ -1,22 +1,22 @@
-package nl.han.oose.buizerd.projectcheck_backend.endpoint;
+package nl.han.oose.buizerd.projectcheck_backend.service;
 
 import javax.validation.constraints.NotNull;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Spel;
+import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-public class SpelService extends WebSocketServer {
+public class KamerService extends WebSocketServer {
 
-	private final Spel spel;
+	private final Kamer kamer;
 
-	public SpelService(@NotNull Spel spel) {
-		this.spel = spel;
+	public KamerService(@NotNull Kamer kamer) {
+		this.kamer = kamer;
 	}
 
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake) {
-		conn.setAttachment(spel);
+		conn.setAttachment(kamer);
 	}
 
 	@Override
