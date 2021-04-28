@@ -4,43 +4,43 @@ import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
 /**
- * A generic repository interface following the Repository Pattern.
+ * Een Repository volgens het Repository pattern.
  *
- * @param <T> The domain class to be operated on.
- * @param <K> The identifier class of the domain class.
+ * @param <T> De domeinklasse waarmee gewerkt moet worden.
+ * @param <K> De identifier van de domeinklasse.
  */
 public interface Repository<T, K> {
 
 	/**
-	 * Adds an instance of {@code T}.
+	 * Voeg een instantie van {@code T} toe.
 	 *
-	 * @param t The instance of {@link T} to add.
+	 * @param t De instantie die toegevoegd moet worden.
 	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#create(Object)
 	 */
 	void add(@NotNull T t);
 
 	/**
-	 * Gets an instance of {@code T}.
+	 * Haal een instantie van {@code T} op met de identifier {@code k}.
 	 *
-	 * @param k The identifier of {@link T}.
-	 * @return A nullable instance of {@code T} wrapped in {@link Optional}.
-	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#read(Object)
+	 * @param k De identifier van de op te halen instantie.
+	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional<T>}.
+	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#read(Class, Object)
 	 */
 	Optional<T> get(@NotNull K k);
 
 	/**
-	 * Updates an instances of {@code T}.
+	 * Update de toegevoegde instantie van {@code T}.
 	 *
-	 * @param t The instance of {@link T} to update.
-	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#update(Object)
+	 * @param t De instantie waarmee de toegevoegde instantie van {@link T} vervangen moet worden.
+	 * @see javax.persistence.EntityManager#merge(Object)
 	 */
 	void update(@NotNull T t);
 
 	/**
-	 * Removes an instance of {@code T}.
+	 * Verwijder de toegevoegde instantie van {@code T} met de identifier {@code k}.
 	 *
-	 * @param k The identifier of {@link T}.
-	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#delete(Object)
+	 * @param k De identifier van de toegevoegde instantie die verwijderd moet worden.
+	 * @see javax.persistence.EntityManager#remove(Object)
 	 */
 	void remove(@NotNull K k);
 
