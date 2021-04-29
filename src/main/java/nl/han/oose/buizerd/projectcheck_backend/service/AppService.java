@@ -35,7 +35,7 @@ public class AppService {
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
 	 *
 	 * @param begeleiderNaam De naam van de {@link Begeleider}.
-	 * @return Een JSON string met de WebSocket URL van de {@link KamerService} gewikkelt in {@link Response}.
+	 * @return Een JSON string met de WebSocket URL van de {@link WebSocketService} gewikkelt in {@link Response}.
 	 * @see KamerRepository#maakKamer(String)
 	 */
 	@Path("/kamer/nieuw")
@@ -43,9 +43,14 @@ public class AppService {
 	@Produces("application/json")
 	public Response maakKamer(@FormParam("begeleiderNaam") String begeleiderNaam) {
 		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
-		KamerService kamerService = kamerServices.put(kamer.getKamerCode(), new KamerService(kamer));
 
-		String url = "wss://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamer.getKamerCode();
+		KamerService kamerService = new KamerService(kamer);
+		kamerService.start();
+
+		kamerServices.put(kamer.getKamerCode(), kamerService);
+
+		// FIXME returns incorrect url
+		String url = "ws://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamer.getKamerCode();
 		JsonObject json = Json.createObjectBuilder().add("kamer_url", url).build();
 		return Response.ok(json).build();
 	}
