@@ -44,7 +44,7 @@ public class AppService {
 	public Response maakKamer(@FormParam("begeleiderNaam") String begeleiderNaam) {
 		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
 
-		KamerService kamerService = new KamerService(kamer);
+		KamerService kamerService = new KamerService(kamerRepository, kamer);
 		kamerService.start();
 
 		kamerServices.put(kamer.getKamerCode(), kamerService);
