@@ -50,17 +50,6 @@ public abstract class Event {
 	}
 
 	public enum EventType {
-		VOLGENDE_RONDE(VolgendeRondeEvent.class);
-
-		private final Class<? extends Event> eventKlasse;
-
-		EventType(Class<? extends Event> eventKlasse) {
-			this.eventKlasse = eventKlasse;
-		}
-
-		public Class<? extends Event> getEventKlasse() {
-			return eventKlasse;
-		}
 	}
 
 }
