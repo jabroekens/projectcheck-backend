@@ -96,4 +96,9 @@ public class Kamer {
 		return kamerCode;
 	}
 
+	public void voegDeelnemerToe(@NotNull Deelnemer deelnemer) {
+		// TODO @Luka: uitwerken in code
+		// XXX moet deelnemer een exceptie gooien of een boolean returnen als de deelnemer al deelneemt aan de kamer?
+	}
+
 }

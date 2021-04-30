@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.validation.constraints.NotNull;
+import nl.han.oose.buizerd.projectcheck_backend.exceptions.InvalideGebruikerException;
 
 /**
  * Een deelnemer is iemand die deelneemt aan een {@link Kamer}.
@@ -42,7 +43,11 @@ public class Deelnemer {
 	// Een constructor voor tests.
 	Deelnemer(@NotNull DeelnemerId deelnemerId, @NotNull String naam) {
 		this.deelnemerId = deelnemerId;
-		this.naam = naam;
+		this.naam = valideerGebruikersnaam(naam);
+	}
+
+	private String valideerGebruikersnaam(String naam) throws InvalideGebruikerException {
+		// TODO @Luka: uitwerken in code
 	}
 
 	/**
