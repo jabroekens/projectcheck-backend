@@ -25,7 +25,7 @@ public class KamerTest {
 
 	@Test
 	void zetJuisteBegeleider() {
-		Begeleider begeleider = new Begeleider(new DeelnemerId("123456"), "Joost");
+		Begeleider begeleider = new Begeleider(kamer, "Joost");
 		Assertions.assertNull(kamer.getBegeleider());
 		kamer.setBegeleider(begeleider);
 		Assertions.assertEquals(kamer.getBegeleider(), begeleider);

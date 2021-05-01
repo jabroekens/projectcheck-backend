@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -23,10 +24,22 @@ public class Kamer {
 	private static final int KAMER_CODE_MAX = 999999;
 
 	/**
+	 * Genereert een unieke code.
+	 *
+	 * @return Een unieke code.
+	 * @see java.util.concurrent.ThreadLocalRandom#nextInt(int)
+	 */
+	// package-private zodat het getest kan worden.
+	static String genereerCode() {
+		return String.valueOf(ThreadLocalRandom.current().nextInt(KAMER_CODE_MAX + 1));
+	}
+
+	/**
 	 * De unieke code waarmee deelnemers kunnen deelnemen aan de kamer.
 	 * Een unieke code kan niet aangepast worden.
 	 */
 	@Id
+	@Column(updatable = false)
 	private String kamerCode;
 
 	/**
@@ -49,24 +62,13 @@ public class Kamer {
 	/**
 	 * De deelnemers van de kamer.
 	 */
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "kamer", orphanRemoval = true)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "kamer", orphanRemoval = true)
 	private Set<Deelnemer> deelnemers;
 
 	public Kamer() {
 		this.kamerCode = Kamer.genereerCode();
 		this.datum = LocalDateTime.now();
 		this.deelnemers = new HashSet<>();
-	}
-
-	/**
-	 * Genereert een unieke code.
-	 *
-	 * @return Een unieke code.
-	 * @see java.util.concurrent.ThreadLocalRandom#nextInt(int)
-	 */
-	// package-private zodat het getest kan worden.
-	static String genereerCode() {
-		return String.valueOf(ThreadLocalRandom.current().nextInt(KAMER_CODE_MAX + 1));
 	}
 
 	/**
@@ -94,6 +96,10 @@ public class Kamer {
 	 */
 	public String getKamerCode() {
 		return kamerCode;
+	}
+
+	int getAantalDeelnemers() {
+		return deelnemers.size();
 	}
 
 }

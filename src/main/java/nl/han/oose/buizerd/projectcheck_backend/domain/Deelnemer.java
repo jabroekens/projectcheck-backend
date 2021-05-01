@@ -1,10 +1,9 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.validation.constraints.NotNull;
@@ -26,7 +25,7 @@ public class Deelnemer {
 	 * De {@link Kamer} waaraan de deelnemer deelneemt.
 	 */
 	@MapsId("kamerCode")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	private Kamer kamer;
 
 	/**
@@ -39,9 +38,8 @@ public class Deelnemer {
 		// Een lege constructor is vereist door JPA.
 	}
 
-	// Een constructor voor tests.
-	Deelnemer(@NotNull DeelnemerId deelnemerId, @NotNull String naam) {
-		this.deelnemerId = deelnemerId;
+	public Deelnemer(@NotNull Kamer kamer, @NotNull String naam) {
+		this.deelnemerId = new DeelnemerId(kamer);
 		this.naam = naam;
 	}
 
@@ -61,23 +59,6 @@ public class Deelnemer {
 	 */
 	public String getNaam() {
 		return naam;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		Deelnemer deelnemer = (Deelnemer) o;
-		return deelnemerId.equals(deelnemer.deelnemerId) && kamer.equals(deelnemer.kamer) && naam.equals(deelnemer.naam);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(deelnemerId, kamer, naam);
 	}
 
 }

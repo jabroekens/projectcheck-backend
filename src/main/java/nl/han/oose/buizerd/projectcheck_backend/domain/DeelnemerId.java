@@ -2,9 +2,8 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.validation.constraints.NotNull;
 
 @Embeddable
@@ -23,20 +22,22 @@ public class DeelnemerId implements Serializable {
 	 *
 	 * Zie: https://stackoverflow.com/a/9146987
 	 */
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(nullable = false, updatable = false)
 	private Long deelnemerId;
 
 	/**
 	 * De code van de {@link Kamer} waaraan de {@link Deelnemer} deelneemt.
 	 */
+	@Column(nullable = false, updatable = false)
 	private String kamerCode;
 
 	public DeelnemerId() {
 		// Een lege constructor is vereist door JPA.
 	}
 
-	public DeelnemerId(@NotNull String kamerCode) {
-		this.kamerCode = kamerCode;
+	public DeelnemerId(@NotNull Kamer kamer) {
+		this.deelnemerId = kamer.getAantalDeelnemers() + 1L;
+		this.kamerCode = kamer.getKamerCode();
 	}
 
 	/**

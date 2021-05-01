@@ -10,8 +10,8 @@ public class Begeleider extends Deelnemer {
 		// Een lege constructor is vereist door JPA.
 	}
 
-	public Begeleider(@NotNull DeelnemerId deelnemerId, @NotNull String naam) {
-		super(deelnemerId, naam);
+	public Begeleider(@NotNull Kamer kamer, @NotNull String naam) {
+		super(kamer, naam);
 	}
 
 }
