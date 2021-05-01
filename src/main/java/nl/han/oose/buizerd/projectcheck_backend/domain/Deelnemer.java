@@ -31,7 +31,7 @@ public class Deelnemer {
 	/**
 	 * De naam van de deelnemer.
 	 */
-	@Column(nullable = false, updatable = false)
+	@Column(nullable = false)
 	private String naam;
 
 	public Deelnemer() {
@@ -59,6 +59,15 @@ public class Deelnemer {
 	 */
 	public String getNaam() {
 		return naam;
+	}
+
+	/**
+	 * Zet de naam van de deelnemer.
+	 *
+	 * @param naam De nieuwe naam van de deelnemer.
+	 */
+	public void setNaam(@NotNull String naam) {
+		this.naam = naam;
 	}
 
 }
