@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
@@ -39,7 +40,10 @@ public class DAOImpl<T, K> implements DAO<T, K> {
 			transaction.commit();
 		} catch (Exception e) {
 			try {
-				transaction.rollback();
+				if (transaction.getStatus() == Status.STATUS_ACTIVE) {
+					transaction.rollback();
+					return;
+				}
 			} catch (SystemException se) {
 				throw new RuntimeException(se);
 			}
