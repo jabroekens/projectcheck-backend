@@ -15,7 +15,9 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Een kamer is een uitvoering van De ProjectCheck waar deelnemers zich aan bij kunnen
- * sluiten doormiddel van een unieke code. Elke kamer wordt begeleid door een begeleider.
+ * sluiten doormiddel van een unieke code.
+ * <p>
+ * Elke kamer wordt begeleid door een begeleider.
  */
 @Entity
 public class Kamer {

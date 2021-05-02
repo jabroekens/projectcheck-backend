@@ -52,9 +52,7 @@ public class KamerService extends WebSocketServer {
 	/**
 	 * Controleert of een kamer geregistreerd.
 	 * <p>
-	 * Als een kamer geregistreerd is, dan zal
-	 * er een WebSocket URL beschikbaar zijn
-	 * voor deze kamer.
+	 * Als een kamer geregistreerd is, dan zal er een WebSocket URL beschikbaar zijn voor deze kamer.
 	 *
 	 * @param kamerCode De code van een kamer.
 	 * @return true als er een kamer met de code {@code kamerCode} is geregistreerd.

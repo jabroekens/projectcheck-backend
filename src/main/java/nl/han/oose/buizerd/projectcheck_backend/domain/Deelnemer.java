@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Een deelnemer is iemand die deelneemt aan een {@link Kamer}.
+ * <p>
  * Elke deelnemer heeft een naam.
  */
 @Entity
@@ -36,6 +37,7 @@ public class Deelnemer {
 
 	/**
 	 * Construeert een {@link Deelnemer}.
+	 * <p>
 	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
 	 */
 	protected Deelnemer() {
