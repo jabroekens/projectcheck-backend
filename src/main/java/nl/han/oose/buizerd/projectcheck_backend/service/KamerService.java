@@ -5,12 +5,10 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import javax.validation.constraints.NotNull;
 import nl.han.oose.buizerd.projectcheck_backend.Util;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.exception.InvalideWebSocketEventException;
-import nl.han.oose.buizerd.projectcheck_backend.exception.KamerNietGevondenException;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 import org.java_websocket.WebSocket;
 import org.java_websocket.WebSocketImpl;
@@ -38,16 +36,6 @@ public class KamerService extends WebSocketServer {
 	public KamerService(@NotNull KamerRepository kamerRepository) {
 		this.kamerRepository = kamerRepository;
 		this.services = Collections.synchronizedMap(new HashMap<>());
-	}
-
-	// XXX Is dit wel de verantwoordelijkheid van KamerService?
-	public Kamer getKamer(@NotNull String kamerCode) throws KamerNietGevondenException {
-		Optional<Kamer> kamer = kamerRepository.get(kamerCode);
-		if (kamer.isPresent()) {
-			return kamer.get();
-		}
-
-		throw new KamerNietGevondenException(kamerCode);
 	}
 
 	/**
@@ -91,7 +79,7 @@ public class KamerService extends WebSocketServer {
 				 *  * https://github.com/google/gson/blob/master/UserGuide.md#serializing-and-deserializing-collection-with-objects-of-arbitrary-types
 				 */
 				// Event event = Util.getGson().fromJson(message, VeranderNaamEvent.class);
-				// Kamer kamer = getKamer(conn.getAttachment());
+				// Kamer kamer = kamerRepository.getKamer(conn.getAttachment());
 				//
 				// try {
 				// 	event.verwerkEvent(kamerRepository, kamer, conn);

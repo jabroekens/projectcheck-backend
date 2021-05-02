@@ -7,6 +7,7 @@ import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.exception.KamerNietGevondenException;
 
 /**
  * Een KamerRepository voor het beheren van {@link Kamer}.
@@ -55,6 +56,23 @@ public class KamerRepository implements Repository<Kamer, String> {
 	@Override
 	public Optional<Kamer> get(String kamerCode) {
 		return kamerDAO.read(Kamer.class, kamerCode);
+	}
+
+	/**
+	 * Haal een instantie van {@link Kamer} op met de code {@code kamerCode}.
+	 *
+	 * @param kamerCode De code van de op te halen {@link Kamer}.
+	 * @return De {@link Kamer} met de code {@code kamerCode}.
+	 * @throws KamerNietGevondenException Als er geen kamer met de code {@code kamerCode} is gevonden.
+	 * @see nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository#get(String)
+	 */
+	public Kamer getKamer(@NotNull String kamerCode) throws KamerNietGevondenException {
+		Optional<Kamer> kamer = get(kamerCode);
+		if (kamer.isPresent()) {
+			return kamer.get();
+		}
+
+		throw new KamerNietGevondenException(kamerCode);
 	}
 
 	@Override
