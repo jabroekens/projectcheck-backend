@@ -30,6 +30,11 @@ public class KamerService extends WebSocketServer {
 	private final KamerRepository kamerRepository;
 	private final Map<String, WebSocketService> services;
 
+	/**
+	 * Construeert een {@link KamerService}.
+	 *
+	 * @param kamerRepository Een {@link KamerRepository}.
+	 */
 	public KamerService(@NotNull KamerRepository kamerRepository) {
 		this.kamerRepository = kamerRepository;
 		this.services = Collections.synchronizedMap(new HashMap<>());
@@ -45,15 +50,38 @@ public class KamerService extends WebSocketServer {
 		throw new KamerNietGevondenException(kamerCode);
 	}
 
+	/**
+	 * Haalt de WebSocket URL op voor de kamer met de code {@code kamerCode}.
+	 *
+	 * @param kamerCode De code van een kamer.
+	 * @return De WebSocket URL van de kamer.
+	 */
 	public String getUrl(@NotNull String kamerCode) {
 		return (getPort() == WebSocketImpl.DEFAULT_WSS_PORT ? "ws://" : "ws://")
 			   + getAddress().getHostName() + KamerService.getPath(kamerCode);
 	}
 
+	/**
+	 * Controleert of een kamer geregistreerd.
+	 * <p>
+	 * Als een kamer geregistreerd is, dan zal
+	 * er een WebSocket URL beschikbaar zijn
+	 * voor deze kamer.
+	 *
+	 * @param kamerCode De code van een kamer.
+	 * @return true als er een kamer met de code {@code kamerCode} is geregistreerd.
+	 * @see nl.han.oose.buizerd.projectcheck_backend.service.KamerService#registreer(String)
+	 */
 	public boolean isGeregistreerd(@NotNull String kamerCode) {
 		return services.containsKey(kamerCode);
 	}
 
+	/**
+	 * Registreert een {@link Kamer} en stelt een WebSocket URL beschikbaar.
+	 *
+	 * @param kamerCode De code van een kamer.
+	 * @see nl.han.oose.buizerd.projectcheck_backend.service.KamerService#getUrl(String)
+	 */
 	public void registreer(@NotNull String kamerCode) {
 		services.put(KamerService.getPath(kamerCode), (conn, message) -> {
 			try {

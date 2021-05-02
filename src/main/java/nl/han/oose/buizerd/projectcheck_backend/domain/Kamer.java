@@ -98,6 +98,11 @@ public class Kamer {
 		return kamerCode;
 	}
 
+	/**
+	 * Haal het aantal deelnemers (incl. begeleider) van de kamer op.
+	 *
+	 * @return Het aantal deelnemers (incl. begeleider).
+	 */
 	int getAantalDeelnemers() {
 		return deelnemers.size();
 	}

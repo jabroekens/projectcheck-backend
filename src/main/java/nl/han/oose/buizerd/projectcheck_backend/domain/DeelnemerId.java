@@ -31,8 +31,11 @@ public class DeelnemerId implements Serializable {
 	@Column(nullable = false, updatable = false)
 	private String kamerCode;
 
-	public DeelnemerId() {
-		// Een lege constructor is vereist door JPA.
+	/**
+	 * Construeert een {@link DeelnemerId}.
+	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 */
+	protected DeelnemerId() {
 	}
 
 	public DeelnemerId(@NotNull Kamer kamer) {

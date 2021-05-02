@@ -34,10 +34,19 @@ public class Deelnemer {
 	@Column(nullable = false)
 	private String naam;
 
-	public Deelnemer() {
-		// Een lege constructor is vereist door JPA.
+	/**
+	 * Construeert een {@link Deelnemer}.
+	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 */
+	protected Deelnemer() {
 	}
 
+	/**
+	 * Construeert een {@link Deelnemer}.
+	 *
+	 * @param kamer De {@link Kamer} waaraan de deelnemer deelneemt.
+	 * @param naam De naam van de deelnemer.
+	 */
 	public Deelnemer(@NotNull Kamer kamer, @NotNull String naam) {
 		this.deelnemerId = new DeelnemerId(kamer);
 		this.naam = naam;
