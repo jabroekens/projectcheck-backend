@@ -25,10 +25,26 @@ public class KamerTest {
 
 	@Test
 	void zetJuisteBegeleider() {
-		Begeleider begeleider = new Begeleider(kamer, "Joost");
+		Begeleider begeleider = Mockito.mock(
+			Begeleider.class,
+			Mockito.withSettings().useConstructor(kamer, "Joost")
+		);
+
 		Assertions.assertNull(kamer.getBegeleider());
 		kamer.setBegeleider(begeleider);
 		Assertions.assertEquals(kamer.getBegeleider(), begeleider);
+	}
+
+	@Test
+	void geeftJuistAantalDeelnemers() {
+		Assertions.assertEquals(0, kamer.getAantalDeelnemers());
+		Begeleider begeleider = Mockito.mock(
+			Begeleider.class,
+			Mockito.withSettings().useConstructor(kamer, "Joost")
+		);
+
+		kamer.setBegeleider(begeleider);
+		Assertions.assertEquals(1, kamer.getAantalDeelnemers());
 	}
 
 }
