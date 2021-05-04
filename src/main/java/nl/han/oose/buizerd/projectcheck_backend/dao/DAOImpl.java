@@ -9,6 +9,9 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
+/**
+ * Een generieke implementatie van {@link DAO}
+ */
 public class DAOImpl<T, K> implements DAO<T, K> {
 
 	@PersistenceContext
@@ -17,18 +20,30 @@ public class DAOImpl<T, K> implements DAO<T, K> {
 	@Resource
 	private UserTransaction transaction;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void create(T t) {
 		doTransaction(entityManager -> entityManager.persist(t));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Optional<T> read(Class<T> klasseType, K k) {
 		return Optional.ofNullable(entityManager.find(klasseType, k));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void update(T t) {
 		doTransaction(entityManager -> entityManager.merge(t));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void delete(K k) {
 		doTransaction(entityManager -> entityManager.remove(k));
 	}

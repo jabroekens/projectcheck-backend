@@ -2,7 +2,7 @@ package nl.han.oose.buizerd.projectcheck_backend.exception;
 
 import javax.validation.constraints.NotNull;
 
-/*
+/**
  * Geeft aan dat een kamer niet is gevonden.
  */
 public class KamerNietGevondenException extends IllegalArgumentException {

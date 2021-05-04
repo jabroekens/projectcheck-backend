@@ -23,7 +23,7 @@ public interface Repository<T, K> {
 	 * Haal een instantie van {@code T} op met de identifier {@code k}.
 	 *
 	 * @param k De identifier van de op te halen instantie.
-	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional<T>}.
+	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional}.
 	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#read(Class, Object)
 	 */
 	Optional<T> get(@NotNull K k);

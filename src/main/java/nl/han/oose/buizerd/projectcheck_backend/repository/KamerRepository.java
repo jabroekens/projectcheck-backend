@@ -65,21 +65,33 @@ public class KamerRepository implements Repository<Kamer, String> {
 		throw new KamerNietGevondenException(kamerCode);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void add(Kamer kamer) {
 		kamerDAO.create(kamer);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Optional<Kamer> get(String kamerCode) {
 		return kamerDAO.read(Kamer.class, kamerCode);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void update(Kamer kamer) {
 		kamerDAO.update(kamer);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void remove(String kamerCode) {
 		kamerDAO.delete(kamerCode);

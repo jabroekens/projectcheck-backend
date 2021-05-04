@@ -23,6 +23,9 @@ public class AppService extends Application {
 	// TODO KamerService injectable maken
 	private final KamerService kamerService;
 
+	/**
+	 * Construeert een {@link AppService}.
+	 */
 	public AppService() {
 		kamerService = new KamerService(kamerRepository);
 		kamerService.start();

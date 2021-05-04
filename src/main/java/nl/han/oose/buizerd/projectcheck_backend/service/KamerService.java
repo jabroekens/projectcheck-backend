@@ -101,6 +101,9 @@ public class KamerService extends WebSocketServer {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake) {
 		String kamerCode = URI.create(conn.getResourceDescriptor()).getPath().replace("/projectcheck-backend-0.0.1/kamer/", "");
@@ -113,21 +116,33 @@ public class KamerService extends WebSocketServer {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onMessage(WebSocket conn, String message) {
 		delegeer(conn, message);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onError(WebSocket conn, Exception ex) {
 		ex.printStackTrace();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onStart() {
 

@@ -62,6 +62,9 @@ public class DeelnemerId implements Serializable {
 		return kamerCode;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -74,6 +77,9 @@ public class DeelnemerId implements Serializable {
 		return deelnemerId.equals(that.deelnemerId) && kamerCode.equals(that.kamerCode);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		return Objects.hash(deelnemerId, kamerCode);
