@@ -46,11 +46,11 @@ public class Deelnemer {
 	/**
 	 * Construeert een {@link Deelnemer}.
 	 *
-	 * @param kamer De {@link Kamer} waaraan de deelnemer deelneemt.
+	 * @param deelnemerId De {@link DeelnemerId} die de deelnemer identificeert.
 	 * @param naam De naam van de deelnemer.
 	 */
-	public Deelnemer(@NotNull Kamer kamer, @NotNull String naam) {
-		this.deelnemerId = new DeelnemerId(kamer);
+	public Deelnemer(@NotNull DeelnemerId deelnemerId, @NotNull String naam) {
+		this.deelnemerId = deelnemerId;
 		this.naam = naam;
 	}
 

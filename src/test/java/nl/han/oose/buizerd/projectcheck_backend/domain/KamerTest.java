@@ -17,9 +17,9 @@ public class KamerTest {
 
 	@Test
 	void genereertUniekeCode() {
-		try (MockedStatic<Kamer> mock = Mockito.mockStatic(Kamer.class)) {
-			mock.when(Kamer::genereerCode).thenReturn("123456");
-			Assertions.assertEquals(Kamer.genereerCode(), "123456");
+		try (MockedStatic<Kamer> kamer = Mockito.mockStatic(Kamer.class)) {
+			kamer.when(Kamer::genereerCode).thenReturn("123456");
+			Assertions.assertEquals("123456", Kamer.genereerCode());
 		}
 	}
 
@@ -27,12 +27,17 @@ public class KamerTest {
 	void zetJuisteBegeleider() {
 		Begeleider begeleider = Mockito.mock(
 			Begeleider.class,
-			Mockito.withSettings().useConstructor(kamer, "Joost")
+			Mockito.withSettings().useConstructor(
+				Mockito.mock(
+					DeelnemerId.class, Mockito.withSettings().useConstructor(kamer)
+				),
+				"Joost"
+			)
 		);
 
 		Assertions.assertNull(kamer.getBegeleider());
 		kamer.setBegeleider(begeleider);
-		Assertions.assertEquals(kamer.getBegeleider(), begeleider);
+		Assertions.assertEquals(begeleider, kamer.getBegeleider());
 	}
 
 	@Test
@@ -40,7 +45,12 @@ public class KamerTest {
 		Assertions.assertEquals(0, kamer.getAantalDeelnemers());
 		Begeleider begeleider = Mockito.mock(
 			Begeleider.class,
-			Mockito.withSettings().useConstructor(kamer, "Joost")
+			Mockito.withSettings().useConstructor(
+				Mockito.mock(
+					DeelnemerId.class, Mockito.withSettings().useConstructor(kamer)
+				),
+				"Joost"
+			)
 		);
 
 		kamer.setBegeleider(begeleider);

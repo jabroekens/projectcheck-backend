@@ -41,21 +41,11 @@ public class KamerRepository implements Repository<Kamer, String> {
 		Kamer kamer = new Kamer();
 		add(kamer);
 
-		Begeleider begeleider = new Begeleider(kamer, begeleiderNaam);
+		Begeleider begeleider = new Begeleider(new DeelnemerId(kamer), begeleiderNaam);
 		begeleiderDAO.create(begeleider);
 
 		kamer.setBegeleider(begeleider);
 		return kamer;
-	}
-
-	@Override
-	public void add(Kamer kamer) {
-		kamerDAO.create(kamer);
-	}
-
-	@Override
-	public Optional<Kamer> get(String kamerCode) {
-		return kamerDAO.read(Kamer.class, kamerCode);
 	}
 
 	/**
@@ -73,6 +63,16 @@ public class KamerRepository implements Repository<Kamer, String> {
 		}
 
 		throw new KamerNietGevondenException(kamerCode);
+	}
+
+	@Override
+	public void add(Kamer kamer) {
+		kamerDAO.create(kamer);
+	}
+
+	@Override
+	public Optional<Kamer> get(String kamerCode) {
+		return kamerDAO.read(Kamer.class, kamerCode);
 	}
 
 	@Override

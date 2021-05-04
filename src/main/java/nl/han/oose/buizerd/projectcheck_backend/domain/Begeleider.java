@@ -20,12 +20,12 @@ public class Begeleider extends Deelnemer {
 	/**
 	 * Construeert een {@link Begeleider}.
 	 *
-	 * @param kamer De {@link Kamer} die de begeleider begeleidt.
+	 * @param deelnemerId De {@link DeelnemerId} die de begeleider identificeerd.
 	 * @param naam De naam van de begeleider.
 	 * @see nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer
 	 */
-	public Begeleider(@NotNull Kamer kamer, @NotNull String naam) {
-		super(kamer, naam);
+	public Begeleider(@NotNull DeelnemerId deelnemerId, @NotNull String naam) {
+		super(deelnemerId, naam);
 	}
 
 }
