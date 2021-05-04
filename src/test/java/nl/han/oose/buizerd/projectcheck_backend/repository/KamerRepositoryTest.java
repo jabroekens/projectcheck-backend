@@ -4,6 +4,7 @@ import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,15 +36,36 @@ public class KamerRepositoryTest {
 		kamerRepository = new KamerRepository(kamerDAO, begeleiderDAO);
 	}
 
-	/*
-	 * FIXME kan niet getest worden
-	 *  * Omdat binnen `maakKamer()` `new Kamer()` wordt aangeroepen, is
-	 *    dit niet te testen. Dit geeft aan dat de code waarschijnlijk
-	 *    verbeterd kan worden. Code moet sowieso herschreven worden
-	 *    zodat dit getest kan worden.
-	 */
 	@Test
 	void maaktKamer() {
+		String begeleiderNaam = "Joost";
+
+		Begeleider begeleider = Mockito.mock(
+			Begeleider.class,
+			Mockito.withSettings().useConstructor(
+				Mockito.mock(
+					DeelnemerId.class,
+					Mockito.withSettings().useConstructor(
+						Mockito.mock(Kamer.class)
+					)
+				),
+				begeleiderNaam
+			)
+		);
+
+		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
+
+		Assertions.assertNotNull(kamer);
+		Assertions.assertNotNull(kamer.getBegeleider());
+
+		/*
+		 * Omdat we niet een Begeleider kunnen mocken met dezelfde kamercode,
+		 * moeten we de begeleider van de kamer zelf gebruiken.
+		 */
+		Mockito.verify(begeleiderDAO).create(kamer.getBegeleider());
+
+		Assertions.assertEquals(begeleiderNaam, kamer.getBegeleider().getNaam());
+		Assertions.assertEquals(kamer.getKamerCode(), kamer.getBegeleider().getDeelnemerId().getKamerCode());
 	}
 
 	void voegtKamerToe() {

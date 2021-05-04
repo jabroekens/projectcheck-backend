@@ -15,6 +15,11 @@ public class KamerTest {
 		kamer = new Kamer();
 	}
 
+	/*
+	 * XXX Misschien een package-private setter voor een eigen code generator?
+	 *  * Dit maakt het ook mogelijk de uitkomst van `KamerRepository#maakKamer(String)`
+	 *    voorspelbaar te maken (zie comment bij KamerRepositoryTest)
+	 */
 	@Test
 	void genereertUniekeCode() {
 		try (MockedStatic<Kamer> kamer = Mockito.mockStatic(Kamer.class)) {
