@@ -106,7 +106,7 @@ public class Kamer {
 	 * @return Het aantal deelnemers (incl. begeleider).
 	 */
 	int getAantalDeelnemers() {
-		return deelnemers.size();
+		return (begeleider == null ? 0 : 1) + deelnemers.size();
 	}
 
 }
