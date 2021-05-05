@@ -44,10 +44,6 @@ public class KamerRepositoryTest {
 		Assertions.assertNotNull(kamer);
 		Assertions.assertNotNull(kamer.getBegeleider());
 
-		/*
-		 * Omdat we niet een Begeleider kunnen mocken met dezelfde kamercode,
-		 * moeten we de begeleider van de kamer zelf gebruiken.
-		 */
 		Mockito.verify(begeleiderDAO).create(kamer.getBegeleider());
 		Assertions.assertAll(
 			() -> Assertions.assertEquals(begeleiderNaam, kamer.getBegeleider().getNaam()),
@@ -55,8 +51,7 @@ public class KamerRepositoryTest {
 		);
 	}
 
-	void voegtToe() {
-		Kamer kamer = Mockito.mock(Kamer.class);
+	void voegtToe(@Mock Kamer kamer) {
 		kamerRepository.add(kamer);
 		Mockito.verify(kamerDAO).create(kamer);
 	}
@@ -67,8 +62,7 @@ public class KamerRepositoryTest {
 		Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
 	}
 
-	void updatet() {
-		Kamer kamer = Mockito.mock(Kamer.class);
+	void updatet(@Mock Kamer kamer) {
 		kamerRepository.update(kamer);
 		Mockito.verify(kamerDAO).update(kamer);
 	}

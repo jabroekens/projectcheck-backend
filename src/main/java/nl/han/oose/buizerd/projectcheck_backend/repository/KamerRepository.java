@@ -37,14 +37,14 @@ public class KamerRepository implements Repository<Kamer, String> {
 	 * @return De aangemaakte {@link Kamer}.
 	 */
 	public Kamer maakKamer(@NotNull String begeleiderNaam) {
-		Kamer kamer = new Kamer();
-		add(kamer);
+		String kamerCode = Kamer.genereerCode();
 
-		// De begeleider heeft altijd deelnemerId `1`.
-		Begeleider begeleider = new Begeleider(new DeelnemerId(1L, kamer.getKamerCode()), begeleiderNaam);
+		Begeleider begeleider = new Begeleider(new DeelnemerId(1L, kamerCode), begeleiderNaam);
 		begeleiderDAO.create(begeleider);
 
-		kamer.setBegeleider(begeleider);
+		Kamer kamer = new Kamer(kamerCode, begeleider);
+		add(kamer);
+
 		return kamer;
 	}
 

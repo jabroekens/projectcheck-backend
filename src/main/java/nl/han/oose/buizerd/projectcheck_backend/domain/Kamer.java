@@ -32,8 +32,7 @@ public class Kamer {
 	 * @return Een unieke code.
 	 * @see java.util.concurrent.ThreadLocalRandom#nextInt(int)
 	 */
-	// package-private zodat het getest kan worden.
-	static String genereerCode() {
+	public static String genereerCode() {
 		return String.valueOf(ThreadLocalRandom.current().nextInt(KAMER_CODE_MAX + 1));
 	}
 
@@ -69,20 +68,42 @@ public class Kamer {
 	private Set<Deelnemer> deelnemers;
 
 	/**
-	 * Construeert een {@link Kamer} met een automatisch gegenereerde unieke code.
+	 * Construeert een {@link Kamer}.
+	 * <p>
+	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
 	 */
-	public Kamer() {
-		this(Kamer.genereerCode(), LocalDateTime.now(), new HashSet<>());
+	protected Kamer() {
+	}
+
+	/**
+	 * Construeert een {@link Kamer} onder begeleiding van een {@link Begeleider}.
+	 *
+	 * @param kamerCode De code van de kamer.
+	 * @param begeleider De begeleider die de kamer begeleidt.
+	 */
+	public Kamer(@NotNull String kamerCode, @NotNull Begeleider begeleider) {
+		this(kamerCode, LocalDateTime.now(), begeleider, new HashSet<>());
 	}
 
 	/**
 	 * Construeert een {@link Kamer} met een specifieke kamercode, datum, en set van deelnemers.
 	 * <p>
 	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
+	 *
+	 * @param kamerCode De code van de kamer.
+	 * @param datum De datum waarop de kamer gemaakt is.
+	 * @param begeleider De begeleider van de kamer.
+	 * @param deelnemers Een set van deelnemers van de kamer.
 	 */
-	Kamer(@NotNull String kamerCode, @NotNull LocalDateTime datum, @NotNull Set<Deelnemer> deelnemers) {
+	Kamer(
+		@NotNull String kamerCode,
+		@NotNull LocalDateTime datum,
+		@NotNull Begeleider begeleider,
+		@NotNull Set<Deelnemer> deelnemers
+	) {
 		this.kamerCode = kamerCode;
 		this.datum = datum;
+		this.begeleider = begeleider;
 		this.deelnemers = deelnemers;
 	}
 
@@ -111,15 +132,6 @@ public class Kamer {
 	 */
 	public Begeleider getBegeleider() {
 		return begeleider;
-	}
-
-	/**
-	 * Zet de begeleider van de kamer.
-	 *
-	 * @param begeleider De {@link Begeleider} van de kamer.
-	 */
-	public void setBegeleider(@NotNull Begeleider begeleider) {
-		this.begeleider = begeleider;
 	}
 
 	/**

@@ -1,24 +1,33 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 public class KamerTest {
 
 	private static final String KAMER_CODE = "123456";
-	private static final LocalDateTime DATUM = LocalDateTime.now();
-	private static final Set<Deelnemer> DEELNEMERS = new HashSet<>();
+
+	@Mock
+	private LocalDateTime datum;
+
+	@Mock
+	private Begeleider begeleider;
+
+	@Mock
+	private Set<Deelnemer> deelnemers;
 
 	private Kamer kamer;
 
 	@BeforeEach
 	void init() {
-		kamer = new Kamer(KamerTest.KAMER_CODE, KamerTest.DATUM, KamerTest.DEELNEMERS);
+		kamer = new Kamer(KamerTest.KAMER_CODE, datum, begeleider, deelnemers);
 	}
 
 	@Test
@@ -28,27 +37,25 @@ public class KamerTest {
 
 	@Test
 	void geeftJuisteDatum() {
-		Assertions.assertEquals(KamerTest.DATUM, kamer.getDatum());
+		Assertions.assertEquals(datum, kamer.getDatum());
 	}
 
 	@Test
-	void zetEnGeeftJuisteBegeleider() {
-		Begeleider begeleider = Mockito.mock(
-			Begeleider.class,
-			Mockito.withSettings().useConstructor(
-				Mockito.mock(DeelnemerId.class, Mockito.withSettings().useConstructor(1L, kamer.getKamerCode())),
-				"Joost"
-			)
-		);
-
-		Assertions.assertNull(kamer.getBegeleider());
-		kamer.setBegeleider(begeleider);
+	void geeftJuisteBegeleider() {
 		Assertions.assertEquals(begeleider, kamer.getBegeleider());
 	}
 
 	@Test
 	void geeftJuisteDeelnemers() {
-		Assertions.assertEquals(KamerTest.DEELNEMERS, kamer.getDeelnemers());
+		/*
+		 * Omdat `Kamer#getDeelnemers()` een UnmodifiableSet teruggeeft
+		 * (wat in werkelijkheid een UnmodifiableCollection is), en die
+		 * niet een eigen `equals` methode implementeert, moeten
+		 * `expected` en `actual` omgedraaid worden.
+		 *
+		 * Zie: https://stackoverflow.com/a/31733658
+		 */
+		Assertions.assertEquals(kamer.getDeelnemers(), deelnemers);
 		Assertions.assertAll(
 			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getDeelnemers().add(null)),
 			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getDeelnemers().remove(null))
