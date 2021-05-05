@@ -36,7 +36,7 @@ public class DeelnemerId implements Serializable {
 	 * <p>
 	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
 	 */
-	protected DeelnemerId() {
+	public DeelnemerId() {
 	}
 
 	/**

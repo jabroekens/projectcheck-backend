@@ -72,7 +72,7 @@ public class Kamer {
 	 * <p>
 	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
 	 */
-	protected Kamer() {
+	public Kamer() {
 	}
 
 	/**
