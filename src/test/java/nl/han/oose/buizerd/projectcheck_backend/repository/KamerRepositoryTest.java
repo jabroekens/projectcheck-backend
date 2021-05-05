@@ -1,9 +1,11 @@
 package nl.han.oose.buizerd.projectcheck_backend.repository;
 
+import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.exception.KamerNietGevondenException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,25 +70,38 @@ public class KamerRepositoryTest {
 		Assertions.assertEquals(kamer.getKamerCode(), kamer.getBegeleider().getDeelnemerId().getKamerCode());
 	}
 
-	void voegtKamerToe() {
+	@Test
+	void geeftKamer() {
+		Assertions.assertDoesNotThrow(() -> {
+			Kamer kamer = Mockito.mock(Kamer.class);
+			Mockito.when(kamerDAO.read(Kamer.class, kamer.getKamerCode())).thenReturn(Optional.of(kamer));
+
+			kamerRepository.add(kamer);
+			kamerRepository.getKamer(kamer.getKamerCode());
+		});
+
+		Assertions.assertThrows(KamerNietGevondenException.class, () -> kamerRepository.getKamer(""));
+	}
+
+	void voegtToe() {
 		Kamer kamer = Mockito.mock(Kamer.class);
 		kamerRepository.add(kamer);
 		Mockito.verify(kamerDAO).create(kamer);
 	}
 
-	void geeftKamer() {
+	void geeft() {
 		String kamerCode = "123456";
 		kamerRepository.get(kamerCode);
 		Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
 	}
 
-	void updatetKamer() {
+	void updatet() {
 		Kamer kamer = Mockito.mock(Kamer.class);
 		kamerRepository.update(kamer);
 		Mockito.verify(kamerDAO).update(kamer);
 	}
 
-	void verwijdertKamer() {
+	void verwijdert() {
 		String kamerCode = "123456";
 		kamerRepository.remove(kamerCode);
 		Mockito.verify(kamerDAO).delete(kamerCode);

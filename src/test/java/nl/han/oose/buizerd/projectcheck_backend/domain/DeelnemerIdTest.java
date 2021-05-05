@@ -3,17 +3,15 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 public class DeelnemerIdTest {
 
-	private String kamerCode;
+	private Kamer kamer;
 	private DeelnemerId deelnemerId;
 
 	@BeforeEach
 	void init() {
-		Kamer kamer = Mockito.mock(Kamer.class);
-		kamerCode = kamer.getKamerCode();
+		kamer = new Kamer();
 		deelnemerId = new DeelnemerId(kamer);
 	}
 
@@ -24,7 +22,29 @@ public class DeelnemerIdTest {
 
 	@Test
 	void geeftJuisteKamerCode() {
-		Assertions.assertEquals(kamerCode, deelnemerId.getKamerCode());
+		Assertions.assertEquals(kamer.getKamerCode(), deelnemerId.getKamerCode());
+	}
+
+	@Test
+	void isGelijkAanGelijkwaardigeInstantie() {
+		Assertions.assertEquals(deelnemerId, deelnemerId);
+		Assertions.assertNotEquals(null, deelnemerId);
+		Assertions.assertNotEquals(new Object(), deelnemerId);
+
+		DeelnemerId equal = new DeelnemerId(kamer);
+		Assertions.assertEquals(equal, deelnemerId);
+
+		DeelnemerId unequalId = new DeelnemerId(2L, kamer.getKamerCode());
+		Assertions.assertNotEquals(unequalId, deelnemerId);
+
+		DeelnemerId unequalKamerCode = new DeelnemerId(deelnemerId.getDeelnemerId(), "");
+		Assertions.assertNotEquals(unequalKamerCode, deelnemerId);
+	}
+
+	@Test
+	void genereertDezelfdeHashCode() {
+		DeelnemerId equal = new DeelnemerId(kamer);
+		Assertions.assertEquals(equal.hashCode(), deelnemerId.hashCode());
 	}
 
 }

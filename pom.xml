@@ -109,10 +109,16 @@
 							<configuration>
 								<rules>
 									<rule>
-										<element>BUNDLE</element>
+										<excludes>
+											<exclude>**.dao.*</exclude>
+											<exclude>**.event.Event.EventType</exclude>
+											<exclude>**.exception.*</exclude>
+											<exclude>**.service.*</exclude>
+										</excludes>
+										<element>CLASS</element>
 										<limits>
 											<limit>
-												<counter>LINE</counter>
+												<counter>BRANCH</counter>
 												<value>COVEREDRATIO</value>
 												<minimum>0.8</minimum>
 											</limit>
