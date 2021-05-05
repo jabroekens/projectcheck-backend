@@ -14,9 +14,7 @@ public class DeelnemerTest {
 	void init() {
 		deelnemerId = Mockito.mock(
 			DeelnemerId.class,
-			Mockito.withSettings().useConstructor(
-				Mockito.mock(Kamer.class)
-			)
+			Mockito.withSettings().useConstructor(2L, "123456")
 		);
 
 		deelnemer = new Deelnemer(deelnemerId, "Joost");

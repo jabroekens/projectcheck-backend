@@ -1,11 +1,9 @@
 package nl.han.oose.buizerd.projectcheck_backend.repository;
 
-import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import nl.han.oose.buizerd.projectcheck_backend.exception.KamerNietGevondenException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,22 +37,8 @@ public class KamerRepositoryTest {
 	}
 
 	@Test
-	void maaktKamer() {
+	void maaktKamerMetBegeleider() {
 		String begeleiderNaam = "Joost";
-
-		Begeleider begeleider = Mockito.mock(
-			Begeleider.class,
-			Mockito.withSettings().useConstructor(
-				Mockito.mock(
-					DeelnemerId.class,
-					Mockito.withSettings().useConstructor(
-						Mockito.mock(Kamer.class)
-					)
-				),
-				begeleiderNaam
-			)
-		);
-
 		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
 
 		Assertions.assertNotNull(kamer);
@@ -65,22 +49,10 @@ public class KamerRepositoryTest {
 		 * moeten we de begeleider van de kamer zelf gebruiken.
 		 */
 		Mockito.verify(begeleiderDAO).create(kamer.getBegeleider());
-
-		Assertions.assertEquals(begeleiderNaam, kamer.getBegeleider().getNaam());
-		Assertions.assertEquals(kamer.getKamerCode(), kamer.getBegeleider().getDeelnemerId().getKamerCode());
-	}
-
-	@Test
-	void geeftKamer() {
-		Assertions.assertDoesNotThrow(() -> {
-			Kamer kamer = Mockito.mock(Kamer.class);
-			Mockito.when(kamerDAO.read(Kamer.class, kamer.getKamerCode())).thenReturn(Optional.of(kamer));
-
-			kamerRepository.add(kamer);
-			kamerRepository.getKamer(kamer.getKamerCode());
-		});
-
-		Assertions.assertThrows(KamerNietGevondenException.class, () -> kamerRepository.getKamer(""));
+		Assertions.assertAll(
+			() -> Assertions.assertEquals(begeleiderNaam, kamer.getBegeleider().getNaam()),
+			() -> Assertions.assertEquals(kamer.getKamerCode(), kamer.getBegeleider().getDeelnemerId().getKamerCode())
+		);
 	}
 
 	void voegtToe() {

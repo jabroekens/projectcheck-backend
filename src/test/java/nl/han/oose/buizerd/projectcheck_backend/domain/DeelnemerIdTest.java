@@ -6,44 +6,50 @@ import org.junit.jupiter.api.Test;
 
 public class DeelnemerIdTest {
 
-	private Kamer kamer;
+	private static final Long DEELNEMER_ID = 2L;
+	private static final String KAMER_CODE = "123456";
+
 	private DeelnemerId deelnemerId;
 
 	@BeforeEach
 	void init() {
-		kamer = new Kamer();
-		deelnemerId = new DeelnemerId(kamer);
+		deelnemerId = new DeelnemerId(DeelnemerIdTest.DEELNEMER_ID, DeelnemerIdTest.KAMER_CODE);
 	}
 
 	@Test
 	void geeftJuisteDeelnemerId() {
-		Assertions.assertEquals(1L, deelnemerId.getDeelnemerId());
+		Assertions.assertEquals(DeelnemerIdTest.DEELNEMER_ID, deelnemerId.getDeelnemerId());
 	}
 
 	@Test
 	void geeftJuisteKamerCode() {
-		Assertions.assertEquals(kamer.getKamerCode(), deelnemerId.getKamerCode());
+		Assertions.assertEquals(DeelnemerIdTest.KAMER_CODE, deelnemerId.getKamerCode());
 	}
 
 	@Test
-	void isGelijkAanGelijkwaardigeInstantie() {
-		Assertions.assertEquals(deelnemerId, deelnemerId);
-		Assertions.assertNotEquals(null, deelnemerId);
-		Assertions.assertNotEquals(new Object(), deelnemerId);
-
-		DeelnemerId equal = new DeelnemerId(kamer);
-		Assertions.assertEquals(equal, deelnemerId);
-
-		DeelnemerId unequalId = new DeelnemerId(2L, kamer.getKamerCode());
-		Assertions.assertNotEquals(unequalId, deelnemerId);
-
-		DeelnemerId unequalKamerCode = new DeelnemerId(deelnemerId.getDeelnemerId(), "");
-		Assertions.assertNotEquals(unequalKamerCode, deelnemerId);
+	void implementeertEqualsCorrect() {
+		Assertions.assertAll(
+			() -> Assertions.assertEquals(deelnemerId, deelnemerId),
+			() -> Assertions.assertNotEquals(null, deelnemerId),
+			() -> Assertions.assertNotEquals(new Object(), deelnemerId),
+			() -> {
+				DeelnemerId equal = new DeelnemerId(deelnemerId.getDeelnemerId(), deelnemerId.getKamerCode());
+				Assertions.assertEquals(equal, deelnemerId);
+			},
+			() -> {
+				DeelnemerId unequalId = new DeelnemerId(deelnemerId.getDeelnemerId() + 1L, deelnemerId.getKamerCode());
+				Assertions.assertNotEquals(unequalId, deelnemerId);
+			},
+			() -> {
+				DeelnemerId unequalKamerCode = new DeelnemerId(deelnemerId.getDeelnemerId(), deelnemerId.getKamerCode() + " ");
+				Assertions.assertNotEquals(unequalKamerCode, deelnemerId);
+			}
+		);
 	}
 
 	@Test
-	void genereertDezelfdeHashCode() {
-		DeelnemerId equal = new DeelnemerId(kamer);
+	void implementeertHashCodeCorrect() {
+		DeelnemerId equal = new DeelnemerId(deelnemerId.getDeelnemerId(), deelnemerId.getKamerCode());
 		Assertions.assertEquals(equal.hashCode(), deelnemerId.hashCode());
 	}
 

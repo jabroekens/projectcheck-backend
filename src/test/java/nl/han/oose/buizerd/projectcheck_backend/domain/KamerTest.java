@@ -1,36 +1,42 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 public class KamerTest {
+
+	private static final String KAMER_CODE = "123456";
+	private static final LocalDateTime DATUM = LocalDateTime.now();
+	private static final Set<Deelnemer> DEELNEMERS = new HashSet<>();
 
 	private Kamer kamer;
 
 	@BeforeEach
 	void init() {
-		kamer = new Kamer();
+		kamer = new Kamer(KamerTest.KAMER_CODE, KamerTest.DATUM, KamerTest.DEELNEMERS);
 	}
 
 	@Test
-	void genereertUniekeCode() {
-		try (MockedStatic<Kamer> kamer = Mockito.mockStatic(Kamer.class)) {
-			kamer.when(Kamer::genereerCode).thenReturn("123456");
-			Assertions.assertEquals("123456", Kamer.genereerCode());
-		}
+	void geeftJuisteKamerCode() {
+		Assertions.assertEquals(KamerTest.KAMER_CODE, kamer.getKamerCode());
 	}
 
 	@Test
-	void zetJuisteBegeleider() {
+	void geeftJuisteDatum() {
+		Assertions.assertEquals(KamerTest.DATUM, kamer.getDatum());
+	}
+
+	@Test
+	void zetEnGeeftJuisteBegeleider() {
 		Begeleider begeleider = Mockito.mock(
 			Begeleider.class,
 			Mockito.withSettings().useConstructor(
-				Mockito.mock(
-					DeelnemerId.class, Mockito.withSettings().useConstructor(kamer)
-				),
+				Mockito.mock(DeelnemerId.class, Mockito.withSettings().useConstructor(1L, kamer.getKamerCode())),
 				"Joost"
 			)
 		);
@@ -41,20 +47,12 @@ public class KamerTest {
 	}
 
 	@Test
-	void geeftJuistAantalDeelnemers() {
-		Assertions.assertEquals(0, kamer.getAantalDeelnemers());
-		Begeleider begeleider = Mockito.mock(
-			Begeleider.class,
-			Mockito.withSettings().useConstructor(
-				Mockito.mock(
-					DeelnemerId.class, Mockito.withSettings().useConstructor(kamer)
-				),
-				"Joost"
-			)
+	void geeftJuisteDeelnemers() {
+		Assertions.assertEquals(KamerTest.DEELNEMERS, kamer.getDeelnemers());
+		Assertions.assertAll(
+			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getDeelnemers().add(null)),
+			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getDeelnemers().remove(null))
 		);
-
-		kamer.setBegeleider(begeleider);
-		Assertions.assertEquals(1, kamer.getAantalDeelnemers());
 	}
 
 }

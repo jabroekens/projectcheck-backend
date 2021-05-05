@@ -10,7 +10,7 @@ public class KamerNietGevondenException extends IllegalArgumentException {
 	/**
 	 * Construeert een {@link KamerNietGevondenException}.
 	 *
-	 * @param kamerCode De kamer code waarmee gezocht is.
+	 * @param kamerCode De kamercode waarmee gezocht is.
 	 */
 	public KamerNietGevondenException(@NotNull String kamerCode) {
 		super("Kamer met kamercode " + kamerCode + " is niet gevonden");

@@ -39,20 +39,13 @@ public class DeelnemerId implements Serializable {
 	protected DeelnemerId() {
 	}
 
-	public DeelnemerId(@NotNull Kamer kamer) {
-		this.deelnemerId = kamer.getAantalDeelnemers() + 1L;
-		this.kamerCode = kamer.getKamerCode();
-	}
-
 	/**
-	 * Construeert een {@link DeelnemerId} met een specifiek ID en kamer code.
-	 * <p>
-	 * <b>Deze constructor mag alleen gebruikt worden voor unit tests.</b>
+	 * Construeert een {@link DeelnemerId}.
 	 *
 	 * @param deelnemerId Het ID van de deelnemer.
 	 * @param kamerCode De code van de kamer.
 	 */
-	DeelnemerId(@NotNull Long deelnemerId, @NotNull String kamerCode) {
+	public DeelnemerId(@NotNull Long deelnemerId, @NotNull String kamerCode) {
 		this.deelnemerId = deelnemerId;
 		this.kamerCode = kamerCode;
 	}

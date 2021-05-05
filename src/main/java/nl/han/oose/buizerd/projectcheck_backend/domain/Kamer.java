@@ -1,6 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -67,10 +68,40 @@ public class Kamer {
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "kamer", orphanRemoval = true)
 	private Set<Deelnemer> deelnemers;
 
+	/**
+	 * Construeert een {@link Kamer} met een automatisch gegenereerde unieke code.
+	 */
 	public Kamer() {
-		this.kamerCode = Kamer.genereerCode();
-		this.datum = LocalDateTime.now();
-		this.deelnemers = new HashSet<>();
+		this(Kamer.genereerCode(), LocalDateTime.now(), new HashSet<>());
+	}
+
+	/**
+	 * Construeert een {@link Kamer} met een specifieke kamercode, datum, en set van deelnemers.
+	 * <p>
+	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
+	 */
+	Kamer(@NotNull String kamerCode, @NotNull LocalDateTime datum, @NotNull Set<Deelnemer> deelnemers) {
+		this.kamerCode = kamerCode;
+		this.datum = datum;
+		this.deelnemers = deelnemers;
+	}
+
+	/**
+	 * Haal de unieke code van de kamer op.
+	 *
+	 * @return De unieke code van de kamer.
+	 */
+	public String getKamerCode() {
+		return kamerCode;
+	}
+
+	/**
+	 * Haal de datum waarop de kamer is aangemaakt op.
+	 *
+	 * @return De datum waarop de kamer is aangemaakt.
+	 */
+	public LocalDateTime getDatum() {
+		return datum;
 	}
 
 	/**
@@ -92,21 +123,13 @@ public class Kamer {
 	}
 
 	/**
-	 * Haal de unieke code van de kamer op.
+	 * Haal een read-only kopie van de deelnemers van de kamer op.
 	 *
-	 * @return De unieke code van de kamer.
+	 * @return Een read-only kopie van de deelnemers van de kamer.
+	 * @see java.util.Collections#unmodifiableSet(Set)
 	 */
-	public String getKamerCode() {
-		return kamerCode;
-	}
-
-	/**
-	 * Haal het aantal deelnemers (incl. begeleider) van de kamer op.
-	 *
-	 * @return Het aantal deelnemers (incl. begeleider).
-	 */
-	int getAantalDeelnemers() {
-		return (begeleider == null ? 0 : 1) + deelnemers.size();
+	public Set<Deelnemer> getDeelnemers() {
+		return Collections.unmodifiableSet(deelnemers);
 	}
 
 }
