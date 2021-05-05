@@ -20,16 +20,8 @@ public class AppService extends Application {
 	@Inject
 	private KamerRepository kamerRepository;
 
-	// TODO KamerService injectable maken
-	private final KamerService kamerService;
-
-	/**
-	 * Construeert een {@link AppService}.
-	 */
-	public AppService() {
-		kamerService = new KamerService(kamerRepository);
-		kamerService.start();
-	}
+	@Inject
+	private KamerService kamerService;
 
 	/**
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
@@ -44,7 +36,7 @@ public class AppService extends Application {
 	public Response maakKamer(@FormParam("begeleiderNaam") @NotNull String begeleiderNaam) {
 		// FIXME foutafhandeling als begeleiderNaam leeg of null is
 		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
-		kamerService.registreer(kamer.getKamerCode());
+		KamerService.registreer(kamer.getKamerCode());
 
 		JsonObject json = new JsonObject();
 		json.addProperty("kamer_url", kamerService.getUrl(kamer.getKamerCode()));

@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import javax.validation.constraints.NotNull;
+import javax.websocket.Session;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
-import org.java_websocket.WebSocket;
 
 public abstract class Event {
 
@@ -37,13 +37,13 @@ public abstract class Event {
 		return context;
 	}
 
-	public void verwerkEvent(@NotNull KamerRepository kamerRepository, @NotNull Kamer kamer, WebSocket conn) {
+	public void verwerkEvent(@NotNull KamerRepository kamerRepository, @NotNull Kamer kamer, Session session) {
 		CompletableFuture
-			.runAsync(() -> voerUit(kamer, conn))
+			.runAsync(() -> voerUit(kamer, session))
 			.thenRunAsync(() -> verwerk(kamerRepository, kamer));
 	}
 
-	protected abstract void voerUit(@NotNull Kamer kamer, WebSocket conn);
+	protected abstract void voerUit(@NotNull Kamer kamer, Session session);
 
 	protected void verwerk(@NotNull KamerRepository kamerRepository, @NotNull Kamer kamer) {
 		// Doe niets

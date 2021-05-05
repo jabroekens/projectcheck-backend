@@ -1,10 +1,10 @@
 package nl.han.oose.buizerd.projectcheck_backend.service;
 
-import org.java_websocket.WebSocket;
+import javax.websocket.Session;
 
 @FunctionalInterface
 public interface WebSocketService {
 
-	void onMessage(WebSocket conn, String message);
+	void onMessage(Session session, String message);
 
 }
