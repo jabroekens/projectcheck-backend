@@ -20,37 +20,46 @@ deelnemers via bijvoorbeeld Zoom of Microsoft Teams bijeenkomen en hun bevinding
 4. Open het bestand `tomee.xml` in de `conf` folder van de TomEE-installatie
     1. Zorgt dat de volgende tekst tussen `<tomee>` en `</tomee>` staat:
         ```
-            <Resource id="ProjectCheckDb" type="DataSource">
-                JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
-                JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
-                UserName = backend
-                Password = 3jsdolD$aev9%xzAbRnA4FuBb
-            </Resource>
-            <Resource id="ProjectCheckDbUnmanaged" type="DataSource">
-                JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
-                JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
-                UserName = backend
-                Password = 3jsdolD$aev9%xzAbRnA4FuBb
-                JtaManaged = false
-            </Resource>
+        <Resource id="ProjectCheckDb" type="DataSource">
+            JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
+            JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
+            UserName = backend
+            Password = 3jsdolD$aev9%xzAbRnA4FuBb
+        </Resource>
+        <Resource id="ProjectCheckDbUnmanaged" type="DataSource">
+            JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
+            JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
+            UserName = backend
+            Password = 3jsdolD$aev9%xzAbRnA4FuBb
+            JtaManaged = false
+        </Resource>
         ```
     2. Sla het geopende bestand op
 5. Voer de volgende SQL-code voor SQL Server uit:
     ```
-        USE master;
-        GO
+    USE master;
+    GO
 
-        CREATE LOGIN backend WITH PASSWORD = '3jsdolD$aev9%xzAbRnA4FuBb';
-        CREATE DATABASE ProjectCheck;
-        GO
+    CREATE LOGIN backend WITH PASSWORD = '3jsdolD$aev9%xzAbRnA4FuBb';
+    CREATE DATABASE ProjectCheck;
+    GO
 
-        USE ProjectCheck;
-        GO
+    USE ProjectCheck;
+    GO
 
-        CREATE USER backend FROM LOGIN backend;
-        ALTER ROLE db_owner ADD MEMBER backend;
-        GO
+    CREATE USER backend FROM LOGIN backend;
+    ALTER ROLE db_owner ADD MEMBER backend;
+    GO
     ```
+
+### Opmerkingen
+De applicatie is ontwikkelt om met iedere JDBC-Compliant Database te kunnen communiceren.
+Het is dus mogelijk om bijvoorbeeld gebruik te maken van MySQL, indien dat gewenst is.
+
+Ook is het mogelijk, en zeer aangeraden, om in een productie-omgeving het wachtwoord (en wellicht
+ook de gebruiker) te veranderen. Het is mogelijk om achteraf een nieuwe gebruiker toe te voegen,
+of de in de bovenstaande instructies aangegeven gebruikersgegevens te wijzigen. Raadpleeg
+hiervoor de relevante documentatie van de gebruikte database.
 
 ## Opdrachtgevers
 - Antonie Reichling (<Antonie@reichling.nl>)
