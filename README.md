@@ -10,6 +10,48 @@ deelnemers via bijvoorbeeld Zoom of Microsoft Teams bijeenkomen en hun bevinding
 [![Code Smells](https://sonarqube.aimsites.nl/api/project_badges/measure?project=nl.han.oose.buizerd%3Aprojectcheck-backend&metric=code_smells)](https://sonarqube.aimsites.nl/dashboard?id=nl.han.oose.buizerd%3Aprojectcheck-backend)
 [![Bugs](https://sonarqube.aimsites.nl/api/project_badges/measure?project=nl.han.oose.buizerd%3Aprojectcheck-backend&metric=bugs)](https://sonarqube.aimsites.nl/dashboard?id=nl.han.oose.buizerd%3Aprojectcheck-backend)
 
+## Setup
+1. Download en installeer [SQL Server 2019 Express](https://go.microsoft.com/fwlink/?linkid=866658)
+2. Download en installeer [Apache TomEE 8.0.6 Plus](https://www.apache.org/dyn/closer.cgi/tomee/tomee-8.0.6/apache-tomee-8.0.6-plus.zip)
+3. Download [Microsoft JDBC Driver 9.2 for SQL Server](https://go.microsoft.com/fwlink/?linkid=2155948)
+    1. Pak het ZIP-bestand uit
+    2. Navigeer naar `sqljdbc_9.2\enu`
+    3. Kopieer `mssql-jdbc-9.2.1.jre11.jar` naar de `lib` folder van de TomEE-installatie
+4. Open het bestand `tomee.xml` in de `conf` folder van de TomEE-installatie
+    1. Zorgt dat de volgende tekst tussen `<tomee>` en `</tomee>` staat:
+        ```
+            <Resource id="ProjectCheckDb" type="DataSource">
+                JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
+                JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
+                UserName = backend
+                Password = 3jsdolD$aev9%xzAbRnA4FuBb
+            </Resource>
+            <Resource id="ProjectCheckDbUnmanaged" type="DataSource">
+                JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
+                JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
+                UserName = backend
+                Password = 3jsdolD$aev9%xzAbRnA4FuBb
+                JtaManaged = false
+            </Resource>
+        ```
+    2. Sla het geopende bestand op
+5. Voer de volgende SQL-code voor SQL Server uit:
+    ```
+        USE master;
+        GO
+
+        CREATE LOGIN backend WITH PASSWORD = '3jsdolD$aev9%xzAbRnA4FuBb';
+        CREATE DATABASE ProjectCheck;
+        GO
+
+        USE ProjectCheck;
+        GO
+
+        CREATE USER backend FROM LOGIN backend;
+        ALTER ROLE db_owner ADD MEMBER backend;
+        GO
+    ```
+
 ## Opdrachtgevers
 - Antonie Reichling (<Antonie@reichling.nl>)
 - Tineke Jacobs (<Tineke.Jacobs@han.nl>)
