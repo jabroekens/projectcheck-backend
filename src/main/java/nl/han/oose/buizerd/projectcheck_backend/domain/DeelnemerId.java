@@ -2,11 +2,13 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.validation.constraints.NotNull;
 
+/**
+ * De identifier van {@link Deelnemer}.
+ */
 @Embeddable
 public class DeelnemerId implements Serializable {
 
@@ -23,19 +25,31 @@ public class DeelnemerId implements Serializable {
 	 *
 	 * Zie: https://stackoverflow.com/a/9146987
 	 */
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(nullable = false, updatable = false)
 	private Long deelnemerId;
 
 	/**
 	 * De code van de {@link Kamer} waaraan de {@link Deelnemer} deelneemt.
 	 */
+	@Column(nullable = false, updatable = false)
 	private String kamerCode;
 
+	/**
+	 * Construeert een {@link DeelnemerId}.
+	 * <p>
+	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 */
 	public DeelnemerId() {
-		// Een lege constructor is vereist door JPA.
 	}
 
-	public DeelnemerId(@NotNull String kamerCode) {
+	/**
+	 * Construeert een {@link DeelnemerId}.
+	 *
+	 * @param deelnemerId Het ID van de deelnemer.
+	 * @param kamerCode De code van de kamer.
+	 */
+	public DeelnemerId(@NotNull Long deelnemerId, @NotNull String kamerCode) {
+		this.deelnemerId = deelnemerId;
 		this.kamerCode = kamerCode;
 	}
 
@@ -57,6 +71,9 @@ public class DeelnemerId implements Serializable {
 		return kamerCode;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -69,6 +86,9 @@ public class DeelnemerId implements Serializable {
 		return deelnemerId.equals(that.deelnemerId) && kamerCode.equals(that.kamerCode);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		return Objects.hash(deelnemerId, kamerCode);

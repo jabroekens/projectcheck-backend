@@ -1,9 +1,11 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,7 +16,9 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Een kamer is een uitvoering van De ProjectCheck waar deelnemers zich aan bij kunnen
- * sluiten doormiddel van een unieke code. Elke kamer wordt begeleid door een begeleider.
+ * sluiten doormiddel van een unieke code.
+ * <p>
+ * Elke kamer wordt begeleid door een begeleider.
  */
 @Entity
 public class Kamer {
@@ -23,10 +27,21 @@ public class Kamer {
 	private static final int KAMER_CODE_MAX = 999999;
 
 	/**
+	 * Genereert een unieke code.
+	 *
+	 * @return Een unieke code.
+	 * @see java.util.concurrent.ThreadLocalRandom#nextInt(int)
+	 */
+	public static String genereerCode() {
+		return String.valueOf(ThreadLocalRandom.current().nextInt(Kamer.KAMER_CODE_MAX + 1));
+	}
+
+	/**
 	 * De unieke code waarmee deelnemers kunnen deelnemen aan de kamer.
 	 * Een unieke code kan niet aangepast worden.
 	 */
 	@Id
+	@Column(updatable = false)
 	private String kamerCode;
 
 	/**
@@ -49,24 +64,65 @@ public class Kamer {
 	/**
 	 * De deelnemers van de kamer.
 	 */
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "kamer", orphanRemoval = true)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "kamer", orphanRemoval = true)
 	private Set<Deelnemer> deelnemers;
 
+	/**
+	 * Construeert een {@link Kamer}.
+	 * <p>
+	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 */
 	public Kamer() {
-		this.kamerCode = Kamer.genereerCode();
-		this.datum = LocalDateTime.now();
-		this.deelnemers = new HashSet<>();
 	}
 
 	/**
-	 * Genereert een unieke code.
+	 * Construeert een {@link Kamer} onder begeleiding van een {@link Begeleider}.
 	 *
-	 * @return Een unieke code.
-	 * @see java.util.concurrent.ThreadLocalRandom#nextInt(int)
+	 * @param kamerCode De code van de kamer.
+	 * @param begeleider De begeleider die de kamer begeleidt.
 	 */
-	// package-private zodat het getest kan worden.
-	static String genereerCode() {
-		return String.valueOf(ThreadLocalRandom.current().nextInt(KAMER_CODE_MAX + 1));
+	public Kamer(@NotNull String kamerCode, @NotNull Begeleider begeleider) {
+		this(kamerCode, LocalDateTime.now(), begeleider, new HashSet<>());
+	}
+
+	/**
+	 * Construeert een {@link Kamer} met een specifieke kamercode, datum, en set van deelnemers.
+	 * <p>
+	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
+	 *
+	 * @param kamerCode De code van de kamer.
+	 * @param datum De datum waarop de kamer gemaakt is.
+	 * @param begeleider De begeleider van de kamer.
+	 * @param deelnemers Een set van deelnemers van de kamer.
+	 */
+	Kamer(
+		@NotNull String kamerCode,
+		@NotNull LocalDateTime datum,
+		@NotNull Begeleider begeleider,
+		@NotNull Set<Deelnemer> deelnemers
+	) {
+		this.kamerCode = kamerCode;
+		this.datum = datum;
+		this.begeleider = begeleider;
+		this.deelnemers = deelnemers;
+	}
+
+	/**
+	 * Haal de unieke code van de kamer op.
+	 *
+	 * @return De unieke code van de kamer.
+	 */
+	public String getKamerCode() {
+		return kamerCode;
+	}
+
+	/**
+	 * Haal de datum waarop de kamer is aangemaakt op.
+	 *
+	 * @return De datum waarop de kamer is aangemaakt.
+	 */
+	public LocalDateTime getDatum() {
+		return datum;
 	}
 
 	/**
@@ -79,21 +135,13 @@ public class Kamer {
 	}
 
 	/**
-	 * Zet de begeleider van de kamer.
+	 * Haal een read-only kopie van de deelnemers van de kamer op.
 	 *
-	 * @param begeleider De {@link Begeleider} van de kamer.
+	 * @return Een read-only kopie van de deelnemers van de kamer.
+	 * @see java.util.Collections#unmodifiableSet(Set)
 	 */
-	public void setBegeleider(@NotNull Begeleider begeleider) {
-		this.begeleider = begeleider;
-	}
-
-	/**
-	 * Haal de unieke code van de kamer op.
-	 *
-	 * @return De unieke code van de kamer.
-	 */
-	public String getKamerCode() {
-		return kamerCode;
+	public Set<Deelnemer> getDeelnemers() {
+		return Collections.unmodifiableSet(deelnemers);
 	}
 
 }

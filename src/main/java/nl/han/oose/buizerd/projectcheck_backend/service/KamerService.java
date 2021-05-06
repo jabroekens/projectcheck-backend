@@ -1,78 +1,113 @@
 package nl.han.oose.buizerd.projectcheck_backend.service;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.core.Response;
+import javax.websocket.CloseReason;
+import javax.websocket.EndpointConfig;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.PathParam;
+import javax.websocket.server.ServerEndpoint;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.event.Event;
+import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
-import org.java_websocket.WebSocket;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
 
-public class KamerService extends WebSocketServer {
+@ServerEndpoint(
+	value = "/kamer/{kamerCode}",
+	decoders = {Event.Decoder.class},
+	encoders = {EventResponse.Encoder.class}
+)
+public class KamerService {
 
-	private final Kamer kamer;
+	private static final Set<String> geregistreerdeKamers;
 
-	private final Gson gson;
-	private final Map<String, WebSocketService> services;
+	static {
+		geregistreerdeKamers = new HashSet<>();
+	}
 
-	public KamerService(@NotNull KamerRepository kamerRepository, @NotNull Kamer kamer) {
-		this.kamer = kamer;
+	/**
+	 * Registreert een {@link Kamer} en stelt een WebSocket URL beschikbaar.
+	 *
+	 * @param kamerCode De code van een kamer.
+	 * @see KamerService#getUrl(String)
+	 */
+	public static void registreer(@NotNull String kamerCode) {
+		KamerService.geregistreerdeKamers.add(kamerCode);
+	}
 
-		this.gson = new Gson();
-		this.services = Collections.synchronizedMap(new HashMap<>());
+	@Context
+	private UriInfo uriInfo;
 
-		handle(kamer, (conn, message) -> {
+	@Inject
+	private KamerRepository kamerRepository;
+
+	/**
+	 * Haalt de WebSocket URL op voor de kamer met de code {@code kamerCode}.
+	 *
+	 * @param kamerCode De code van een kamer.
+	 * @return De WebSocket URL van de kamer.
+	 */
+	public String getUrl(@NotNull String kamerCode) {
+		// TODO Schema en pad dynamisch bepalen
+		return "ws://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamerCode;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@OnOpen
+	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") String kamerCode) {
+		if (!KamerService.geregistreerdeKamers.contains(kamerCode)) {
 			try {
-				 /*
-				  * FIXME vertaal message naar een soort event en voort dit uit
-				 *  * https://stackoverflow.com/a/15593399
-				 *  * https://github.com/google/gson/blob/master/UserGuide.md#serializing-and-deserializing-collection-with-objects-of-arbitrary-types
-				 */
-				// Event event = gson.fromJson(message, VolgendeRondeEvent.class);
-			} catch (JsonSyntaxException e) {
-				conn.send(gson.toJson(Response.status(Response.Status.BAD_REQUEST)));
+				// TODO CloseReason meegeven?
+				session.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		});
-	}
-
-	@Override
-	public void onOpen(WebSocket conn, ClientHandshake handshake) {
-		conn.setAttachment(kamer);
-	}
-
-	@Override
-	public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-
-	}
-
-	@Override
-	public void onMessage(WebSocket conn, String message) {
-		String path = URI.create(conn.getResourceDescriptor()).getPath().replace("/projectcheck-backend-0.0.1", "");
-		WebSocketService service = services.get(path);
-
-		if (service != null) {
-			service.onMessage(conn, message);
 		}
 	}
 
-	@Override
-	public void onError(WebSocket conn, Exception ex) {
-		ex.printStackTrace();
+	/**
+	 * {@inheritDoc}
+	 */
+	@OnClose
+	public void close(Session session, CloseReason closeReason, @PathParam("kamerCode") String kamerCode) {
+		// XXX Behandelen als iemand (onverwachts) een kamer verlaat, bijv.
 	}
 
-	@Override
-	public void onStart() {
+	/**
+	 * {@inheritDoc}
+	 */
+	@OnMessage
+	public EventResponse message(Event event, @PathParam("kamerCode") String kamerCode, Session session) {
+		String eventKamerCode = event.getDeelnemer().getKamerCode();
+		Optional<Kamer> kamer = kamerRepository.get(eventKamerCode);
 
+		if (kamer.isPresent()) {
+			event.voerUit(kamerRepository, kamer.get(), session);
+		} else {
+			return new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN);
+		}
+
+		return new EventResponse(EventResponse.Status.OK);
 	}
 
-	private void handle(@NotNull Kamer kamer, WebSocketService service) {
-		services.put("/kamer/" + kamer.getKamerCode(), service);
+	/**
+	 * {@inheritDoc}
+	 */
+	@OnError
+	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) {
+		error.printStackTrace();
 	}
 
 }

@@ -24,7 +24,7 @@ public interface DAO<T, K> {
 	 *
 	 * @param klasseType Het klassetype van {@link T}.
 	 * @param k De identifier van de op te halen instantie.
-	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional<T>}.
+	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional}.
 	 * @see javax.persistence.EntityManager#find(Class, Object)
 	 */
 	Optional<T> read(@NotNull Class<T> klasseType, @NotNull K k);
