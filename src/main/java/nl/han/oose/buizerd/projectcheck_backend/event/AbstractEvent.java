@@ -21,18 +21,18 @@ import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 // TODO Code splitsen in aparte bestanden? is dat beter/logischer?
 public abstract class AbstractEvent {
 
-	private static final EventDeserializer eventDeserializer;
-	private static final Gson gson;
+	private static final EventDeserializer EVENT_DESERIALIZER;
+	private static final Gson GSON;
 
 	static {
-		eventDeserializer = new EventDeserializer();
-		gson = new GsonBuilder().registerTypeAdapter(AbstractEvent.class, eventDeserializer).create();
+		EVENT_DESERIALIZER = new EventDeserializer();
+		GSON = new GsonBuilder().registerTypeAdapter(AbstractEvent.class, AbstractEvent.EVENT_DESERIALIZER).create();
 	}
 
 	protected static void registreerEvent(@NotNull Class<? extends AbstractEvent> eventKlasse) {
-		// TODO Klasse registreren (en naam van event bepalen) d.m.v @Event("<event_naam>")
-		// https://stackoverflow.com/a/2206432
-		eventDeserializer.registreerKlasse(eventKlasse.getSimpleName().toUpperCase(), eventKlasse);
+		// Verandert een klassenaam als "FooBarEvent" naar "FOO_BAR"
+		String eventNaam = eventKlasse.getSimpleName().replace("Event", "").replaceAll("(?<!^)(?=[A-Z])", "_").toUpperCase();
+		AbstractEvent.EVENT_DESERIALIZER.registreerKlasse(eventNaam, eventKlasse);
 	}
 
 	private DeelnemerId deelnemerId;
@@ -57,7 +57,7 @@ public abstract class AbstractEvent {
 
 		@Override
 		public AbstractEvent decode(String s) {
-			return gson.fromJson(s, AbstractEvent.class);
+			return AbstractEvent.GSON.fromJson(s, AbstractEvent.class);
 		}
 
 		@Override
