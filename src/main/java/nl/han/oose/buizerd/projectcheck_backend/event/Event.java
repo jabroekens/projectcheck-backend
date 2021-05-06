@@ -116,6 +116,7 @@ public abstract class Event {
 		 */
 		@Override
 		public void init(EndpointConfig config) {
+			// Wordt niet gebruikt
 		}
 
 		/**
@@ -123,6 +124,7 @@ public abstract class Event {
 		 */
 		@Override
 		public void destroy() {
+			// Wordt niet gebruikt
 		}
 
 	}

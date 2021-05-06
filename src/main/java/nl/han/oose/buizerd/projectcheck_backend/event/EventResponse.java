@@ -63,6 +63,7 @@ public class EventResponse implements Serializable {
 		 */
 		@Override
 		public void init(EndpointConfig config) {
+			// Wordt niet gebruikt
 		}
 
 		/**
@@ -70,6 +71,7 @@ public class EventResponse implements Serializable {
 		 */
 		@Override
 		public void destroy() {
+			// Wordt niet gebruikt
 		}
 
 	}
