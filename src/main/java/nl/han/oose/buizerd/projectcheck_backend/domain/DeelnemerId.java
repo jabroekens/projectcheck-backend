@@ -6,6 +6,9 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 
+/**
+ * De identifier van {@link Deelnemer}.
+ */
 @Embeddable
 public class DeelnemerId implements Serializable {
 

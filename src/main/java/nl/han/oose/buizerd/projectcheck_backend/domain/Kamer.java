@@ -33,7 +33,7 @@ public class Kamer {
 	 * @see java.util.concurrent.ThreadLocalRandom#nextInt(int)
 	 */
 	public static String genereerCode() {
-		return String.valueOf(ThreadLocalRandom.current().nextInt(KAMER_CODE_MAX + 1));
+		return String.valueOf(ThreadLocalRandom.current().nextInt(Kamer.KAMER_CODE_MAX + 1));
 	}
 
 	/**

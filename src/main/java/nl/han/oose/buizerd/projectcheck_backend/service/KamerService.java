@@ -18,13 +18,13 @@ import javax.websocket.server.ServerEndpoint;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import nl.han.oose.buizerd.projectcheck_backend.event.AbstractEvent;
+import nl.han.oose.buizerd.projectcheck_backend.event.Event;
 import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 
 @ServerEndpoint(
 	value = "/kamer/{kamerCode}",
-	decoders = {AbstractEvent.Decoder.class},
+	decoders = {Event.Decoder.class},
 	encoders = {EventResponse.Encoder.class}
 )
 public class KamerService {
@@ -62,6 +62,9 @@ public class KamerService {
 		return "ws://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamerCode;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@OnOpen
 	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") String kamerCode) {
 		if (!KamerService.geregistreerdeKamers.contains(kamerCode)) {
@@ -74,18 +77,24 @@ public class KamerService {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@OnClose
 	public void close(Session session, CloseReason closeReason, @PathParam("kamerCode") String kamerCode) {
 		// XXX Behandelen als iemand (onverwachts) een kamer verlaat, bijv.
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@OnMessage
-	public EventResponse message(AbstractEvent abstractEvent, @PathParam("kamerCode") String kamerCode, Session session) {
-		String eventKamerCode = abstractEvent.getDeelnemerId().getKamerCode();
+	public EventResponse message(Event event, @PathParam("kamerCode") String kamerCode, Session session) {
+		String eventKamerCode = event.getDeelnemer().getKamerCode();
 		Optional<Kamer> kamer = kamerRepository.get(eventKamerCode);
 
 		if (kamer.isPresent()) {
-			abstractEvent.verwerkEvent(kamerRepository, kamer.get(), session);
+			event.voerUit(kamerRepository, kamer.get(), session);
 		} else {
 			return new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN);
 		}
@@ -93,6 +102,9 @@ public class KamerService {
 		return new EventResponse(EventResponse.Status.OK);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@OnError
 	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) {
 		error.printStackTrace();

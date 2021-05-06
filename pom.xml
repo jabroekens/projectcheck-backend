@@ -102,8 +102,8 @@
 									<rule>
 										<excludes>
 											<exclude>**.dao.*</exclude>
-											<exclude>**.event.AbstractEvent</exclude>
-											<exclude>**.event.AbstractEvent.*</exclude>
+											<exclude>**.event.Event</exclude>
+											<exclude>**.event.Event.*</exclude>
 											<exclude>**.event.EventResponse</exclude>
 											<exclude>**.event.EventResponse.*</exclude>
 											<exclude>**.service.*</exclude>
