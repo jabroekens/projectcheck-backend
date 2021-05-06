@@ -27,14 +27,14 @@ public class AppService extends Application {
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
 	 *
 	 * @param begeleiderNaam De naam van de {@link Begeleider}.
-	 * @return Een JSON string met de WebSocket URL van de {@link WebSocketService} gewikkelt in {@link Response}.
+	 * @return Een JSON string met de WebSocket URL van de {@link Kamer} gewikkelt in {@link Response}.
 	 * @see KamerRepository#maakKamer(String)
 	 */
 	@Path("/kamer/nieuw")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response maakKamer(@FormParam("begeleiderNaam") @NotNull String begeleiderNaam) {
-		// FIXME foutafhandeling als begeleiderNaam leeg of null is
+		// FIXME Foutafhandeling als begeleiderNaam leeg of null is
 		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
 		KamerService.registreer(kamer.getKamerCode());
 

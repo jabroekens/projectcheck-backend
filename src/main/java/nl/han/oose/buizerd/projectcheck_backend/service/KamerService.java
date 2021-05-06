@@ -1,8 +1,9 @@
 package nl.han.oose.buizerd.projectcheck_backend.service;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.websocket.CloseReason;
@@ -17,15 +18,21 @@ import javax.websocket.server.ServerEndpoint;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.event.AbstractEvent;
+import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 
-@ServerEndpoint("/kamer/{kamerCode}")
+@ServerEndpoint(
+	value = "/kamer/{kamerCode}",
+	decoders = {AbstractEvent.Decoder.class},
+	encoders = {EventResponse.Encoder.class}
+)
 public class KamerService {
 
-	private static final Map<String, WebSocketService> services;
+	private static final Set<String> geregistreerdeKamers;
 
 	static {
-		services = new ConcurrentHashMap<>();
+		geregistreerdeKamers = new HashSet<>();
 	}
 
 	/**
@@ -35,36 +42,7 @@ public class KamerService {
 	 * @see KamerService#getUrl(String)
 	 */
 	public static void registreer(@NotNull String kamerCode) {
-		KamerService.services.put(kamerCode, (session, message) -> {
-			// try {
-			// 	/*
-			// 	 * FIXME vertaal message naar een soort event en voort dit uit
-			// 	 *  * https://stackoverflow.com/a/15593399
-			// 	 *  * https://github.com/google/gson/blob/master/UserGuide.md#serializing-and-deserializing-collection-with-objects-of-arbitrary-types
-			// 	 */
-			// 	Event event = Util.getGson().fromJson(message, Event.class);
-			//
-			// 	String eventKamerCode = event.getDeelnemerId().getKamerCode();
-			// 	Optional<Kamer> kamer = kamerRepository.get(eventKamerCode);
-			//
-			// 	if (kamer.isPresent()) {
-			// 		event.verwerkEvent(kamerRepository, kamer.get(), session);
-			// 	} else {
-			// 		// TODO betere foutafhandeling (misschien een klasse speciaal voor gebruikersvriendelijke foutmeldingen?)
-			// 		session.getBasicRemote().sendText(Util.getGson().toJson(new KamerNietGevondenException(eventKamerCode)));
-			// 	}
-			// } catch (JsonSyntaxException e) {
-			// 	session.getBasicRemote().sendText(Util.getGson().toJson(new InvalideWebSocketEventException()));
-			// }
-		});
-	}
-
-	private static void delegeer(String kamerCode, Session session, String message) throws IOException {
-		WebSocketService service = services.get(kamerCode);
-
-		if (service != null) {
-			service.onMessage(session, message);
-		}
+		KamerService.geregistreerdeKamers.add(kamerCode);
 	}
 
 	@Context
@@ -86,7 +64,7 @@ public class KamerService {
 
 	@OnOpen
 	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") String kamerCode) {
-		if (!KamerService.services.containsKey(kamerCode)) {
+		if (!KamerService.geregistreerdeKamers.contains(kamerCode)) {
 			try {
 				// TODO CloseReason meegeven?
 				session.close();
@@ -102,12 +80,17 @@ public class KamerService {
 	}
 
 	@OnMessage
-	public void message(String message, @PathParam("kamerCode") String kamerCode, Session session) {
-		try {
-			KamerService.delegeer(kamerCode, session, message);
-		} catch (IOException e) {
-			e.printStackTrace();
+	public EventResponse message(AbstractEvent abstractEvent, @PathParam("kamerCode") String kamerCode, Session session) {
+		String eventKamerCode = abstractEvent.getDeelnemerId().getKamerCode();
+		Optional<Kamer> kamer = kamerRepository.get(eventKamerCode);
+
+		if (kamer.isPresent()) {
+			abstractEvent.verwerkEvent(kamerRepository, kamer.get(), session);
+		} else {
+			return new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN);
 		}
+
+		return new EventResponse(EventResponse.Status.OK);
 	}
 
 	@OnError
