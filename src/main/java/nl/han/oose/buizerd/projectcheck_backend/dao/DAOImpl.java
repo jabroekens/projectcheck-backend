@@ -24,7 +24,7 @@ public class DAOImpl<T, K> implements DAO<T, K> {
 	 * {@inheritDoc}
 	 */
 	public void create(T t) {
-		doTransaction(entityManager -> entityManager.persist(t));
+		doTransaction(em -> em.persist(t));
 	}
 
 	/**
@@ -38,14 +38,14 @@ public class DAOImpl<T, K> implements DAO<T, K> {
 	 * {@inheritDoc}
 	 */
 	public void update(T t) {
-		doTransaction(entityManager -> entityManager.merge(t));
+		doTransaction(em -> em.merge(t));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public void delete(K k) {
-		doTransaction(entityManager -> entityManager.remove(k));
+		doTransaction(em -> em.remove(k));
 	}
 
 	private void doTransaction(Consumer<EntityManager> consumer) throws RuntimeException {
