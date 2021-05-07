@@ -59,7 +59,7 @@ public class KamerService {
 	 */
 	public String getUrl(@NotNull String kamerCode) {
 		// TODO Schema en pad dynamisch bepalen
-		return "ws://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamerCode;
+		return "wss://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamerCode;
 	}
 
 	/**

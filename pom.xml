@@ -13,7 +13,6 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>12</maven.compiler.source>
 		<maven.compiler.target>12</maven.compiler.target>
-		<failOnMissingWebXml>false</failOnMissingWebXml>
 	</properties>
 
 	<repositories>
