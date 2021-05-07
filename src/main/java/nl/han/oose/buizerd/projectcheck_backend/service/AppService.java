@@ -34,7 +34,7 @@ public class AppService extends Application {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response maakKamer(@FormParam("begeleiderNaam") @NotNull String begeleiderNaam) {
-		// FIXME Foutafhandeling als begeleiderNaam leeg of null is
+		// FIXME @Luka: begeleiderNaam valideren (`DeelnemerId#valideerNaam(String)`)
 		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
 		KamerService.registreer(kamer.getKamerCode());
 

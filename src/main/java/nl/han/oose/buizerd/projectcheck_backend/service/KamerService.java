@@ -90,9 +90,16 @@ public class KamerService {
 	 */
 	@OnMessage
 	public EventResponse message(Event event, @PathParam("kamerCode") String kamerCode, Session session) {
-		String eventKamerCode = event.getDeelnemer().getKamerCode();
-		Optional<Kamer> kamer = kamerRepository.get(eventKamerCode);
+		if (event.getDeelnemer() == null || event.getDeelnemer().getKamerCode() == null) {
+			return new EventResponse(EventResponse.Status.INVALIDE);
+		}
 
+		String eventKamerCode = event.getDeelnemer().getKamerCode();
+		if (!eventKamerCode.equals(kamerCode)) {
+			return new EventResponse(EventResponse.Status.VERBODEN);
+		}
+
+		Optional<Kamer> kamer = kamerRepository.get(eventKamerCode);
 		if (kamer.isPresent()) {
 			event.voerUit(kamerRepository, kamer.get(), session);
 		} else {
@@ -107,7 +114,9 @@ public class KamerService {
 	 */
 	@OnError
 	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) {
-		error.printStackTrace();
+		if (!(error instanceof IllegalArgumentException)) {
+			error.printStackTrace();
+		}
 	}
 
 }

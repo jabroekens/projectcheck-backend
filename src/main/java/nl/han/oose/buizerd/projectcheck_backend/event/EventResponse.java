@@ -40,7 +40,9 @@ public class EventResponse implements Serializable {
 	 */
 	public enum Status {
 		OK,
-		KAMER_NIET_GEVONDEN
+		VERBODEN,
+		INVALIDE,
+		KAMER_NIET_GEVONDEN,
 	}
 
 	/**
