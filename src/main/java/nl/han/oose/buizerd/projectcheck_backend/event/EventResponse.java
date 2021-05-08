@@ -2,6 +2,8 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import javax.validation.constraints.NotNull;
+import javax.validation.executable.ValidateOnExecution;
 import javax.websocket.EndpointConfig;
 import nl.han.oose.buizerd.projectcheck_backend.Util;
 
@@ -19,7 +21,8 @@ public class EventResponse implements Serializable {
 	 *
 	 * @param status De responsestatus.
 	 */
-	public EventResponse(EventResponse.Status status) {
+	@ValidateOnExecution
+	public EventResponse(@NotNull EventResponse.Status status) {
 		this(status, null);
 	}
 
@@ -29,7 +32,8 @@ public class EventResponse implements Serializable {
 	 * @param status De responsestatus.
 	 * @param context De context van de response.
 	 */
-	public EventResponse(EventResponse.Status status, String context) {
+	@ValidateOnExecution
+	public EventResponse(@NotNull EventResponse.Status status, String context) {
 		this.datum = LocalDateTime.now();
 		this.status = status;
 		this.context = context;

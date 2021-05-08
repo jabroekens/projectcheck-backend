@@ -12,7 +12,11 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.executable.ValidateOnExecution;
+import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
 /**
  * Een kamer is een uitvoering van De ProjectCheck waar deelnemers zich aan bij kunnen
@@ -24,7 +28,7 @@ import javax.validation.constraints.NotNull;
 public class Kamer {
 
 	// Wordt gebruikt voor het genereren van kamercodes
-	private static final int KAMER_CODE_MAX = 999999;
+	public static final int KAMER_CODE_MAX = 999999;
 
 	/**
 	 * Genereert een unieke code.
@@ -32,7 +36,8 @@ public class Kamer {
 	 * @return Een unieke code.
 	 * @see java.util.concurrent.ThreadLocalRandom#nextInt(int)
 	 */
-	public static String genereerCode() {
+	@ValidateOnExecution
+	public static @KamerCode String genereerCode() {
 		return String.valueOf(ThreadLocalRandom.current().nextInt(Kamer.KAMER_CODE_MAX + 1));
 	}
 
@@ -40,14 +45,17 @@ public class Kamer {
 	 * De unieke code waarmee deelnemers kunnen deelnemen aan de kamer.
 	 * Een unieke code kan niet aangepast worden.
 	 */
+	@KamerCode
 	@Id
-	@Column(updatable = false)
+	@Column(nullable = false, updatable = false)
 	private String kamerCode;
 
 	/**
 	 * De datum waarop de kamer is aangemaakt.
 	 * Een datum kan niet aangepast worden.
 	 */
+	@NotNull
+	@PastOrPresent
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime datum;
 
@@ -58,6 +66,8 @@ public class Kamer {
 	 * Het is niet nodig om dit bij te houden bij Spel in de datastore,
 	 * maar het is wel nodig in de klasse Spel.
 	 */
+	@NotNull
+	@Valid
 	@Transient
 	private Begeleider begeleider;
 
@@ -81,7 +91,8 @@ public class Kamer {
 	 * @param kamerCode De code van de kamer.
 	 * @param begeleider De begeleider die de kamer begeleidt.
 	 */
-	public Kamer(@NotNull String kamerCode, @NotNull Begeleider begeleider) {
+	@ValidateOnExecution
+	public Kamer(@KamerCode String kamerCode, @NotNull @Valid Begeleider begeleider) {
 		this(kamerCode, LocalDateTime.now(), begeleider, new HashSet<>());
 	}
 
@@ -95,12 +106,7 @@ public class Kamer {
 	 * @param begeleider De begeleider van de kamer.
 	 * @param deelnemers Een set van deelnemers van de kamer.
 	 */
-	Kamer(
-		@NotNull String kamerCode,
-		@NotNull LocalDateTime datum,
-		@NotNull Begeleider begeleider,
-		@NotNull Set<Deelnemer> deelnemers
-	) {
+	Kamer(String kamerCode, LocalDateTime datum, Begeleider begeleider, Set<Deelnemer> deelnemers) {
 		this.kamerCode = kamerCode;
 		this.datum = datum;
 		this.begeleider = begeleider;

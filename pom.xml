@@ -121,6 +121,7 @@
 											<exclude>**.event.Event</exclude>
 											<exclude>**.event.Event.Decoder</exclude>
 											<exclude>**.event.EventResponse</exclude>
+											<exclude>**.event.EventResponse.Status</exclude>
 											<exclude>**.event.EventResponse.Encoder</exclude>
 											<exclude>**.service.*</exclude>
 										</excludes>

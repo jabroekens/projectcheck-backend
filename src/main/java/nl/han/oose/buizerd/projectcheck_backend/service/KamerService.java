@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
 import javax.websocket.CloseReason;
 import javax.websocket.EndpointConfig;
 import javax.websocket.OnClose;
@@ -41,7 +40,7 @@ public class KamerService {
 	 * @param kamerCode De code van een kamer.
 	 * @see KamerService#getUrl(String)
 	 */
-	public static void registreer(@NotNull String kamerCode) {
+	public static void registreer(String kamerCode) {
 		KamerService.geregistreerdeKamers.add(kamerCode);
 	}
 
@@ -57,7 +56,7 @@ public class KamerService {
 	 * @param kamerCode De code van een kamer.
 	 * @return De WebSocket URL van de kamer.
 	 */
-	public String getUrl(@NotNull String kamerCode) {
+	public String getUrl(String kamerCode) {
 		// TODO Schema en pad dynamisch bepalen
 		return "wss://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamerCode;
 	}
@@ -90,10 +89,6 @@ public class KamerService {
 	 */
 	@OnMessage
 	public EventResponse message(Event event, @PathParam("kamerCode") String kamerCode, Session session) {
-		if (event.getDeelnemer() == null || event.getDeelnemer().getKamerCode() == null) {
-			return new EventResponse(EventResponse.Status.INVALIDE);
-		}
-
 		String eventKamerCode = event.getDeelnemer().getKamerCode();
 		if (!eventKamerCode.equals(kamerCode)) {
 			return new EventResponse(EventResponse.Status.VERBODEN);

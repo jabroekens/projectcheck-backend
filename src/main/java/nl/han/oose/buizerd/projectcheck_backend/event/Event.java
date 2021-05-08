@@ -5,6 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import java.util.concurrent.CompletableFuture;
+import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
@@ -19,6 +22,8 @@ import org.reflections.Reflections;
  */
 public abstract class Event {
 
+	@NotNull
+	@Valid
 	private DeelnemerId deelnemer;
 
 	/**
@@ -37,7 +42,7 @@ public abstract class Event {
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 * @param session De betrokken {@link Session}.
 	 */
-	public void voerUit(@NotNull KamerRepository kamerRepository, @NotNull Kamer kamer, Session session) {
+	public void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) {
 		CompletableFuture
 			.runAsync(() -> voerUit(kamer, session))
 			.thenRunAsync(() -> handelAf(kamerRepository, kamer));
@@ -49,7 +54,7 @@ public abstract class Event {
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 * @param session De betrokken {@link Session}.
 	 */
-	protected abstract void voerUit(@NotNull Kamer kamer, Session session);
+	protected abstract void voerUit(Kamer kamer, Session session);
 
 	/**
 	 * Wordt aangeroepen bij het afhandelen van een event.
@@ -61,7 +66,7 @@ public abstract class Event {
 	 * @param kamerRepository Een {@link KamerRepository}.
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 */
-	protected void handelAf(@NotNull KamerRepository kamerRepository, @NotNull Kamer kamer) {
+	protected void handelAf(KamerRepository kamerRepository, Kamer kamer) {
 		// Doe niets
 	}
 
@@ -73,6 +78,7 @@ public abstract class Event {
 	public static class Decoder implements javax.websocket.Decoder.Text<Event> {
 
 		private static final Gson GSON;
+		private static final Validator VALIDATOR;
 
 		static {
 			RuntimeTypeAdapterFactory<Event> eventAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "eventNaam");
@@ -86,6 +92,7 @@ public abstract class Event {
 			);
 
 			GSON = new GsonBuilder().registerTypeAdapterFactory(eventAdapterFactory).create();
+			VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
 		}
 
 		private Event event;
@@ -106,6 +113,9 @@ public abstract class Event {
 			// Probeer te deserializeren en cache het resultaat als het wel lukt.
 			try {
 				event = Decoder.GSON.fromJson(s, Event.class);
+				if (!Decoder.VALIDATOR.validate(event).isEmpty()) {
+					return false;
+				}
 			} catch (JsonParseException e) {
 				return false;
 			}
