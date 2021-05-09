@@ -10,8 +10,9 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
+import java.util.concurrent.CompletionException;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
@@ -27,7 +28,7 @@ public abstract class Event {
 	private DeelnemerId deelnemer;
 
 	/**
-	 * Haal het {@link Deelnemer} van de deelnemer op die het event heeft aangeroepen.
+	 * Haal het {@link DeelnemerId} op van de deelnemer die het event heeft aangeroepen.
 	 *
 	 * @return De identifier van de betrokken deelnemer.
 	 */
@@ -42,10 +43,22 @@ public abstract class Event {
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 * @param session De betrokken {@link Session}.
 	 */
-	public void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) {
+	public void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) throws CompletionException {
 		CompletableFuture
-			.runAsync(() -> voerUit(kamer, session))
-			.thenRunAsync(() -> handelAf(kamerRepository, kamer));
+			.runAsync(() -> {
+				try {
+					voerUit(kamer, session);
+				} catch (IOException e) {
+					throw new CompletionException(e);
+				}
+			})
+			.thenRunAsync(() -> {
+				try {
+					handelAf(kamerRepository, kamer);
+				} catch (IOException e) {
+					throw new CompletionException(e);
+				}
+			});
 	}
 
 	/**
@@ -54,7 +67,7 @@ public abstract class Event {
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 * @param session De betrokken {@link Session}.
 	 */
-	protected abstract void voerUit(Kamer kamer, Session session);
+	protected abstract void voerUit(Kamer kamer, Session session) throws IOException;
 
 	/**
 	 * Wordt aangeroepen bij het afhandelen van een event.
@@ -66,7 +79,7 @@ public abstract class Event {
 	 * @param kamerRepository Een {@link KamerRepository}.
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 */
-	protected void handelAf(KamerRepository kamerRepository, Kamer kamer) {
+	protected void handelAf(KamerRepository kamerRepository, Kamer kamer) throws IOException {
 		// Doe niets
 	}
 
