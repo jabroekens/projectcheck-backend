@@ -48,7 +48,7 @@ public class DAOImpl<T, K> implements DAO<T, K> {
 		doTransaction(em -> em.remove(k));
 	}
 
-	private void doTransaction(Consumer<EntityManager> consumer) throws RuntimeException {
+	private void doTransaction(Consumer<EntityManager> consumer) {
 		try {
 			transaction.begin();
 			consumer.accept(entityManager);

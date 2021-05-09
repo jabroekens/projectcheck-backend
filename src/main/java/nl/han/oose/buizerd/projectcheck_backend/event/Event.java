@@ -43,7 +43,7 @@ public abstract class Event {
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 * @param session De betrokken {@link Session}.
 	 */
-	public void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) throws CompletionException {
+	public void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) {
 		CompletableFuture
 			.runAsync(() -> {
 				try {
