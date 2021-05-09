@@ -14,6 +14,7 @@ import jakarta.validation.executable.ValidateOnExecution;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
@@ -76,7 +77,7 @@ public class Kamer {
 	 * De deelnemers van de kamer.
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "kamer", orphanRemoval = true)
-	private Set<Deelnemer> deelnemers;
+	private Set<@NotNull @Valid Deelnemer> deelnemers;
 
 	/**
 	 * Construeert een {@link Kamer}.
@@ -94,6 +95,7 @@ public class Kamer {
 	 */
 	@ValidateOnExecution
 	public Kamer(@KamerCode String kamerCode, @NotNull @Valid Begeleider begeleider) {
+		// Dit is een uitzondering op de comment bij `Kamer#Kamer(String, LocalDateTime, Begeleider, Set)`
 		this(kamerCode, LocalDateTime.now(), begeleider, new HashSet<>());
 	}
 
@@ -139,6 +141,11 @@ public class Kamer {
 	 */
 	public Begeleider getBegeleider() {
 		return begeleider;
+	}
+
+	@ValidateOnExecution
+	public Optional<Deelnemer> getDeelnemer(@Valid DeelnemerId deelnemerId) {
+		return deelnemers.stream().filter(d -> d.getDeelnemerId().equals(deelnemerId)).findAny();
 	}
 
 	/**
