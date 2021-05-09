@@ -2,50 +2,33 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
+import jakarta.validation.Valid;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Session;
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
-import javax.validation.constraints.NotNull;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Session;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
+import java.util.concurrent.CompletionException;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
+import org.reflections.Reflections;
 
 /**
  * Representeert een event.
  */
 public abstract class Event {
 
-	private static final EventDeserializer EVENT_DESERIALIZER;
-	private static final Gson GSON;
-
-	static {
-		EVENT_DESERIALIZER = new EventDeserializer();
-		GSON = new GsonBuilder().registerTypeAdapter(Event.class, Event.EVENT_DESERIALIZER).create();
-	}
-
-	/**
-	 * Registreert een eventklasse.
-	 *
-	 * @param eventKlasse De eventklasse.
-	 */
-	protected static void registreerEvent(@NotNull Class<? extends Event> eventKlasse) {
-		// Verandert een klassenaam als "FooBarEvent" naar "FOO_BAR"
-		String eventNaam = eventKlasse.getSimpleName().replace("Event", "").replaceAll("(?<!^)(?=[A-Z])", "_").toUpperCase();
-		Event.EVENT_DESERIALIZER.registreerKlasse(eventNaam, eventKlasse);
-	}
-
+	@NotNull
+	@Valid
 	private DeelnemerId deelnemer;
 
 	/**
-	 * Haal het {@link Deelnemer} van de deelnemer op die het event heeft aangeroepen.
+	 * Haal het {@link DeelnemerId} op van de deelnemer die het event heeft aangeroepen.
 	 *
 	 * @return De identifier van de betrokken deelnemer.
 	 */
@@ -60,10 +43,22 @@ public abstract class Event {
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 * @param session De betrokken {@link Session}.
 	 */
-	public void voerUit(@NotNull KamerRepository kamerRepository, @NotNull Kamer kamer, Session session) {
+	public void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) throws CompletionException {
 		CompletableFuture
-			.runAsync(() -> voerUit(kamer, session))
-			.thenRunAsync(() -> handelAf(kamerRepository, kamer));
+			.runAsync(() -> {
+				try {
+					voerUit(kamer, session);
+				} catch (IOException e) {
+					throw new CompletionException(e);
+				}
+			})
+			.thenRunAsync(() -> {
+				try {
+					handelAf(kamerRepository, kamer);
+				} catch (IOException e) {
+					throw new CompletionException(e);
+				}
+			});
 	}
 
 	/**
@@ -72,7 +67,7 @@ public abstract class Event {
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 * @param session De betrokken {@link Session}.
 	 */
-	protected abstract void voerUit(@NotNull Kamer kamer, Session session);
+	protected abstract void voerUit(Kamer kamer, Session session) throws IOException;
 
 	/**
 	 * Wordt aangeroepen bij het afhandelen van een event.
@@ -84,23 +79,43 @@ public abstract class Event {
 	 * @param kamerRepository Een {@link KamerRepository}.
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 */
-	protected void handelAf(@NotNull KamerRepository kamerRepository, @NotNull Kamer kamer) {
+	protected void handelAf(KamerRepository kamerRepository, Kamer kamer) throws IOException {
 		// Doe niets
 	}
 
 	/**
 	 * Decodeert een {@link Event}.
 	 *
-	 * @see javax.websocket.Decoder.Text
+	 * @see jakarta.websocket.Decoder.Text
 	 */
-	public static class Decoder implements javax.websocket.Decoder.Text<Event> {
+	public static class Decoder implements jakarta.websocket.Decoder.Text<Event> {
+
+		private static final Gson GSON;
+		private static final Validator VALIDATOR;
+
+		static {
+			RuntimeTypeAdapterFactory<Event> eventAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "eventNaam");
+
+			Reflections reflections = new Reflections(Event.class.getPackage().getName());
+			reflections.getSubTypesOf(Event.class).forEach(
+				event -> {
+					String eventNaam = event.getSimpleName().replace("Event", "").replaceAll("(?<!^)(?=[A-Z])", "_").toUpperCase();
+					eventAdapterFactory.registerSubtype(event, eventNaam);
+				}
+			);
+
+			GSON = new GsonBuilder().registerTypeAdapterFactory(eventAdapterFactory).create();
+			VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
+		}
+
+		private Event event;
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public Event decode(String s) {
-			return Event.GSON.fromJson(s, Event.class);
+			return event;
 		}
 
 		/**
@@ -108,7 +123,16 @@ public abstract class Event {
 		 */
 		@Override
 		public boolean willDecode(String s) {
-			return s != null && !s.isEmpty();
+			// Probeer te deserializeren en cache het resultaat als het wel lukt.
+			try {
+				event = Decoder.GSON.fromJson(s, Event.class);
+				if (!Decoder.VALIDATOR.validate(event).isEmpty()) {
+					return false;
+				}
+			} catch (JsonParseException e) {
+				return false;
+			}
+			return true;
 		}
 
 		/**
@@ -125,47 +149,6 @@ public abstract class Event {
 		@Override
 		public void destroy() {
 			// Wordt niet gebruikt
-		}
-
-	}
-
-	/**
-	 * Deserializeert een {@link Event}.
-	 *
-	 * @see com.google.gson.JsonDeserializer
-	 */
-	private static class EventDeserializer implements JsonDeserializer<Event> {
-
-		private final Map<String, Class<? extends Event>> eventKlassen;
-
-		private EventDeserializer() {
-			eventKlassen = new HashMap<>();
-		}
-
-		private void registreerKlasse(@NotNull String eventNaam, @NotNull Class<? extends Event> eventKlasse) {
-			this.eventKlassen.put(eventNaam, eventKlasse);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Event deserialize(JsonElement json, java.lang.reflect.Type typeOfT, JsonDeserializationContext context)
-		throws JsonParseException {
-			JsonObject jsonObject = json.getAsJsonObject();
-			if (jsonObject.has("eventNaam")) {
-				String eventNaam = jsonObject.get("eventNaam").getAsString();
-
-				if (eventKlassen.containsKey(eventNaam)) {
-					return context.deserialize(jsonObject, eventKlassen.get(eventNaam));
-				} else {
-					// XXX Hier een aparte exception-klasse voor aanmaken? Denk ook aan de front-end!
-					throw new RuntimeException("Value of 'eventNaam' is not recognized.");
-				}
-			} else {
-				// XXX Is dit de juiste manier om JsonParseException te gebruiken? Zie ook comment hierboven
-				throw new JsonParseException("Key 'eventNaam' not present.");
-			}
 		}
 
 	}

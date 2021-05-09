@@ -23,7 +23,7 @@ public final class Util {
 	}
 
 	private Util() {
-		throw new UnsupportedOperationException("Cannot instantiate this utility class.");
+		throw new UnsupportedOperationException("Cannot instantiate this utility class");
 	}
 
 }

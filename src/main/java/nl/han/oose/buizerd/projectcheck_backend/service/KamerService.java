@@ -1,22 +1,21 @@
 package nl.han.oose.buizerd.projectcheck_backend.service;
 
+import jakarta.inject.Inject;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.PathParam;
+import jakarta.websocket.server.ServerEndpoint;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import javax.websocket.CloseReason;
-import javax.websocket.EndpointConfig;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.event.Event;
 import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
@@ -41,7 +40,7 @@ public class KamerService {
 	 * @param kamerCode De code van een kamer.
 	 * @see KamerService#getUrl(String)
 	 */
-	public static void registreer(@NotNull String kamerCode) {
+	public static void registreer(String kamerCode) {
 		KamerService.geregistreerdeKamers.add(kamerCode);
 	}
 
@@ -57,9 +56,9 @@ public class KamerService {
 	 * @param kamerCode De code van een kamer.
 	 * @return De WebSocket URL van de kamer.
 	 */
-	public String getUrl(@NotNull String kamerCode) {
+	public String getUrl(String kamerCode) {
 		// TODO Schema en pad dynamisch bepalen
-		return "ws://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamerCode;
+		return "wss://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamerCode;
 	}
 
 	/**
@@ -91,8 +90,11 @@ public class KamerService {
 	@OnMessage
 	public EventResponse message(Event event, @PathParam("kamerCode") String kamerCode, Session session) {
 		String eventKamerCode = event.getDeelnemer().getKamerCode();
-		Optional<Kamer> kamer = kamerRepository.get(eventKamerCode);
+		if (!eventKamerCode.equals(kamerCode)) {
+			return new EventResponse(EventResponse.Status.VERBODEN);
+		}
 
+		Optional<Kamer> kamer = kamerRepository.get(eventKamerCode);
 		if (kamer.isPresent()) {
 			event.voerUit(kamerRepository, kamer.get(), session);
 		} else {
@@ -107,7 +109,9 @@ public class KamerService {
 	 */
 	@OnError
 	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) {
-		error.printStackTrace();
+		if (!(error instanceof IllegalArgumentException)) {
+			error.printStackTrace();
+		}
 	}
 
 }

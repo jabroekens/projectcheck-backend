@@ -1,7 +1,10 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import javax.persistence.Entity;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.Entity;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
+import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**
  * Een begeleider is iemand die een {@link Kamer} begeleidt.
@@ -24,7 +27,8 @@ public class Begeleider extends Deelnemer {
 	 * @param naam De naam van de begeleider.
 	 * @see nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer
 	 */
-	public Begeleider(@NotNull DeelnemerId deelnemerId, @NotNull String naam) {
+	@ValidateOnExecution
+	public Begeleider(@NotNull @Valid DeelnemerId deelnemerId, @Naam String naam) {
 		super(deelnemerId, naam);
 	}
 

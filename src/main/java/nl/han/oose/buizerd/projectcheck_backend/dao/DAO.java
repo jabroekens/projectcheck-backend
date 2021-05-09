@@ -1,7 +1,9 @@
 package nl.han.oose.buizerd.projectcheck_backend.dao;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
 import java.util.Optional;
-import javax.validation.constraints.NotNull;
 
 /**
  * Een DAO volgens het DAO pattern.
@@ -15,9 +17,10 @@ public interface DAO<T, K> {
 	 * Sla de staat van {@code t} op.
 	 *
 	 * @param t De instantie die opgeslagen moet worden.
-	 * @see javax.persistence.EntityManager#persist(Object)
+	 * @see jakarta.persistence.EntityManager#persist(Object)
 	 */
-	void create(@NotNull T t);
+	@ValidateOnExecution
+	void create(@NotNull @Valid T t);
 
 	/**
 	 * Haal een instantie van {@code T} op met de identifier {@code k}.
@@ -25,24 +28,27 @@ public interface DAO<T, K> {
 	 * @param klasseType Het klassetype van {@link T}.
 	 * @param k De identifier van de op te halen instantie.
 	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional}.
-	 * @see javax.persistence.EntityManager#find(Class, Object)
+	 * @see jakarta.persistence.EntityManager#find(Class, Object)
 	 */
-	Optional<T> read(@NotNull Class<T> klasseType, @NotNull K k);
+	@ValidateOnExecution
+	Optional<@Valid T> read(@NotNull Class<T> klasseType, @NotNull @Valid K k);
 
 	/**
 	 * Update de opgeslagen staat van {@code t}.
 	 *
 	 * @param t De instantie waarmee de opgeslagen instantie van {@link T} vervangen moet worden.
-	 * @see javax.persistence.EntityManager#merge(Object)
+	 * @see jakarta.persistence.EntityManager#merge(Object)
 	 */
-	void update(@NotNull T t);
+	@ValidateOnExecution
+	void update(@NotNull @Valid T t);
 
 	/**
 	 * Verwijder de opgeslagen staat van een instantie van {@code T} met de identifier {@code k}.
 	 *
 	 * @param k De identifier van de opgeslagen staat die verwijderd moet worden.
-	 * @see javax.persistence.EntityManager#remove(Object)
+	 * @see jakarta.persistence.EntityManager#remove(Object)
 	 */
-	void delete(@NotNull K k);
+	@ValidateOnExecution
+	void delete(@NotNull @Valid K k);
 
 }

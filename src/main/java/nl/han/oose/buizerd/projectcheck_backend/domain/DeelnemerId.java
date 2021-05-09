@@ -1,10 +1,12 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
+import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
 /**
  * De identifier van {@link Deelnemer}.
@@ -25,12 +27,14 @@ public class DeelnemerId implements Serializable {
 	 *
 	 * Zie: https://stackoverflow.com/a/9146987
 	 */
+	@NotNull
 	@Column(nullable = false, updatable = false)
 	private Long deelnemerId;
 
 	/**
 	 * De code van de {@link Kamer} waaraan de {@link Deelnemer} deelneemt.
 	 */
+	@KamerCode
 	@Column(nullable = false, updatable = false)
 	private String kamerCode;
 
@@ -48,7 +52,8 @@ public class DeelnemerId implements Serializable {
 	 * @param deelnemerId Het ID van de deelnemer.
 	 * @param kamerCode De code van de kamer.
 	 */
-	public DeelnemerId(@NotNull Long deelnemerId, @NotNull String kamerCode) {
+	@ValidateOnExecution
+	public DeelnemerId(@NotNull Long deelnemerId, @KamerCode String kamerCode) {
 		this.deelnemerId = deelnemerId;
 		this.kamerCode = kamerCode;
 	}

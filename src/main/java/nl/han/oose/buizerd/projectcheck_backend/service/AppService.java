@@ -1,18 +1,18 @@
 package nl.han.oose.buizerd.projectcheck_backend.service;
 
 import com.google.gson.JsonObject;
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
+import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 @Path("/")
 public class AppService extends Application {
@@ -33,8 +33,7 @@ public class AppService extends Application {
 	@Path("/kamer/nieuw")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response maakKamer(@FormParam("begeleiderNaam") @NotNull String begeleiderNaam) {
-		// FIXME Foutafhandeling als begeleiderNaam leeg of null is
+	public Response maakKamer(@FormParam("begeleiderNaam") @Naam String begeleiderNaam) {
 		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
 		KamerService.registreer(kamer.getKamerCode());
 

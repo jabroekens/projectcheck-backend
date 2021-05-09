@@ -1,8 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend.repository;
 
+import jakarta.inject.Inject;
 import java.util.Optional;
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
@@ -25,7 +24,7 @@ public class KamerRepository implements Repository<Kamer, String> {
 	 * @param begeleiderDAO De {@link DAO} verantwoordelijk voor {@link Begeleider}.
 	 */
 	@Inject
-	public KamerRepository(@NotNull DAO<Kamer, String> kamerDAO, @NotNull DAO<Begeleider, DeelnemerId> begeleiderDAO) {
+	public KamerRepository(DAO<Kamer, String> kamerDAO, DAO<Begeleider, DeelnemerId> begeleiderDAO) {
 		this.kamerDAO = kamerDAO;
 		this.begeleiderDAO = begeleiderDAO;
 	}
@@ -36,7 +35,7 @@ public class KamerRepository implements Repository<Kamer, String> {
 	 * @param begeleiderNaam De naam van de {@link Begeleider}.
 	 * @return De aangemaakte {@link Kamer}.
 	 */
-	public Kamer maakKamer(@NotNull String begeleiderNaam) {
+	public Kamer maakKamer(String begeleiderNaam) {
 		String kamerCode = Kamer.genereerCode();
 
 		Begeleider begeleider = new Begeleider(new DeelnemerId(1L, kamerCode), begeleiderNaam);

@@ -1,8 +1,10 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
+import jakarta.websocket.EndpointConfig;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.websocket.EndpointConfig;
 import nl.han.oose.buizerd.projectcheck_backend.Util;
 
 /**
@@ -19,7 +21,8 @@ public class EventResponse implements Serializable {
 	 *
 	 * @param status De responsestatus.
 	 */
-	public EventResponse(EventResponse.Status status) {
+	@ValidateOnExecution
+	public EventResponse(@NotNull EventResponse.Status status) {
 		this(status, null);
 	}
 
@@ -29,7 +32,8 @@ public class EventResponse implements Serializable {
 	 * @param status De responsestatus.
 	 * @param context De context van de response.
 	 */
-	public EventResponse(EventResponse.Status status, String context) {
+	@ValidateOnExecution
+	public EventResponse(@NotNull EventResponse.Status status, String context) {
 		this.datum = LocalDateTime.now();
 		this.status = status;
 		this.context = context;
@@ -40,15 +44,17 @@ public class EventResponse implements Serializable {
 	 */
 	public enum Status {
 		OK,
-		KAMER_NIET_GEVONDEN
+		VERBODEN,
+		INVALIDE,
+		KAMER_NIET_GEVONDEN,
 	}
 
 	/**
 	 * Encodeert een {@link EventResponse}.
 	 *
-	 * @see javax.websocket.Encoder.Text
+	 * @see jakarta.websocket.Encoder.Text
 	 */
-	public static class Encoder implements javax.websocket.Encoder.Text<EventResponse> {
+	public static class Encoder implements jakarta.websocket.Encoder.Text<EventResponse> {
 
 		/**
 		 * {@inheritDoc}
