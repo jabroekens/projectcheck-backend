@@ -4,13 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
+import jakarta.validation.Valid;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Session;
 import java.util.concurrent.CompletableFuture;
-import javax.validation.Valid;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Session;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
@@ -73,9 +73,9 @@ public abstract class Event {
 	/**
 	 * Decodeert een {@link Event}.
 	 *
-	 * @see javax.websocket.Decoder.Text
+	 * @see jakarta.websocket.Decoder.Text
 	 */
-	public static class Decoder implements javax.websocket.Decoder.Text<Event> {
+	public static class Decoder implements jakarta.websocket.Decoder.Text<Event> {
 
 		private static final Gson GSON;
 		private static final Validator VALIDATOR;

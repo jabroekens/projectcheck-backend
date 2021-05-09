@@ -1,10 +1,10 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
+import jakarta.websocket.EndpointConfig;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.validation.constraints.NotNull;
-import javax.validation.executable.ValidateOnExecution;
-import javax.websocket.EndpointConfig;
 import nl.han.oose.buizerd.projectcheck_backend.Util;
 
 /**
@@ -52,9 +52,9 @@ public class EventResponse implements Serializable {
 	/**
 	 * Encodeert een {@link EventResponse}.
 	 *
-	 * @see javax.websocket.Encoder.Text
+	 * @see jakarta.websocket.Encoder.Text
 	 */
-	public static class Encoder implements javax.websocket.Encoder.Text<EventResponse> {
+	public static class Encoder implements jakarta.websocket.Encoder.Text<EventResponse> {
 
 		/**
 		 * {@inheritDoc}

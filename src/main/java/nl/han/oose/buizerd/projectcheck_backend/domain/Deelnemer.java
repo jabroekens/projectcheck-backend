@@ -1,14 +1,14 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.executable.ValidateOnExecution;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**

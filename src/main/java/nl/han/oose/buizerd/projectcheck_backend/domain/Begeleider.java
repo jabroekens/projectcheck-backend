@@ -1,9 +1,9 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import javax.persistence.Entity;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.executable.ValidateOnExecution;
+import jakarta.persistence.Entity;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**

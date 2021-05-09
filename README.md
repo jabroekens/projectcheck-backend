@@ -11,9 +11,7 @@ deelnemers via bijvoorbeeld Zoom of Microsoft Teams bijeenkomen en hun bevinding
 [![Bugs](https://sonarqube.aimsites.nl/api/project_badges/measure?project=nl.han.oose.buizerd%3Aprojectcheck-backend&metric=bugs)](https://sonarqube.aimsites.nl/dashboard?id=nl.han.oose.buizerd%3Aprojectcheck-backend)
 
 ## Setup
-1. Download en installeer Java 12 of hoger: <https://openjdk.java.net/install/index.html>
-    * Voeg `JAVA_HOME` toe aan de omgevingsvariabelen, met als waarde de locatie van de Java-installatiefolder
-    * Voeg `$JAVA_HOME/bin` (Linux) of `%JAVA_HOME%\bin` (Windows) toe aan het systeempad
+1. Download en installeer Java 12 of hoger, met uitzondering van Java 16: <https://adoptopenjdk.net/installation.html>
 2. Download en installeer [Apache TomEE 8.0.6 Plus](https://www.apache.org/dyn/closer.cgi/tomee/tomee-8.0.6/apache-tomee-8.0.6-plus.zip)
     * Zie: <https://tomee.apache.org/tomee-8.0/docs/installing-tomee.html>
     * Voeg `CATALINA_HOME` toe aan de omgevingsvariabelen, met als waarde de locatie van de Apache TomEE-installatiefolder
@@ -53,17 +51,17 @@ deelnemers via bijvoorbeeld Zoom of Microsoft Teams bijeenkomen en hun bevinding
     1. Zorgt dat de volgende tekst tussen `<tomee>` en `</tomee>` staat:
         ```
         <Resource id="ProjectCheckDb" type="DataSource">
-            JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
-            JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
-            UserName = backend
-            Password = 3jsdolD$aev9%xzAbRnA4FuBb
+          JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
+          JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
+          UserName = backend
+          Password = 3jsdolD$aev9%xzAbRnA4FuBb
         </Resource>
         <Resource id="ProjectCheckDbUnmanaged" type="DataSource">
-            JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
-            JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
-            UserName = backend
-            Password = 3jsdolD$aev9%xzAbRnA4FuBb
-            JtaManaged = false
+          JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
+          JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
+          UserName = backend
+          Password = 3jsdolD$aev9%xzAbRnA4FuBb
+          JtaManaged = false
         </Resource>
         ```
     2. Sla het geopende bestand op

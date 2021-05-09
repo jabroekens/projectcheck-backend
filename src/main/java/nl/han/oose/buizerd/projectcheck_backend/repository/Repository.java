@@ -1,9 +1,9 @@
 package nl.han.oose.buizerd.projectcheck_backend.repository;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.executable.ValidateOnExecution;
 
 /**
  * Een Repository volgens het Repository pattern.
@@ -30,7 +30,7 @@ public interface Repository<T, K> {
 	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#read(Class, Object)
 	 */
 	@ValidateOnExecution
-	Optional<T> get(@NotNull @Valid K k);
+	Optional<@Valid T> get(@NotNull @Valid K k);
 
 	/**
 	 * Update de toegevoegde instantie van {@code T}.
