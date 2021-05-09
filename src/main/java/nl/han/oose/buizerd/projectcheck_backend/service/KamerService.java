@@ -11,11 +11,15 @@ import jakarta.websocket.Session;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.event.Event;
 import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
@@ -27,6 +31,8 @@ import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 	encoders = {EventResponse.Encoder.class}
 )
 public class KamerService {
+
+	private static final Logger LOGGER = Logger.getLogger(KamerService.class.getName());
 
 	private static final Set<String> geregistreerdeKamers;
 
@@ -57,8 +63,13 @@ public class KamerService {
 	 * @return De WebSocket URL van de kamer.
 	 */
 	public String getUrl(String kamerCode) {
-		// TODO Schema en pad dynamisch bepalen
-		return "wss://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamerCode;
+		URI uri = uriInfo.getBaseUri();
+
+		return UriBuilder
+			.fromUri(uri)
+			.resolveTemplate(this.getClass().getAnnotation(ServerEndpoint.class).value(), kamerCode)
+			.scheme(uri.getScheme().equals("https") ? "wss" : "ws")
+			.build().toString();
 	}
 
 	/**
@@ -68,10 +79,9 @@ public class KamerService {
 	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") String kamerCode) {
 		if (!KamerService.geregistreerdeKamers.contains(kamerCode)) {
 			try {
-				// TODO CloseReason meegeven?
-				session.close();
+				session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer niet gevonden"));
 			} catch (IOException e) {
-				e.printStackTrace();
+				KamerService.LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 	}
@@ -110,7 +120,7 @@ public class KamerService {
 	@OnError
 	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) {
 		if (!(error instanceof IllegalArgumentException)) {
-			error.printStackTrace();
+			KamerService.LOGGER.log(Level.SEVERE, error.getMessage(), error);
 		}
 	}
 
