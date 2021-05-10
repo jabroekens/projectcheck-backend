@@ -1,8 +1,11 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
@@ -30,6 +33,13 @@ public class Deelnemer {
 	@Naam
 	@Column(nullable = false)
 	private String naam;
+
+	/**
+	 * De {@link Kamer} waaraan de deelnemer deelneemt.
+	 */
+	@MapsId("kamerCode")
+	@ManyToOne(cascade = CascadeType.ALL)
+	private Kamer kamer;
 
 	/**
 	 * Construeert een {@link Deelnemer}.
@@ -77,6 +87,15 @@ public class Deelnemer {
 	@ValidateOnExecution
 	public void setNaam(@Naam String naam) {
 		this.naam = naam;
+	}
+
+	/**
+	 * Haal de kamer waaraan de deelnemer deelneemt op.
+	 *
+	 * @return De kamer waaraan de deelnemer deelneemt.
+	 */
+	public Kamer getKamer() {
+		return kamer;
 	}
 
 }

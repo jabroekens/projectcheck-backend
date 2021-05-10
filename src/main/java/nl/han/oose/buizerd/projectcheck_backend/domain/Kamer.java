@@ -3,6 +3,7 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
@@ -75,7 +76,7 @@ public class Kamer {
 	/**
 	 * De deelnemers van de kamer.
 	 */
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "kamer", orphanRemoval = true)
 	private Set<@NotNull @Valid Deelnemer> deelnemers;
 
 	/**
