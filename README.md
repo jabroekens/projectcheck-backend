@@ -11,8 +11,8 @@ deelnemers via bijvoorbeeld Zoom of Microsoft Teams bijeenkomen en hun bevinding
 [![Bugs](https://sonarqube.aimsites.nl/api/project_badges/measure?project=nl.han.oose.buizerd%3Aprojectcheck-backend&metric=bugs)](https://sonarqube.aimsites.nl/dashboard?id=nl.han.oose.buizerd%3Aprojectcheck-backend)
 
 ## Setup
-1. Download en installeer Java 12 of hoger, met uitzondering van Java 16: <https://adoptopenjdk.net/installation.html>
-2. Download en installeer [Apache TomEE 8.0.6 Plus](https://www.apache.org/dyn/closer.cgi/tomee/tomee-8.0.6/apache-tomee-8.0.6-plus.zip)
+1. Download en installeer Java 12 of hoger, met uitzondering van Java 16 of hoger: <https://adoptopenjdk.net/installation.html>
+2. Download en installeer [Apache TomEE 9.0.0-M3 Plus](https://www.apache.org/dyn/closer.cgi/tomee/tomee-9.0.0-M3/apache-tomee-9.0.0-M3-plus.zip)
     * Zie: <https://tomee.apache.org/tomee-8.0/docs/installing-tomee.html>
     * Voeg `CATALINA_HOME` toe aan de omgevingsvariabelen, met als waarde de locatie van de Apache TomEE-installatiefolder
     * Voeg `$CATALINA_HOME/bin` (Linux) of `%CATALINA_HOME%\bin` (Windows) toe aan het systeempad
@@ -77,6 +77,8 @@ deelnemers via bijvoorbeeld Zoom of Microsoft Teams bijeenkomen en hun bevinding
     ALTER ROLE db_owner ADD MEMBER backend;
     GO
     ```
+8. Stel de Server Authentication Mode voor SQL Server in op `SQL Server and Windows Authentication mode` door de stappen te volgen zoals hier beschreven:
+   <https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/change-server-authentication-mode?view=sql-server-ver15#change-authentication-mode-with-ssms>
 
 ### Opmerkingen
 De applicatie is ontwikkelt om met iedere JDBC-Compliant Database te kunnen communiceren.

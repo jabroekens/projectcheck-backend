@@ -14,29 +14,16 @@ public class EventResponse implements Serializable {
 
 	private final LocalDateTime datum;
 	private final EventResponse.Status status;
-	private final String context;
-
-	/**
-	 * Construeert een {@link EventResponse} zonder context.
-	 *
-	 * @param status De responsestatus.
-	 */
-	@ValidateOnExecution
-	public EventResponse(@NotNull EventResponse.Status status) {
-		this(status, null);
-	}
 
 	/**
 	 * Construeert een {@link EventResponse}.
 	 *
 	 * @param status De responsestatus.
-	 * @param context De context van de response.
 	 */
 	@ValidateOnExecution
-	public EventResponse(@NotNull EventResponse.Status status, String context) {
+	public EventResponse(@NotNull EventResponse.Status status) {
 		this.datum = LocalDateTime.now();
 		this.status = status;
-		this.context = context;
 	}
 
 	/**
