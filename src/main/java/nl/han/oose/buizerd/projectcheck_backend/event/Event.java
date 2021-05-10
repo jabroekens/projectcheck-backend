@@ -44,21 +44,14 @@ public abstract class Event {
 	 * @param session De betrokken {@link Session}.
 	 */
 	public void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) {
-		CompletableFuture
-			.runAsync(() -> {
-				try {
-					voerUit(kamer, session);
-				} catch (IOException e) {
-					throw new CompletionException(e);
-				}
-			})
-			.thenRunAsync(() -> {
-				try {
-					handelAf(kamerRepository, kamer);
-				} catch (IOException e) {
-					throw new CompletionException(e);
-				}
-			});
+		CompletableFuture.runAsync(() -> {
+			try {
+				voerUit(kamer, session);
+				handelAf(kamerRepository, kamer);
+			} catch (IOException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
 	/**
