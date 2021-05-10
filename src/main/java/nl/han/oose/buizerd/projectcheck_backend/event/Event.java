@@ -25,15 +25,15 @@ public abstract class Event {
 
 	@NotNull
 	@Valid
-	private DeelnemerId deelnemer;
+	private DeelnemerId deelnemerId;
 
 	/**
 	 * Haal het {@link DeelnemerId} op van de deelnemer die het event heeft aangeroepen.
 	 *
 	 * @return De identifier van de betrokken deelnemer.
 	 */
-	public DeelnemerId getDeelnemer() {
-		return deelnemer;
+	public DeelnemerId getDeelnemerId() {
+		return deelnemerId;
 	}
 
 	/**
@@ -87,7 +87,7 @@ public abstract class Event {
 		private static final Validator VALIDATOR;
 
 		static {
-			RuntimeTypeAdapterFactory<Event> eventAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "eventNaam");
+			RuntimeTypeAdapterFactory<Event> eventAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "event");
 
 			Reflections reflections = new Reflections(Event.class.getPackage().getName());
 			reflections.getSubTypesOf(Event.class).forEach(

@@ -21,8 +21,8 @@ Een event is een JSON-bericht. Elk event heeft minimaal de volgende waarden:
 ```
 {
     "event":"EVENT",
-    "deelnemer": {
-        "deelnemerId": 1,
+    "deelnemerId": {
+        "id": 1,
         "kamerCode": "123456"
     }
 }
@@ -125,7 +125,7 @@ public class FooEvent extends Event {
 
 	@Override
 	protected void voerUit(Kamer kamer, Session session) throws IOException {
-		Optional<Deelnemer> deelnemer = kamer.getDeelnemer(super.getDeelnemer());
+		Optional<Deelnemer> deelnemer = kamer.getDeelnemer(super.getDeelnemerId());
 		if (deelnemer.isPresent()) {
 			session.getBasicRemote().sendText(deelnemer.get().getNaam() + " is een " + woord);
 		}
@@ -169,7 +169,7 @@ public class FooEventTest {
 		@Mock Deelnemer deelnemer,
 		@Mock RemoteEndpoint.Basic basicRemote
 	) throws IOException {
-		Mockito.when(kamer.getDeelnemer(fooEvent.getDeelnemer())).thenReturn(Optional.of(deelnemer));
+		Mockito.when(kamer.getDeelnemer(fooEvent.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
 		Mockito.when(session.getBasicRemote()).thenReturn(basicRemote);
 		fooEvent.voerUit(kamer, session);
 		Mockito.verify(basicRemote).sendText(deelnemer.getNaam() + " is een " + fooEvent.woord);
@@ -181,7 +181,7 @@ public class FooEventTest {
 		@Mock Session session,
 		@Mock RemoteEndpoint.Basic basicRemote
 	) throws IOException {
-		Mockito.when(kamer.getDeelnemer(fooEvent.getDeelnemer())).thenReturn(Optional.empty());
+		Mockito.when(kamer.getDeelnemer(fooEvent.getDeelnemerId())).thenReturn(Optional.empty());
 		fooEvent.voerUit(kamer, session);
 		Mockito.verifyNoInteractions(basicRemote);
 	}

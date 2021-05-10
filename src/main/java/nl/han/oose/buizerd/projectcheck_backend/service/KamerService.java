@@ -99,7 +99,7 @@ public class KamerService {
 	 */
 	@OnMessage
 	public EventResponse message(Event event, @PathParam("kamerCode") String kamerCode, Session session) {
-		String eventKamerCode = event.getDeelnemer().getKamerCode();
+		String eventKamerCode = event.getDeelnemerId().getKamerCode();
 		if (!eventKamerCode.equals(kamerCode)) {
 			return new EventResponse(EventResponse.Status.VERBODEN);
 		}
