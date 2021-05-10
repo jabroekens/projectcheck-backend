@@ -1,62 +1,46 @@
 package nl.han.oose.buizerd.projectcheck_backend.service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import javax.inject.Inject;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import com.google.gson.JsonObject;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.exceptions.KamerNietGevondenExceptie;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
+import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 @Path("/")
-public class AppService {
-
-	@Context
-	UriInfo uriInfo;
+public class AppService extends Application {
 
 	@Inject
 	private KamerRepository kamerRepository;
 
-	private final Map<String, KamerService> kamerServices;
-
-	public AppService() {
-		this.kamerServices = new HashMap<>();
-	}
+	@Inject
+	private KamerService kamerService;
 
 	/**
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
 	 *
 	 * @param begeleiderNaam De naam van de {@link Begeleider}.
-	 * @return Een JSON string met de WebSocket URL van de {@link WebSocketService} gewikkelt in {@link Response}.
+	 * @return Een JSON string met de WebSocket URL van de {@link Kamer} gewikkelt in {@link Response}.
 	 * @see KamerRepository#maakKamer(String)
 	 */
 	@Path("/kamer/nieuw")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response maakKamer(@FormParam("begeleiderNaam") String begeleiderNaam) {
+	public Response maakKamer(@FormParam("begeleiderNaam") @Naam String begeleiderNaam) {
 		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
+		KamerService.registreer(kamer.getKamerCode());
 
-		KamerService kamerService = new KamerService(kamerRepository, kamer);
-		kamerService.start();
-
-		kamerServices.put(kamer.getKamerCode(), kamerService);
-
-		// FIXME returns incorrect url
-		String url = "ws://" + uriInfo.getBaseUri().getHost() + "/kamer/" + kamer.getKamerCode();
-		JsonObject json = Json.createObjectBuilder().add("kamer_url", url).build();
-		return Response.ok(json).build();
+		JsonObject json = new JsonObject();
+		json.addProperty("kamer_url", kamerService.getUrl(kamer.getKamerCode()));
+		return Response.ok(json.toString()).build();
 	}
 
 	@Path("/kamer/neemdeel/{kamer-code}")

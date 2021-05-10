@@ -1,7 +1,9 @@
 package nl.han.oose.buizerd.projectcheck_backend.repository;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
 import java.util.Optional;
-import javax.validation.constraints.NotNull;
 
 /**
  * Een Repository volgens het Repository pattern.
@@ -17,31 +19,35 @@ public interface Repository<T, K> {
 	 * @param t De instantie die toegevoegd moet worden.
 	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#create(Object)
 	 */
-	void add(@NotNull T t);
+	@ValidateOnExecution
+	void add(@NotNull @Valid T t);
 
 	/**
 	 * Haal een instantie van {@code T} op met de identifier {@code k}.
 	 *
 	 * @param k De identifier van de op te halen instantie.
-	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional<T>}.
+	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional}.
 	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#read(Class, Object)
 	 */
-	Optional<T> get(@NotNull K k);
+	@ValidateOnExecution
+	Optional<@Valid T> get(@NotNull @Valid K k);
 
 	/**
 	 * Update de toegevoegde instantie van {@code T}.
 	 *
 	 * @param t De instantie waarmee de toegevoegde instantie van {@link T} vervangen moet worden.
-	 * @see javax.persistence.EntityManager#merge(Object)
+	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#update(Object)
 	 */
-	void update(@NotNull T t);
+	@ValidateOnExecution
+	void update(@NotNull @Valid T t);
 
 	/**
 	 * Verwijder de toegevoegde instantie van {@code T} met de identifier {@code k}.
 	 *
 	 * @param k De identifier van de toegevoegde instantie die verwijderd moet worden.
-	 * @see javax.persistence.EntityManager#remove(Object)
+	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#delete(Object)
 	 */
-	void remove(@NotNull K k);
+	@ValidateOnExecution
+	void remove(@NotNull @Valid K k);
 
 }

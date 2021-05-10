@@ -1,12 +1,16 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Embeddable;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.validation.constraints.NotNull;
+import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
+/**
+ * De identifier van {@link Deelnemer}.
+ */
 @Embeddable
 public class DeelnemerId implements Serializable {
 
@@ -23,19 +27,34 @@ public class DeelnemerId implements Serializable {
 	 *
 	 * Zie: https://stackoverflow.com/a/9146987
 	 */
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long deelnemerId;
+	@NotNull
+	@Column(nullable = false, updatable = false)
+	private Long id;
 
 	/**
 	 * De code van de {@link Kamer} waaraan de {@link Deelnemer} deelneemt.
 	 */
+	@KamerCode
+	@Column(nullable = false, updatable = false)
 	private String kamerCode;
 
+	/**
+	 * Construeert een {@link DeelnemerId}.
+	 * <p>
+	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 */
 	public DeelnemerId() {
-		// Een lege constructor is vereist door JPA.
 	}
 
-	public DeelnemerId(@NotNull String kamerCode) {
+	/**
+	 * Construeert een {@link DeelnemerId}.
+	 *
+	 * @param id Het ID van de deelnemer.
+	 * @param kamerCode De code van de kamer.
+	 */
+	@ValidateOnExecution
+	public DeelnemerId(@NotNull Long id, @KamerCode String kamerCode) {
+		this.id = id;
 		this.kamerCode = kamerCode;
 	}
 
@@ -44,8 +63,8 @@ public class DeelnemerId implements Serializable {
 	 *
 	 * @return Het ID van de deelnemer.
 	 */
-	public Long getDeelnemerId() {
-		return deelnemerId;
+	public Long getId() {
+		return id;
 	}
 
 	/**
@@ -57,6 +76,9 @@ public class DeelnemerId implements Serializable {
 		return kamerCode;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -66,12 +88,15 @@ public class DeelnemerId implements Serializable {
 			return false;
 		}
 		DeelnemerId that = (DeelnemerId) o;
-		return deelnemerId.equals(that.deelnemerId) && kamerCode.equals(that.kamerCode);
+		return id.equals(that.id) && kamerCode.equals(that.kamerCode);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(deelnemerId, kamerCode);
+		return Objects.hash(id, kamerCode);
 	}
 
 }

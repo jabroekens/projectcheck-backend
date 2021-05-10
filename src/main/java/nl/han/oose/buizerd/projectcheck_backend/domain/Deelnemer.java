@@ -1,17 +1,20 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
-import javax.validation.constraints.NotNull;
-import nl.han.oose.buizerd.projectcheck_backend.exceptions.InvalideGebruikerException;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
+import java.util.Optional;
+import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**
  * Een deelnemer is iemand die deelneemt aan een {@link Kamer}.
+ * <p>
  * Elke deelnemer heeft een naam.
  */
 @Entity
@@ -20,28 +23,41 @@ public class Deelnemer {
 	/**
 	 * De identifier van de deelnemer.
 	 */
+	@NotNull
+	@Valid
 	@EmbeddedId
 	private DeelnemerId deelnemerId;
+
+	/**
+	 * De naam van de deelnemer.
+	 */
+	@Naam
+	@Column(nullable = false)
+	private String naam;
 
 	/**
 	 * De {@link Kamer} waaraan de deelnemer deelneemt.
 	 */
 	@MapsId("kamerCode")
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.ALL)
 	private Kamer kamer;
 
 	/**
-	 * De naam van de deelnemer.
+	 * Construeert een {@link Deelnemer}.
+	 * <p>
+	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
 	 */
-	@Column(nullable = false, updatable = false)
-	private String naam;
-
 	public Deelnemer() {
-		// Een lege constructor is vereist door JPA.
 	}
 
-	// Een constructor voor tests.
-	Deelnemer(@NotNull DeelnemerId deelnemerId, @NotNull String naam) {
+	/**
+	 * Construeert een {@link Deelnemer}.
+	 *
+	 * @param deelnemerId De {@link DeelnemerId} die de deelnemer identificeert.
+	 * @param naam De naam van de deelnemer.
+	 */
+	@ValidateOnExecution
+	public Deelnemer(@NotNull @Valid DeelnemerId deelnemerId, @Naam String naam) {
 		this.deelnemerId = deelnemerId;
 		this.naam = valideerGebruikersnaam(naam);
 	}
@@ -68,21 +84,24 @@ public class Deelnemer {
 		return naam;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		Deelnemer deelnemer = (Deelnemer) o;
-		return deelnemerId.equals(deelnemer.deelnemerId) && kamer.equals(deelnemer.kamer) && naam.equals(deelnemer.naam);
+	/**
+	 * Zet de naam van de deelnemer.
+	 *
+	 * @param naam De nieuwe naam van de deelnemer.
+	 */
+	@ValidateOnExecution
+	public void setNaam(@Naam String naam) {
+		this.naam = naam;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(deelnemerId, kamer, naam);
+	/**
+	 * Haal de kamer waaraan de deelnemer deelneemt op.
+	 * <b>Deze is alleen aanwezig nadat een deelnemer uit de datastore is geladen.</b>
+	 *
+	 * @return De kamer waaraan de deelnemer deelneemt.
+	 */
+	public Optional<Kamer> getKamer() {
+		return Optional.ofNullable(kamer);
 	}
 
 }
