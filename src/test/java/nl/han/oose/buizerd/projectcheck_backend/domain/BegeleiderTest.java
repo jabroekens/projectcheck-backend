@@ -1,8 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class BegeleiderTest {
@@ -18,17 +16,6 @@ public class BegeleiderTest {
 		);
 
 		begeleider = new Begeleider(deelnemerId, "Joost");
-	}
-
-	@Test
-	void geeftJuisteDeelnemerId() {
-		Assertions.assertEquals(deelnemerId, begeleider.getDeelnemerId());
-	}
-
-	@Test
-	void zetJuisteNaam() {
-		begeleider.setNaam("Jochem");
-		Assertions.assertEquals("Jochem", begeleider.getNaam());
 	}
 
 }

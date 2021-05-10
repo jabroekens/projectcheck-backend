@@ -46,6 +46,11 @@ public class KamerTest {
 	}
 
 	@Test
+	void geeftJuisteDeelnemer(@Mock DeelnemerId deelnemerId) {
+		Assertions.assertTrue(kamer.getDeelnemer(deelnemerId).isEmpty());
+	}
+
+	@Test
 	void geeftJuisteDeelnemers() {
 		/*
 		 * Omdat `Kamer#getDeelnemers()` een UnmodifiableSet teruggeeft

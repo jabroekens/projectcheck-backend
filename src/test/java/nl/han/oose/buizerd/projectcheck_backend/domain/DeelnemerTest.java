@@ -26,7 +26,7 @@ public class DeelnemerTest {
 	}
 
 	@Test
-	void zetJuisteNaam() {
+	void zetEnGeeftJuisteNaam() {
 		deelnemer.setNaam("Jochem");
 		Assertions.assertEquals("Jochem", deelnemer.getNaam());
 	}

@@ -3,7 +3,11 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 public class DeelnemerIdTest {
 
 	private static final Long DEELNEMER_ID = 2L;
@@ -27,11 +31,11 @@ public class DeelnemerIdTest {
 	}
 
 	@Test
-	void implementeertEqualsCorrect() {
+	void implementeertEqualsCorrect(@Mock Object object) {
 		Assertions.assertAll(
 			() -> Assertions.assertEquals(deelnemerId, deelnemerId),
 			() -> Assertions.assertNotEquals(null, deelnemerId),
-			() -> Assertions.assertNotEquals(new Object(), deelnemerId),
+			() -> Assertions.assertNotEquals(object, deelnemerId),
 			() -> {
 				DeelnemerId equal = new DeelnemerId(deelnemerId.getDeelnemerId(), deelnemerId.getKamerCode());
 				Assertions.assertEquals(equal, deelnemerId);

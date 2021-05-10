@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  *  * Zie: https://stackoverflow.com/a/6724555
  */
 @ExtendWith(MockitoExtension.class)
-public class KamerRepositoryTest {
+public class KamerRepositoryTest extends RepositoryTest<Kamer, String> {
 
 	@Mock
 	private DAO<Kamer, String> kamerDAO;
@@ -51,26 +51,24 @@ public class KamerRepositoryTest {
 		);
 	}
 
-	void voegtToe(@Mock Kamer kamer) {
+	void voegtToe(Kamer kamer) {
 		kamerRepository.add(kamer);
 		Mockito.verify(kamerDAO).create(kamer);
 	}
 
-	void geeft() {
-		String kamerCode = "123456";
-		kamerRepository.get(kamerCode);
-		Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
+	void geeft(String s) {
+		Assertions.assertTrue(kamerRepository.get(s).isEmpty());
+		Mockito.verify(kamerDAO).read(Kamer.class, s);
 	}
 
-	void updatet(@Mock Kamer kamer) {
+	void updatet(Kamer kamer) {
 		kamerRepository.update(kamer);
 		Mockito.verify(kamerDAO).update(kamer);
 	}
 
-	void verwijdert() {
-		String kamerCode = "123456";
-		kamerRepository.remove(kamerCode);
-		Mockito.verify(kamerDAO).delete(kamerCode);
+	void verwijdert(String s) {
+		kamerRepository.remove(s);
+		Mockito.verify(kamerDAO).delete(s);
 	}
 
 }
