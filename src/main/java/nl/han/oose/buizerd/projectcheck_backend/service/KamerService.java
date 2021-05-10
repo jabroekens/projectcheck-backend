@@ -67,9 +67,9 @@ public class KamerService {
 
 		return UriBuilder
 			.fromUri(uri)
-			.resolveTemplate(this.getClass().getAnnotation(ServerEndpoint.class).value(), kamerCode)
+			.path(getClass().getAnnotation(ServerEndpoint.class).value())
 			.scheme(uri.getScheme().equals("https") ? "wss" : "ws")
-			.build().toString();
+			.build(kamerCode).toString();
 	}
 
 	/**
