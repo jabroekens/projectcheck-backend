@@ -29,7 +29,7 @@ public class DeelnemerId implements Serializable {
 	 */
 	@NotNull
 	@Column(nullable = false, updatable = false)
-	private Long deelnemerId;
+	private Long id;
 
 	/**
 	 * De code van de {@link Kamer} waaraan de {@link Deelnemer} deelneemt.
@@ -49,12 +49,12 @@ public class DeelnemerId implements Serializable {
 	/**
 	 * Construeert een {@link DeelnemerId}.
 	 *
-	 * @param deelnemerId Het ID van de deelnemer.
+	 * @param id Het ID van de deelnemer.
 	 * @param kamerCode De code van de kamer.
 	 */
 	@ValidateOnExecution
-	public DeelnemerId(@NotNull Long deelnemerId, @KamerCode String kamerCode) {
-		this.deelnemerId = deelnemerId;
+	public DeelnemerId(@NotNull Long id, @KamerCode String kamerCode) {
+		this.id = id;
 		this.kamerCode = kamerCode;
 	}
 
@@ -63,8 +63,8 @@ public class DeelnemerId implements Serializable {
 	 *
 	 * @return Het ID van de deelnemer.
 	 */
-	public Long getDeelnemerId() {
-		return deelnemerId;
+	public Long getId() {
+		return id;
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class DeelnemerId implements Serializable {
 			return false;
 		}
 		DeelnemerId that = (DeelnemerId) o;
-		return deelnemerId.equals(that.deelnemerId) && kamerCode.equals(that.kamerCode);
+		return id.equals(that.id) && kamerCode.equals(that.kamerCode);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class DeelnemerId implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(deelnemerId, kamerCode);
+		return Objects.hash(id, kamerCode);
 	}
 
 }

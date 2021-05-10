@@ -9,6 +9,7 @@ import jakarta.persistence.MapsId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
+import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**
@@ -91,11 +92,12 @@ public class Deelnemer {
 
 	/**
 	 * Haal de kamer waaraan de deelnemer deelneemt op.
+	 * <b>Deze is alleen aanwezig nadat een deelnemer uit de datastore is geladen.</b>
 	 *
 	 * @return De kamer waaraan de deelnemer deelneemt.
 	 */
-	public Kamer getKamer() {
-		return kamer;
+	public Optional<Kamer> getKamer() {
+		return Optional.ofNullable(kamer);
 	}
 
 }

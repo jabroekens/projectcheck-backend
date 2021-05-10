@@ -3,7 +3,11 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 public class DeelnemerIdTest {
 
 	private static final Long DEELNEMER_ID = 2L;
@@ -18,7 +22,7 @@ public class DeelnemerIdTest {
 
 	@Test
 	void geeftJuisteDeelnemerId() {
-		Assertions.assertEquals(DeelnemerIdTest.DEELNEMER_ID, deelnemerId.getDeelnemerId());
+		Assertions.assertEquals(DeelnemerIdTest.DEELNEMER_ID, deelnemerId.getId());
 	}
 
 	@Test
@@ -27,21 +31,21 @@ public class DeelnemerIdTest {
 	}
 
 	@Test
-	void implementeertEqualsCorrect() {
+	void implementeertEqualsCorrect(@Mock Object object) {
 		Assertions.assertAll(
 			() -> Assertions.assertEquals(deelnemerId, deelnemerId),
 			() -> Assertions.assertNotEquals(null, deelnemerId),
-			() -> Assertions.assertNotEquals(new Object(), deelnemerId),
+			() -> Assertions.assertNotEquals(object, deelnemerId),
 			() -> {
-				DeelnemerId equal = new DeelnemerId(deelnemerId.getDeelnemerId(), deelnemerId.getKamerCode());
+				DeelnemerId equal = new DeelnemerId(deelnemerId.getId(), deelnemerId.getKamerCode());
 				Assertions.assertEquals(equal, deelnemerId);
 			},
 			() -> {
-				DeelnemerId unequalId = new DeelnemerId(deelnemerId.getDeelnemerId() + 1L, deelnemerId.getKamerCode());
+				DeelnemerId unequalId = new DeelnemerId(deelnemerId.getId() + 1L, deelnemerId.getKamerCode());
 				Assertions.assertNotEquals(unequalId, deelnemerId);
 			},
 			() -> {
-				DeelnemerId unequalKamerCode = new DeelnemerId(deelnemerId.getDeelnemerId(), deelnemerId.getKamerCode() + " ");
+				DeelnemerId unequalKamerCode = new DeelnemerId(deelnemerId.getId(), deelnemerId.getKamerCode() + " ");
 				Assertions.assertNotEquals(unequalKamerCode, deelnemerId);
 			}
 		);
@@ -49,7 +53,7 @@ public class DeelnemerIdTest {
 
 	@Test
 	void implementeertHashCodeCorrect() {
-		DeelnemerId equal = new DeelnemerId(deelnemerId.getDeelnemerId(), deelnemerId.getKamerCode());
+		DeelnemerId equal = new DeelnemerId(deelnemerId.getId(), deelnemerId.getKamerCode());
 		Assertions.assertEquals(equal.hashCode(), deelnemerId.hashCode());
 	}
 
