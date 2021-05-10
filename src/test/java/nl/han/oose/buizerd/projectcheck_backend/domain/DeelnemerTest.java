@@ -31,4 +31,9 @@ public class DeelnemerTest {
 		Assertions.assertEquals("Jochem", deelnemer.getNaam());
 	}
 
+	@Test
+	void geeftJuisteKamer() {
+		Assertions.assertTrue(deelnemer.getKamer().isEmpty());
+	}
+
 }
