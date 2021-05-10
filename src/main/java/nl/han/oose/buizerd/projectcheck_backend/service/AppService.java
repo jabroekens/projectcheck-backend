@@ -60,12 +60,9 @@ public class AppService extends Application {
 		if (kamer.isPresent()) {
 			Deelnemer deelnemer = new Deelnemer(new DeelnemerId(kamer.get().genereerDeelnemerId(), kamer.get().getKamerCode()), deelnemerNaam);
 			deelnemerDAO.create(deelnemer);
-
-			// TODO @Luka: injecten DAO voor deelnemer en aanmaken deelnemer met DAO (zie KamerRepository voor een voorbeeld)
 			kamer.get().voegDeelnemerToe(deelnemer);
-			return Response.ok().entity(deelnemer).build();
+			return Response.ok().build();
 			//kamerRepository.add(kamer.get());
-			// afhankelijk van hoe de bovenstaande methode wordt afgehandeld, wel of niet returnen en iets meegeven met een Response
 
 		} else {
 			throw new KamerNietGevondenExceptie(kamerCode);
