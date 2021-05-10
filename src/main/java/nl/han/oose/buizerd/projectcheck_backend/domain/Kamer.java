@@ -158,4 +158,16 @@ public class Kamer {
 		return Collections.unmodifiableSet(deelnemers);
 	}
 
+	public void voegDeelnemerToe(Deelnemer deelnemer) {
+		deelnemers.add(deelnemer);
+
+	}
+
+	public long genereerDeelnemerId() {
+		return getDeelnemers().size() + 2;
+
+	}
+
+
+
 }

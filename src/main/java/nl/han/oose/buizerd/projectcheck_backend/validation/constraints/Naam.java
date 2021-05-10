@@ -3,6 +3,7 @@ package nl.han.oose.buizerd.projectcheck_backend.validation.constraints;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -15,7 +16,7 @@ import java.lang.annotation.Target;
  *  * Zie: https://docs.oracle.com/javaee/7/tutorial/bean-validation001.htm
  *  * Ook handig: https://regexr.com
  */
-@NotBlank
+@Pattern(regexp = "^[a-zA-Z0-9]([._-](?![._-])|[a-zA-Z0-9]){3,18}[a-zA-Z0-9]$")
 @Constraint(validatedBy = {})
 @Documented
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER})

@@ -59,12 +59,9 @@ public class Deelnemer {
 	@ValidateOnExecution
 	public Deelnemer(@NotNull @Valid DeelnemerId deelnemerId, @Naam String naam) {
 		this.deelnemerId = deelnemerId;
-		this.naam = valideerGebruikersnaam(naam);
+		this.naam = naam;
 	}
 
-	private String valideerGebruikersnaam(String naam) throws InvalideGebruikerException {
-		// TODO @Luka: uitwerken in code
-	}
 
 	/**
 	 * Haal de identifier van de deelnemer op.

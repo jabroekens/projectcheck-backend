@@ -66,5 +66,13 @@ public class KamerTest {
 			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getDeelnemers().remove(null))
 		);
 	}
+	@Test
+	void kamerGeeftJuisteDeelnemerId(){
+
+
+
+
+	}
+
 
 }
