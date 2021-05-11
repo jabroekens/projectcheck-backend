@@ -2,7 +2,11 @@ package nl.han.oose.buizerd.projectcheck_backend.service;
 
 import com.google.gson.JsonObject;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -14,7 +18,6 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.exceptions.KamerNietGevondenExceptie;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
-
 import java.util.Optional;
 
 @Path("/")
@@ -28,9 +31,6 @@ public class AppService extends Application {
 
 	@Inject
 	private DAO<Deelnemer, DeelnemerId> deelnemerDAO;
-
-
-
 
 	/**
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
@@ -51,18 +51,16 @@ public class AppService extends Application {
 		return Response.ok(json.toString()).build();
 	}
 
-	@Path("/kamer/neemdeel/{kamer-code}")
+	@Path("/kamer/neemdeel/{kamerCode}")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response neemDeel(@PathParam("kamer-code") String kamerCode, @FormParam("deelnemerNaam") String deelnemerNaam) {
+	public Response neemDeel(@PathParam("kamerCode") String kamerCode, @FormParam("deelnemerNaam") String deelnemerNaam) {
 		Optional<Kamer> kamer = kamerRepository.get(kamerCode);
-		System.out.println(deelnemerNaam);
 		if (kamer.isPresent()) {
 			Deelnemer deelnemer = new Deelnemer(new DeelnemerId(kamer.get().genereerDeelnemerId(), kamer.get().getKamerCode()), deelnemerNaam);
 			deelnemerDAO.create(deelnemer);
 			kamer.get().voegDeelnemerToe(deelnemer);
 			return Response.ok().build();
-			//kamerRepository.add(kamer.get());
 
 		} else {
 			throw new KamerNietGevondenExceptie(kamerCode);

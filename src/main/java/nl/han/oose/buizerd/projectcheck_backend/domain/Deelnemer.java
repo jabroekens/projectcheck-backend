@@ -62,7 +62,6 @@ public class Deelnemer {
 		this.naam = naam;
 	}
 
-
 	/**
 	 * Haal de identifier van de deelnemer op.
 	 *

@@ -158,13 +158,14 @@ public class Kamer {
 		return Collections.unmodifiableSet(deelnemers);
 	}
 
-	public void voegDeelnemerToe(Deelnemer deelnemer) {
+	@ValidateOnExecution
+	public void voegDeelnemerToe(@NotNull Deelnemer deelnemer) {
 		deelnemers.add(deelnemer);
 
 	}
 
-	public long genereerDeelnemerId() {
-		return getDeelnemers().size() + 2;
+	public Long genereerDeelnemerId() {
+		return (long) (getDeelnemers().size() + 2);
 
 	}
 

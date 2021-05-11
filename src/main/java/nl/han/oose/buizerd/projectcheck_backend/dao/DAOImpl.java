@@ -50,7 +50,7 @@ public class DAOImpl<T, K> implements DAO<T, K> {
 
 	private void doTransaction(Consumer<EntityManager> consumer) {
 		try {
-			if(transaction.getStatus() != Status.STATUS_ACTIVE) {
+			if (transaction.getStatus() != Status.STATUS_ACTIVE) {
 				transaction.begin();
 			}
 			consumer.accept(entityManager);

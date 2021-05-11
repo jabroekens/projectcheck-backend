@@ -10,12 +10,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/*
- * TODO @Luka: regex voor naamvalidatie
- *  * Denk aan Unicode letters, spaties en andere tekens
- *  * Zie: https://docs.oracle.com/javaee/7/tutorial/bean-validation001.htm
- *  * Ook handig: https://regexr.com
- */
 @Pattern(regexp = "^[a-zA-Z0-9]([._-](?![._-])|[a-zA-Z0-9]){3,18}[a-zA-Z0-9]$")
 @Constraint(validatedBy = {})
 @Documented
