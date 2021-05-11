@@ -28,6 +28,9 @@ public class KamerTest {
 	@Mock
 	private Begeleider begeleider;
 
+	@Mock
+	private Deelnemer deelnemer;
+
 	/*
 	* Deze set kan niet worden gemokt, omdat er niks kan worden toegevoegd aan een list wanneer deze gemocked is.
 	* Daarom wordt er hier gebruik gemaakt van een Spy die de Set gedeeltelijk mocked.
@@ -81,12 +84,9 @@ public class KamerTest {
 	}
 	@Test
 	void kamerGeeftJuisteDeelnemerId(){
+
 		//Arrange
-		Kamer testKamer = new Kamer(KamerTest.KAMER_CODE, datum, begeleider, deelnemers);
-		Deelnemer deelnemer = Mockito.mock(Deelnemer.class);
-
-		testKamer.voegDeelnemerToe(deelnemer);
-
+		kamer.voegDeelnemerToe(deelnemer);
 		int expectedId = 3;
 		//Act
 		int actualId = Math.toIntExact(kamer.genereerDeelnemerId());
