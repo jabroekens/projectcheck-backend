@@ -43,7 +43,7 @@ public abstract class Event {
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 * @param session De betrokken {@link Session}.
 	 */
-	public void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) {
+	public final void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) {
 		CompletableFuture.runAsync(() -> {
 			try {
 				voerUit(kamer, session);
@@ -81,7 +81,7 @@ public abstract class Event {
 	 *
 	 * @see jakarta.websocket.Decoder.Text
 	 */
-	public static class Decoder implements jakarta.websocket.Decoder.Text<Event> {
+	public static final class Decoder implements jakarta.websocket.Decoder.Text<Event> {
 
 		private static final Gson GSON;
 		private static final Validator VALIDATOR;
