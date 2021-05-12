@@ -86,16 +86,13 @@
 							<rules>
 								<rule>
 									<excludes>
-										<exclude>**.CORSFilter</exclude>
 										<exclude>**.dao.*</exclude>
 										<exclude>**.event.Event</exclude>
 										<exclude>**.event.Event.Decoder</exclude>
 										<exclude>**.event.EventResponse</exclude>
 										<exclude>**.event.EventResponse.Status</exclude>
 										<exclude>**.event.EventResponse.Encoder</exclude>
-										<exclude>**.exception.*</exclude>
-										<exclude>**.exception_mapper.*</exclude>
-										<exclude>**.service.*</exclude>
+										<exclude>**.service.KamerService</exclude>
 									</excludes>
 									<element>CLASS</element>
 									<limits>

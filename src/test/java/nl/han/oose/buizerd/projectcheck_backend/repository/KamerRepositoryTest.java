@@ -32,7 +32,7 @@ public class KamerRepositoryTest extends RepositoryTest<Kamer, String> {
 	private KamerRepository kamerRepository;
 
 	@BeforeEach
-	void init() {
+	void setUp() {
 		kamerRepository = new KamerRepository(kamerDAO, begeleiderDAO);
 	}
 

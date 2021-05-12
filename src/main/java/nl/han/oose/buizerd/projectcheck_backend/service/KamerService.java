@@ -32,12 +32,23 @@ import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 )
 public class KamerService {
 
-	private static final Logger LOGGER = Logger.getLogger(KamerService.class.getName());
-
-	private static final Set<String> geregistreerdeKamers;
+	static Logger LOGGER;
+	static final Set<String> GEREGISTREERDE_KAMERS;
 
 	static {
-		geregistreerdeKamers = new HashSet<>();
+		LOGGER = Logger.getLogger(KamerService.class.getName());
+		GEREGISTREERDE_KAMERS = new HashSet<>();
+	}
+
+	/**
+	 * Zet de {@link Logger} van {@link KamerService}.
+	 *
+	 * <b>Deze methode mag alleen aangeroepen worden binnen tests.</b>
+	 *
+	 * @param logger Een {@link Logger}.
+	 */
+	static void setLogger(Logger logger) {
+		KamerService.LOGGER = logger;
 	}
 
 	/**
@@ -47,7 +58,7 @@ public class KamerService {
 	 * @see KamerService#getUrl(String)
 	 */
 	public static void registreer(String kamerCode) {
-		KamerService.geregistreerdeKamers.add(kamerCode);
+		KamerService.GEREGISTREERDE_KAMERS.add(kamerCode);
 	}
 
 	@Context
@@ -55,6 +66,27 @@ public class KamerService {
 
 	@Inject
 	private KamerRepository kamerRepository;
+
+	/**
+	 * Construeert een {@link KamerService}.
+	 * <p>
+	 * <b>Deze constructor wordt gebruikt door Jakarta WebSockets API en mag niet aangeroepen worden.</b>
+	 */
+	public KamerService() {
+	}
+
+	/**
+	 * Construeert een {@link KamerService}.
+	 *
+	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
+	 *
+	 * @param uriInfo Een implementatie van {@link UriInfo}.
+	 * @param kamerRepository Een {@link KamerRepository}.
+	 */
+	KamerService(UriInfo uriInfo, KamerRepository kamerRepository) {
+		this.uriInfo = uriInfo;
+		this.kamerRepository = kamerRepository;
+	}
 
 	/**
 	 * Haalt de WebSocket URL op voor de kamer met de code {@code kamerCode}.
@@ -67,7 +99,7 @@ public class KamerService {
 
 		return UriBuilder
 			.fromUri(uri)
-			.replacePath(getClass().getAnnotation(ServerEndpoint.class).value())
+			.replacePath(KamerService.class.getAnnotation(ServerEndpoint.class).value())
 			.scheme("https".equals(uri.getScheme()) ? "wss" : "ws")
 			.build(kamerCode).toString();
 	}
@@ -77,7 +109,7 @@ public class KamerService {
 	 */
 	@OnOpen
 	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") String kamerCode) {
-		if (!KamerService.geregistreerdeKamers.contains(kamerCode)) {
+		if (!KamerService.GEREGISTREERDE_KAMERS.contains(kamerCode)) {
 			try {
 				session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer niet gevonden"));
 			} catch (IOException e) {

@@ -9,7 +9,7 @@ public class BegeleiderTest {
 	private Begeleider begeleider;
 
 	@BeforeEach
-	void init() {
+	void setUp() {
 		deelnemerId = Mockito.mock(
 			DeelnemerId.class,
 			Mockito.withSettings().useConstructor(1L, "123456")

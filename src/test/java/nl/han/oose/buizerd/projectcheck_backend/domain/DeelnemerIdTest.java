@@ -16,7 +16,7 @@ public class DeelnemerIdTest {
 	private DeelnemerId deelnemerId;
 
 	@BeforeEach
-	void init() {
+	void setUp() {
 		deelnemerId = new DeelnemerId(DeelnemerIdTest.DEELNEMER_ID, DeelnemerIdTest.KAMER_CODE);
 	}
 

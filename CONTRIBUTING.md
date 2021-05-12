@@ -157,7 +157,7 @@ public class FooEventTest {
 	private FooEvent fooEvent;
 
 	@BeforeEach
-	void init() {
+	void setUp() {
 		fooEvent = new FooEvent();
 		fooEvent.woord = "aap";
 	}

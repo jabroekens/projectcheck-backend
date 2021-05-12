@@ -11,7 +11,7 @@ public class DeelnemerTest {
 	private Deelnemer deelnemer;
 
 	@BeforeEach
-	void init() {
+	void setUp() {
 		deelnemerId = Mockito.mock(
 			DeelnemerId.class,
 			Mockito.withSettings().useConstructor(2L, "123456")

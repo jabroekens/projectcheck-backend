@@ -35,7 +35,7 @@ public class KamerTest {
 	private Kamer kamer;
 
 	@BeforeEach
-	void init() {
+	void setUp() {
 		deelnemers = new HashSet<>();
 		kamer = new Kamer(KamerTest.KAMER_CODE, datum, begeleider, deelnemers);
 	}
