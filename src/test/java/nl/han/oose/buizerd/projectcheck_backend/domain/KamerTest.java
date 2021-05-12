@@ -32,12 +32,15 @@ public class KamerTest {
 	@Spy
 	private Set<Deelnemer> deelnemers;
 
+	@Mock
+	private Set<Rol> relevanteRollen;
+
 	private Kamer kamer;
 
 	@BeforeEach
 	void setUp() {
 		deelnemers = new HashSet<>();
-		kamer = new Kamer(KamerTest.KAMER_CODE, datum, begeleider, deelnemers);
+		kamer = new Kamer(KamerTest.KAMER_CODE, datum, begeleider, deelnemers, relevanteRollen);
 	}
 
 	@Test

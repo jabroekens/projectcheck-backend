@@ -2,6 +2,7 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -13,10 +14,12 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.executable.ValidateOnExecution;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import nl.han.oose.buizerd.projectcheck_backend.exception.RoleNotFoundException;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
 /**
@@ -74,6 +77,12 @@ public class Kamer {
 	private Begeleider begeleider;
 
 	/**
+	 * De rollen die in de kamer ingeschakeld zijn.
+	 */
+	@ElementCollection
+	private Set<Rol> relevanteRollen;
+
+	/**
 	 * De deelnemers van de kamer.
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "kamer", orphanRemoval = true)
@@ -96,7 +105,7 @@ public class Kamer {
 	@ValidateOnExecution
 	public Kamer(@KamerCode String kamerCode, @NotNull @Valid Begeleider begeleider) {
 		// Dit is een uitzondering op de comment bij `Kamer#Kamer(String, LocalDateTime, Begeleider, Set)`
-		this(kamerCode, LocalDateTime.now(), begeleider, new HashSet<>());
+		this(kamerCode, LocalDateTime.now(), begeleider, new HashSet<>(), EnumSet.noneOf(Rol.class));
 	}
 
 	/**
@@ -109,11 +118,12 @@ public class Kamer {
 	 * @param begeleider De begeleider van de kamer.
 	 * @param deelnemers Een set van deelnemers van de kamer.
 	 */
-	Kamer(String kamerCode, LocalDateTime datum, Begeleider begeleider, Set<Deelnemer> deelnemers) {
+	Kamer(String kamerCode, LocalDateTime datum, Begeleider begeleider, Set<Deelnemer> deelnemers, Set<Rol> relevanteRollen) {
 		this.kamerCode = kamerCode;
 		this.datum = datum;
 		this.begeleider = begeleider;
 		this.deelnemers = deelnemers;
+		this.relevanteRollen = relevanteRollen;
 	}
 
 	/**
@@ -177,7 +187,35 @@ public class Kamer {
 	public Long genereerDeelnemerId() {
 		// Een begeleider heeft altijd het ID `1`, dus het ID van deelnemers begint vanaf `2`
 		return deelnemers.size() + 1L;
+	}
 
+	/*
+	 * Haal een read-only kopie op van de relevante rollen van de kamer.
+	 *
+	 * @return Een read-only kopie van de relevante rolen van de kamer.
+	 */
+	@ValidateOnExecution
+	public Set<Rol> getRelevanteRollen() {
+		return relevanteRollen;
+	}
+
+	@ValidateOnExecution
+	public Optional<Rol> getRelevanteRol(@Valid String rolNaam) {
+		return relevanteRollen.stream().filter(r -> r.getRolNaam().equals(rolNaam)).findAny();
+	}
+
+	/**
+	 * Schakel een relevante rol in voor de kamer.
+	 */
+	@ValidateOnExecution
+	public void activeerRelevanteRol(String rol) {
+		for (Rol mogelijkeRol : Rol.values()) {
+			if (mogelijkeRol.getRolNaam().equals(rol)) {
+				this.relevanteRollen.add(mogelijkeRol);
+			} else {
+				throw new RoleNotFoundException();
+			}
+		}
 	}
 
 }
