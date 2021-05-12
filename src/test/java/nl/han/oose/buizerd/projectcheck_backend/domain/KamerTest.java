@@ -1,12 +1,14 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,12 +23,20 @@ public class KamerTest {
 	private Begeleider begeleider;
 
 	@Mock
+	private Deelnemer deelnemer;
+
+	/*
+	 * Deze set kan niet worden gemokt, omdat er niks kan worden toegevoegd aan een list wanneer deze gemocked is.
+	 * Daarom wordt er hier gebruik gemaakt van een Spy die de Set gedeeltelijk mocked.
+	 */
+	@Spy
 	private Set<Deelnemer> deelnemers;
 
 	private Kamer kamer;
 
 	@BeforeEach
 	void init() {
+		deelnemers = new HashSet<>();
 		kamer = new Kamer(KamerTest.KAMER_CODE, datum, begeleider, deelnemers);
 	}
 
@@ -65,6 +75,20 @@ public class KamerTest {
 			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getDeelnemers().add(null)),
 			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getDeelnemers().remove(null))
 		);
+	}
+
+	@Test
+	void kamerGeeftJuisteDeelnemerId() {
+		//Arrange
+		kamer.voegDeelnemerToe(deelnemer);
+		Long expectedId = 2L;
+
+		//Act
+		Long actualId = kamer.genereerDeelnemerId();
+
+		//Assert
+		Assertions.assertEquals(expectedId, actualId);
+
 	}
 
 }

@@ -2,20 +2,14 @@ package nl.han.oose.buizerd.projectcheck_backend.validation.constraints;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/*
- * TODO @Luka: regex voor naamvalidatie
- *  * Denk aan Unicode letters, spaties en andere tekens
- *  * Zie: https://docs.oracle.com/javaee/7/tutorial/bean-validation001.htm
- *  * Ook handig: https://regexr.com
- */
-@NotBlank
+@Pattern(regexp = "^[\\p{L}\\p{Zs}\\p{Mn}\\p{Pd}']{3,18}$")
 @Constraint(validatedBy = {})
 @Documented
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER})

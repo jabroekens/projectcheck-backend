@@ -158,4 +158,26 @@ public class Kamer {
 		return Collections.unmodifiableSet(deelnemers);
 	}
 
+	/**
+	 * Voeg een deelnemer toe aan de kamer.
+	 *
+	 * @param deelnemer De {@link Deelnemer} die toegevoegd moet worden.
+	 */
+	@ValidateOnExecution
+	public void voegDeelnemerToe(@NotNull @Valid Deelnemer deelnemer) {
+		deelnemers.add(deelnemer);
+
+	}
+
+	/**
+	 * Genereert een ID dat gebruikt wordt in {@link DeelnemerId}.
+	 *
+	 * @return Het ID dat gebruikt wordt in {@link DeelnemerId}.
+	 */
+	public Long genereerDeelnemerId() {
+		// Een begeleider heeft altijd het ID `1`, dus het ID van deelnemers begint vanaf `2`
+		return deelnemers.size() + 1L;
+
+	}
+
 }
