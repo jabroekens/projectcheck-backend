@@ -1,19 +1,13 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -32,9 +26,9 @@ public class KamerTest {
 	private Deelnemer deelnemer;
 
 	/*
-	* Deze set kan niet worden gemokt, omdat er niks kan worden toegevoegd aan een list wanneer deze gemocked is.
-	* Daarom wordt er hier gebruik gemaakt van een Spy die de Set gedeeltelijk mocked.
-	*/
+	 * Deze set kan niet worden gemokt, omdat er niks kan worden toegevoegd aan een list wanneer deze gemocked is.
+	 * Daarom wordt er hier gebruik gemaakt van een Spy die de Set gedeeltelijk mocked.
+	 */
 	@Spy
 	private Set<Deelnemer> deelnemers;
 
@@ -82,20 +76,19 @@ public class KamerTest {
 			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getDeelnemers().remove(null))
 		);
 	}
-	@Test
-	void kamerGeeftJuisteDeelnemerId(){
 
+	@Test
+	void kamerGeeftJuisteDeelnemerId() {
 		//Arrange
 		kamer.voegDeelnemerToe(deelnemer);
-		int expectedId = 3;
+		Long expectedId = 2L;
+
 		//Act
-		int actualId = Math.toIntExact(kamer.genereerDeelnemerId());
+		Long actualId = kamer.genereerDeelnemerId();
+
 		//Assert
-		Assertions.assertEquals(expectedId,actualId);
-
-
+		Assertions.assertEquals(expectedId, actualId);
 
 	}
-
 
 }

@@ -10,15 +10,15 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
+import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import nl.han.oose.buizerd.projectcheck_backend.exceptions.KamerNietGevondenExceptie;
+import nl.han.oose.buizerd.projectcheck_backend.exception.KamerNietGevondenException;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
+import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
-import java.util.Optional;
 
 @Path("/")
 public class AppService extends Application {
@@ -28,9 +28,6 @@ public class AppService extends Application {
 
 	@Inject
 	private KamerService kamerService;
-
-	@Inject
-	private DAO<Deelnemer, DeelnemerId> deelnemerDAO;
 
 	/**
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
@@ -46,27 +43,33 @@ public class AppService extends Application {
 		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
 		KamerService.registreer(kamer.getKamerCode());
 
-		JsonObject json = new JsonObject();
-		json.addProperty("kamer_url", kamerService.getUrl(kamer.getKamerCode()));
-		return Response.ok(json.toString()).build();
+		return Response.ok(getWebSocketURL(kamer.getKamerCode())).build();
 	}
 
 	@Path("/kamer/neemdeel/{kamerCode}")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response neemDeel(@PathParam("kamerCode") String kamerCode, @FormParam("deelnemerNaam") String deelnemerNaam) {
+	public Response neemDeel(@PathParam("kamerCode") @KamerCode String kamerCode, @FormParam("deelnemerNaam") @Naam String deelnemerNaam) {
 		Optional<Kamer> kamer = kamerRepository.get(kamerCode);
-		if (kamer.isPresent()) {
-			Deelnemer deelnemer = new Deelnemer(new DeelnemerId(kamer.get().genereerDeelnemerId(), kamer.get().getKamerCode()), deelnemerNaam);
-			deelnemerDAO.create(deelnemer);
-			kamer.get().voegDeelnemerToe(deelnemer);
-			return Response.ok().build();
 
+		if (kamer.isPresent()) {
+			Deelnemer deelnemer = new Deelnemer(
+				new DeelnemerId(kamer.get().genereerDeelnemerId(), kamer.get().getKamerCode()),
+				deelnemerNaam
+			);
+
+			kamer.get().voegDeelnemerToe(deelnemer);
+			return Response.ok(getWebSocketURL(kamer.get().getKamerCode())).build();
 		} else {
-			throw new KamerNietGevondenExceptie(kamerCode);
+			throw new KamerNietGevondenException(kamerCode);
 		}
 
+	}
 
+	private String getWebSocketURL(String kamerCode) {
+		JsonObject json = new JsonObject();
+		json.addProperty("kamer_url", kamerService.getUrl(kamerCode));
+		return json.toString();
 	}
 
 }
