@@ -3,6 +3,7 @@ package nl.han.oose.buizerd.projectcheck_backend.dao;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Optional;
  * @param <T> De domeinklasse waarmee gewerkt moet worden.
  * @param <K> De identifier van de domeinklasse.
  */
-public interface DAO<T, K> {
+public interface DAO<T, K extends Serializable> {
 
 	/**
 	 * Sla de staat van {@code t} op.

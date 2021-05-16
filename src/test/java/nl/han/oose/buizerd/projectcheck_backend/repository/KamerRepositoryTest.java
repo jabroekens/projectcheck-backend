@@ -16,9 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * Zie:
  *  * https://www.baeldung.com/mockito-junit-5-extension
  *  * https://stackoverflow.com/questions/12539365/when-to-use-mockito-verify
- *
- * XXX Wellicht interessant om de interface te testen?
- *  * Zie: https://stackoverflow.com/a/6724555
  */
 @ExtendWith(MockitoExtension.class)
 public class KamerRepositoryTest extends RepositoryTest<Kamer, String> {

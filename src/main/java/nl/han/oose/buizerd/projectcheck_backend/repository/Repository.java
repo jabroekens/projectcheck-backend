@@ -3,6 +3,7 @@ package nl.han.oose.buizerd.projectcheck_backend.repository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
+import java.io.Serializable;
 import java.util.Optional;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Optional;
  * @param <T> De domeinklasse waarmee gewerkt moet worden.
  * @param <K> De identifier van de domeinklasse.
  */
-public interface Repository<T, K> {
+public interface Repository<T, K extends Serializable> {
 
 	/**
 	 * Voeg een instantie van {@code T} toe.
@@ -27,7 +28,7 @@ public interface Repository<T, K> {
 	 *
 	 * @param k De identifier van de op te halen instantie.
 	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional}.
-	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#read(Class, Object)
+	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#read(Class, Serializable)
 	 */
 	@ValidateOnExecution
 	Optional<@Valid T> get(@NotNull @Valid K k);
@@ -45,7 +46,7 @@ public interface Repository<T, K> {
 	 * Verwijder de toegevoegde instantie van {@code T} met de identifier {@code k}.
 	 *
 	 * @param k De identifier van de toegevoegde instantie die verwijderd moet worden.
-	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#delete(Object)
+	 * @see nl.han.oose.buizerd.projectcheck_backend.dao.DAO#delete(Serializable)
 	 */
 	@ValidateOnExecution
 	void remove(@NotNull @Valid K k);

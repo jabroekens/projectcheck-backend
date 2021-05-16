@@ -6,13 +6,14 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Status;
 import jakarta.transaction.SystemException;
 import jakarta.transaction.UserTransaction;
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
  * Een generieke implementatie van {@link DAO}
  */
-public class DAOImpl<T, K> implements DAO<T, K> {
+public class DAOImpl<T, K extends Serializable> implements DAO<T, K> {
 
 	@PersistenceContext
 	private EntityManager entityManager;
