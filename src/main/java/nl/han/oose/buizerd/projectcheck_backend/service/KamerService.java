@@ -28,23 +28,13 @@ import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 @ServerEndpoint(value = "/kamer/{kamerCode}", decoders = {Event.Decoder.class})
 public class KamerService {
 
-	static Logger LOGGER;
+	// package-private zodat het getest kan worden
+	static final Logger LOGGER;
 	static final Set<String> GEREGISTREERDE_KAMERS;
 
 	static {
 		LOGGER = Logger.getLogger(KamerService.class.getName());
 		GEREGISTREERDE_KAMERS = new HashSet<>();
-	}
-
-	/**
-	 * Zet de {@link Logger} van {@link KamerService}.
-	 *
-	 * <b>Deze methode mag alleen aangeroepen worden binnen tests.</b>
-	 *
-	 * @param logger Een {@link Logger}.
-	 */
-	static void setLogger(Logger logger) {
-		KamerService.LOGGER = logger;
 	}
 
 	/**
@@ -90,6 +80,7 @@ public class KamerService {
 	 * @param kamerCode De code van een kamer.
 	 * @return De WebSocket URL van de kamer.
 	 */
+	@SuppressWarnings("brain-overload")
 	public String getUrl(String kamerCode) {
 		URI uri = uriInfo.getBaseUri();
 
@@ -149,10 +140,17 @@ public class KamerService {
 	 * {@inheritDoc}
 	 */
 	@OnError
-	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) throws IOException {
+	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) {
 		if (error instanceof IllegalArgumentException) {
-			session.getBasicRemote().sendText(new EventResponse(EventResponse.Status.INVALIDE).asJson());
-			return;
+			/*
+			 * Voer uit in een try/catch-statement zodat `KamerService#error(Session, Throwable, String)`
+			 * niet opnieuw aangeroepen wordt, wat tot een StackOverflowError zou leiden.
+			 */
+			try {
+				session.getBasicRemote().sendText(new EventResponse(EventResponse.Status.INVALIDE).asJson());
+			} catch (IOException e) {
+				KamerService.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			}
 		}
 
 		KamerService.LOGGER.log(Level.SEVERE, error.getMessage(), error);

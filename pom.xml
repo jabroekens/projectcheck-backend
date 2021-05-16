@@ -86,6 +86,7 @@
 							<rules>
 								<rule>
 									<excludes>
+										<exclude>**.Util.1</exclude>
 										<exclude>**.dao.*</exclude>
 										<exclude>**.event.Event</exclude>
 										<exclude>**.event.Event.Decoder</exclude>
