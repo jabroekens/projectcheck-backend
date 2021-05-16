@@ -59,7 +59,7 @@ public abstract class Event {
 	 */
 	public final void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) {
 		CompletableFuture.runAsync(() -> {
-			String response = voerUit(kamer, session).AntwoordOp(this).asJson();
+			String response = voerUit(kamer, session).antwoordOp(this).asJson();
 
 			if (stuurNaarAlleClients) {
 				/*

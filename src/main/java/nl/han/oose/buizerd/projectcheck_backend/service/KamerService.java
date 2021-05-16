@@ -120,7 +120,7 @@ public class KamerService {
 	public void message(Event event, @PathParam("kamerCode") String kamerCode, Session session) throws IOException {
 		String eventKamerCode = event.getDeelnemerId().getKamerCode();
 		if (!eventKamerCode.equals(kamerCode)) {
-			EventResponse response = new EventResponse(EventResponse.Status.VERBODEN).AntwoordOp(event);
+			EventResponse response = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
 			session.getBasicRemote().sendText(response.asJson());
 			return;
 		}
@@ -131,7 +131,7 @@ public class KamerService {
 		} else {
 			EventResponse response = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
 				.metContext("kamerCode", eventKamerCode)
-				.AntwoordOp(event);
+				.antwoordOp(event);
 			session.getBasicRemote().sendText(response.asJson());
 		}
 	}

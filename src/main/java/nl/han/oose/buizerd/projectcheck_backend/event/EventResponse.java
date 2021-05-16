@@ -14,7 +14,7 @@ import nl.han.oose.buizerd.projectcheck_backend.Util;
 public class EventResponse {
 
 	// package-private zodat het getest kan worden.
-	final transient EventResponse.Status status;
+	final EventResponse.Status status;
 	final Map<String, Object> context;
 
 	private final LocalDateTime datum;
@@ -37,7 +37,7 @@ public class EventResponse {
 		return this;
 	}
 
-	public EventResponse AntwoordOp(Event event) {
+	public EventResponse antwoordOp(Event event) {
 		antwoordOp = Event.Decoder.getEventNaam(event.getClass());
 		return this;
 	}
