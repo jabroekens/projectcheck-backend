@@ -15,7 +15,7 @@ Voordat je aan de slag gaat, zijn er een aantal afspraken:
 4. AppService registreert de kamercode bij KamerService en geeft de WebSocket URL terug aan de client.
 5. De client stelt een verbinding op met de WebSocket blootgesteld door KamerService.
 5. De client stuurt een event over de WebSocket-connectie naar KamerService.
-6. KamerService voert het event uit.
+6. KamerService voert het event uit en stuurt een event response naar de client.
 
 Een event is een JSON-bericht. Elk event heeft minimaal de volgende waarden:
 ```
@@ -28,6 +28,18 @@ Een event is een JSON-bericht. Elk event heeft minimaal de volgende waarden:
 }
 ```
 Waarbij `EVENT`, `1` en `123456` waarden zijn die de client meegeeft.
+
+Een event response is een JSON-bericht. Een event response heeft de volgende waarden:
+```
+{
+    "status": "STATUS",
+    "context": {},
+    "datum": "DATUM",
+    "antwoordOp": "EVENT"
+}
+```
+Waarbij `STATUS`, `DATUM`, `EVENT` waarden zijn die de back-end meegeeft.
+Het veld `antwoordOp` is optioneel en wordt mogelijk niet meegegeven.
 
 ## Codestijl
 Om de kwaliteit van de code te waarborgen, wordt er een vaste stijl vastgehouden in de code.
@@ -106,84 +118,69 @@ Je kunt een event ook waardes geven, in de vorm van instantievelden. Als een vel
 De velden worden gevalideerd doormiddel van Bean Validation, dus je kunt elke mogelijke validatie hiervoor gebruiken.
 
 ### Voorbeeld
-FooEvent.java
+ChatEvent.java
 ```
-package nl.han.oose.buizerd.projectcheck_backend.event;
+public class ChatEvent extends Event {
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.websocket.Session;
-import java.io.IOException;
-import java.util.Optional;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-
-public class FooEvent extends Event {
-
-	// package-private zodat dit getest kan worden.
+	// package-private zodat het getest kan worden.
 	@NotNull
 	String woord;
 
 	@Override
-	protected void voerUit(Kamer kamer, Session session) throws IOException {
+	protected EventResponse voerUit(Kamer kamer, Session session) {
 		Optional<Deelnemer> deelnemer = kamer.getDeelnemer(super.getDeelnemerId());
 		if (deelnemer.isPresent()) {
-			session.getBasicRemote().sendText(deelnemer.get().getNaam() + " is een " + woord);
+			String bericht = String.format("%s zegt: \"%s\"", deelnemer.get().getNaam(), woord);
+			super.stuurNaarAlleClients();
+			return new EventResponse(EventResponse.Status.OK).metContext("bericht", bericht);
+		} else {
+			return new EventResponse(EventResponse.Status.DEELNEMER_NIET_GEVONDEN)
+				.metContext("deelnemerId", super.getDeelnemerId());
 		}
 	}
 
 }
 ```
 
-FooEventTest.java
+ChatEventTest.java
 ```
-package nl.han.oose.buizerd.projectcheck_backend.event;
-
-import jakarta.websocket.RemoteEndpoint;
-import jakarta.websocket.Session;
-import java.io.IOException;
-import java.util.Optional;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 @ExtendWith(MockitoExtension.class)
-public class FooEventTest {
+public class ChatEventTest {
 
-	private FooEvent fooEvent;
+	private ChatEvent chatEvent;
 
 	@BeforeEach
 	void setUp() {
-		fooEvent = new FooEvent();
-		fooEvent.woord = "aap";
+		chatEvent = new ChatEvent();
+		chatEvent.woord = "Hallo!";
 	}
 
 	@Test
-	void voerUit_deelnemerAanwezig(
-		@Mock Kamer kamer,
-		@Mock Session session,
-		@Mock Deelnemer deelnemer,
-		@Mock RemoteEndpoint.Basic basicRemote
-	) throws IOException {
-		Mockito.when(kamer.getDeelnemer(fooEvent.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
-		Mockito.when(session.getBasicRemote()).thenReturn(basicRemote);
-		fooEvent.voerUit(kamer, session);
-		Mockito.verify(basicRemote).sendText(deelnemer.getNaam() + " is een " + fooEvent.woord);
+	void voerUit_deelnemerAanwezig(@Mock Kamer kamer, @Mock Session session, @Mock Deelnemer deelnemer) {
+		Mockito.when(kamer.getDeelnemer(chatEvent.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
+		String expectedBericht = String.format("%s zegt: \"%s\"", deelnemer.getNaam(), chatEvent.woord);
+
+		EventResponse response = chatEvent.voerUit(kamer, session);
+
+		Assertions.assertAll(
+			() -> Mockito.verify(kamer).getDeelnemer(chatEvent.getDeelnemerId()),
+			() -> Assertions.assertTrue(chatEvent.stuurNaarAlleClients),
+			() -> Assertions.assertEquals(EventResponse.Status.OK, response.status),
+			() -> Assertions.assertEquals(expectedBericht, response.context.get("bericht"))
+		);
 	}
 
 	@Test
-	void voerUit_deelnemerAfwezig(
-		@Mock Kamer kamer,
-		@Mock Session session,
-		@Mock RemoteEndpoint.Basic basicRemote
-	) throws IOException {
-		Mockito.when(kamer.getDeelnemer(fooEvent.getDeelnemerId())).thenReturn(Optional.empty());
-		fooEvent.voerUit(kamer, session);
-		Mockito.verifyNoInteractions(basicRemote);
+	void voerUit_deelnemerAfwezig(@Mock Kamer kamer, @Mock Session session) {
+		Mockito.when(kamer.getDeelnemer(chatEvent.getDeelnemerId())).thenReturn(Optional.empty());
+
+		EventResponse response = chatEvent.voerUit(kamer, session);
+
+		Assertions.assertAll(
+			() -> Mockito.verify(kamer).getDeelnemer(chatEvent.getDeelnemerId()),
+			() -> Assertions.assertEquals(EventResponse.Status.DEELNEMER_NIET_GEVONDEN, response.status),
+			() -> Assertions.assertEquals(chatEvent.getDeelnemerId(), response.context.get("deelnemerId"))
+		);
 	}
 
 }

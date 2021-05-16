@@ -2,18 +2,23 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
-import jakarta.websocket.EndpointConfig;
-import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import nl.han.oose.buizerd.projectcheck_backend.Util;
 
 /**
  * Representeert een antwoord op een WebSocket bericht.
  */
-public class EventResponse implements Serializable {
+@SuppressWarnings({"FieldCanBeLocal", "unused"})
+public class EventResponse {
+
+	// package-private zodat het getest kan worden.
+	final transient EventResponse.Status status;
+	final Map<String, Object> context;
 
 	private final LocalDateTime datum;
-	private final EventResponse.Status status;
+	private String antwoordOp;
 
 	/**
 	 * Construeert een {@link EventResponse}.
@@ -22,8 +27,23 @@ public class EventResponse implements Serializable {
 	 */
 	@ValidateOnExecution
 	public EventResponse(@NotNull EventResponse.Status status) {
-		this.datum = LocalDateTime.now();
 		this.status = status;
+		this.context = new HashMap<>();
+		this.datum = LocalDateTime.now();
+	}
+
+	public EventResponse metContext(String sleutel, Object waarde) {
+		context.put(sleutel, waarde);
+		return this;
+	}
+
+	public EventResponse AntwoordOp(Event event) {
+		antwoordOp = Event.Decoder.getEventNaam(event.getClass());
+		return this;
+	}
+
+	public String asJson() {
+		return Util.getGson().toJson(this);
 	}
 
 	/**
@@ -34,39 +54,6 @@ public class EventResponse implements Serializable {
 		VERBODEN,
 		INVALIDE,
 		KAMER_NIET_GEVONDEN,
-	}
-
-	/**
-	 * Encodeert een {@link EventResponse}.
-	 *
-	 * @see jakarta.websocket.Encoder.Text
-	 */
-	public static class Encoder implements jakarta.websocket.Encoder.Text<EventResponse> {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String encode(EventResponse object) {
-			return Util.getGson().toJson(object);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void init(EndpointConfig config) {
-			// Wordt niet gebruikt
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void destroy() {
-			// Wordt niet gebruikt
-		}
-
 	}
 
 }

@@ -25,11 +25,7 @@ import nl.han.oose.buizerd.projectcheck_backend.event.Event;
 import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 
-@ServerEndpoint(
-	value = "/kamer/{kamerCode}",
-	decoders = {Event.Decoder.class},
-	encoders = {EventResponse.Encoder.class}
-)
+@ServerEndpoint(value = "/kamer/{kamerCode}", decoders = {Event.Decoder.class})
 public class KamerService {
 
 	static Logger LOGGER;
@@ -130,30 +126,36 @@ public class KamerService {
 	 * {@inheritDoc}
 	 */
 	@OnMessage
-	public EventResponse message(Event event, @PathParam("kamerCode") String kamerCode, Session session) {
+	public void message(Event event, @PathParam("kamerCode") String kamerCode, Session session) throws IOException {
 		String eventKamerCode = event.getDeelnemerId().getKamerCode();
 		if (!eventKamerCode.equals(kamerCode)) {
-			return new EventResponse(EventResponse.Status.VERBODEN);
+			EventResponse response = new EventResponse(EventResponse.Status.VERBODEN).AntwoordOp(event);
+			session.getBasicRemote().sendText(response.asJson());
+			return;
 		}
 
 		Optional<Kamer> kamer = kamerRepository.get(eventKamerCode);
 		if (kamer.isPresent()) {
 			event.voerUit(kamerRepository, kamer.get(), session);
 		} else {
-			return new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN);
+			EventResponse response = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
+				.metContext("kamerCode", eventKamerCode)
+				.AntwoordOp(event);
+			session.getBasicRemote().sendText(response.asJson());
 		}
-
-		return new EventResponse(EventResponse.Status.OK);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@OnError
-	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) {
-		if (!(error instanceof IllegalArgumentException)) {
-			KamerService.LOGGER.log(Level.SEVERE, error.getMessage(), error);
+	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) throws IOException {
+		if (error instanceof IllegalArgumentException) {
+			session.getBasicRemote().sendText(new EventResponse(EventResponse.Status.INVALIDE).asJson());
+			return;
 		}
+
+		KamerService.LOGGER.log(Level.SEVERE, error.getMessage(), error);
 	}
 
 }

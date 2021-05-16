@@ -8,11 +8,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
@@ -22,6 +21,12 @@ import org.reflections.Reflections;
  * Representeert een event.
  */
 public abstract class Event {
+
+	/*
+	 * `transient` zodat het niet ge(de)serializeerd wordt door Gson.
+	 * package-private zodat het getest kan worden.
+	 */
+	transient boolean stuurNaarAlleClients = false;
 
 	@NotNull
 	@Valid
@@ -37,6 +42,15 @@ public abstract class Event {
 	}
 
 	/**
+	 * Geeft aan dat de {@link EventResponse} die volgt
+	 * uit {@link Event#voerUit(Kamer, Session)} naar
+	 * alle open sessies gestuurd moet worden.
+	 */
+	protected void stuurNaarAlleClients() {
+		this.stuurNaarAlleClients = true;
+	}
+
+	/**
 	 * Voert de event in kwestie uit.
 	 *
 	 * @param kamerRepository Een {@link KamerRepository}.
@@ -45,12 +59,23 @@ public abstract class Event {
 	 */
 	public final void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) {
 		CompletableFuture.runAsync(() -> {
-			try {
-				voerUit(kamer, session);
-				handelAf(kamerRepository, kamer);
-			} catch (IOException e) {
-				throw new CompletionException(e);
+			String response = voerUit(kamer, session).AntwoordOp(this).asJson();
+
+			if (stuurNaarAlleClients) {
+				/*
+				 * foreach loop zodat er geen try/catch-statement
+				 * nodig is voor `sendText(String)`
+				 */
+				for (Session s : session.getOpenSessions()) {
+					if (s.isOpen()) {
+						s.getAsyncRemote().sendText(response);
+					}
+				}
+			} else if (session.isOpen()) {
+				session.getAsyncRemote().sendText(response);
 			}
+
+			handelAf(kamerRepository, kamer);
 		});
 	}
 
@@ -59,8 +84,10 @@ public abstract class Event {
 	 *
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 * @param session De betrokken {@link Session}.
+	 * @return Een {@link EventResponse}.
 	 */
-	protected abstract void voerUit(Kamer kamer, Session session) throws IOException;
+	@ValidateOnExecution
+	protected abstract @NotNull @Valid EventResponse voerUit(Kamer kamer, Session session);
 
 	/**
 	 * Wordt aangeroepen bij het afhandelen van een event.
@@ -72,7 +99,7 @@ public abstract class Event {
 	 * @param kamerRepository Een {@link KamerRepository}.
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 */
-	protected void handelAf(KamerRepository kamerRepository, Kamer kamer) throws IOException {
+	protected void handelAf(KamerRepository kamerRepository, Kamer kamer) {
 		// Doe niets
 	}
 
@@ -91,14 +118,15 @@ public abstract class Event {
 
 			Reflections reflections = new Reflections(Event.class.getPackage().getName());
 			reflections.getSubTypesOf(Event.class).forEach(
-				event -> {
-					String eventNaam = event.getSimpleName().replace("Event", "").replaceAll("(?<!^)(?=[A-Z])", "_").toUpperCase();
-					eventAdapterFactory.registerSubtype(event, eventNaam);
-				}
+				event -> eventAdapterFactory.registerSubtype(event, Decoder.getEventNaam(event))
 			);
 
 			GSON = new GsonBuilder().registerTypeAdapterFactory(eventAdapterFactory).create();
 			VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
+		}
+
+		protected static String getEventNaam(Class<? extends Event> eventKlasse) {
+			return eventKlasse.getSimpleName().replace("Event", "").replaceAll("(?<!^)(?=[A-Z])", "_").toUpperCase();
 		}
 
 		private Event event;
@@ -119,7 +147,7 @@ public abstract class Event {
 			// Probeer te deserializeren en cache het resultaat als het wel lukt.
 			try {
 				event = Decoder.GSON.fromJson(s, Event.class);
-				if (!Decoder.VALIDATOR.validate(event).isEmpty()) {
+				if (event == null || !Decoder.VALIDATOR.validate(event).isEmpty()) {
 					return false;
 				}
 			} catch (JsonParseException e) {

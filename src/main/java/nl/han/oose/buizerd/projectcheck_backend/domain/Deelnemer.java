@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
 import java.util.Optional;
+import nl.han.oose.buizerd.projectcheck_backend.Util;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**
@@ -38,6 +39,15 @@ public class Deelnemer {
 	/**
 	 * De {@link Kamer} waaraan de deelnemer deelneemt.
 	 */
+	/*
+	 * `@Util.GsonExclude` om StackOverflowError te voorkomen
+	 * als Gson een Deelnemer serializeert (Deelnemer bevat
+	 * Kamer en Kamer bevat Deelnemer).
+	 *
+	 * Als we het veld als `transient` markeren wordt het ook
+	 * niet gedeserializeerd door JPA, wat wel moet.
+	 */
+	@Util.GsonExclude
 	@MapsId("kamerCode")
 	@ManyToOne(cascade = CascadeType.ALL)
 	private Kamer kamer;
