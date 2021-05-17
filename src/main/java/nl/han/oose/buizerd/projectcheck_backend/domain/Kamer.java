@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import nl.han.oose.buizerd.projectcheck_backend.exception.RoleNotFoundException;
+import nl.han.oose.buizerd.projectcheck_backend.exception.RolNietGevondenException;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
 /**
@@ -80,7 +80,7 @@ public class Kamer {
 	 * De rollen die in de kamer ingeschakeld zijn.
 	 */
 	@ElementCollection
-	private Set<Rol> relevanteRollen;
+	private Set<@Valid Rol> relevanteRollen;
 
 	/**
 	 * De deelnemers van de kamer.
@@ -117,6 +117,7 @@ public class Kamer {
 	 * @param datum De datum waarop de kamer gemaakt is.
 	 * @param begeleider De begeleider van de kamer.
 	 * @param deelnemers Een set van deelnemers van de kamer.
+	 * @param relevanteRollen Een set van ingeschakelde rollen van de kamer.
 	 */
 	Kamer(String kamerCode, LocalDateTime datum, Begeleider begeleider, Set<Deelnemer> deelnemers, Set<Rol> relevanteRollen) {
 		this.kamerCode = kamerCode;
@@ -196,11 +197,14 @@ public class Kamer {
 	 */
 	@ValidateOnExecution
 	public Set<Rol> getRelevanteRollen() {
-		return relevanteRollen;
+		return Collections.unmodifiableSet(relevanteRollen);
 	}
 
+	/*
+	Haal een read-only kopie op van een rol binnen de kamer.
+	 */
 	@ValidateOnExecution
-	public Optional<Rol> getRelevanteRol(@Valid String rolNaam) {
+	public Optional<Rol> getRelevanteRol(@NotNull @Valid String rolNaam) {
 		return relevanteRollen.stream().filter(r -> r.getRolNaam().equals(rolNaam)).findAny();
 	}
 
@@ -208,12 +212,12 @@ public class Kamer {
 	 * Schakel een relevante rol in voor de kamer.
 	 */
 	@ValidateOnExecution
-	public void activeerRelevanteRol(String rol) {
+	public void activeerRelevanteRol(Rol rol) {
 		for (Rol mogelijkeRol : Rol.values()) {
-			if (mogelijkeRol.getRolNaam().equals(rol)) {
+			if (mogelijkeRol.getRolNaam().equals(rol.getRolNaam())) {
 				this.relevanteRollen.add(mogelijkeRol);
 			} else {
-				throw new RoleNotFoundException();
+				throw new RolNietGevondenException();
 			}
 		}
 	}

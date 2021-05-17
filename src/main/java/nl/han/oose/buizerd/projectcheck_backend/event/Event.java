@@ -95,12 +95,13 @@ public abstract class Event {
 	 * Deze methode is bedoeld voor het opslaan van veranderingen aan
 	 * de datastore. Als de staat van de {@code kamer} is veranderd,
 	 * dan moet dit opgeslagen worden met de {@code kamerRepository}.
-	 *
-	 * @param kamerRepository Een {@link KamerRepository}.
+	 *  @param kamerRepository Een {@link KamerRepository}.
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
+	 * @return
 	 */
-	protected void handelAf(KamerRepository kamerRepository, Kamer kamer) {
+	protected EventResponse handelAf(KamerRepository kamerRepository, Kamer kamer) {
 		// Doe niets
+		return null;
 	}
 
 	/**

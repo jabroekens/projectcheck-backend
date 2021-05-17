@@ -37,16 +37,6 @@ public class Begeleider extends Deelnemer {
 		super(deelnemerId, naam);
 	}
 
-	/**
-	 * Roept de methode binnen de Kamer class in die een rol inschakelt voor die kamer.
-	 *
-	 * @see nl.han.oose.buizerd.projectcheck_backend.domain.Kamer
-	 */
-	@ValidateOnExecution
-	public void activeerRol(String rol) {
-		kamer.activeerRelevanteRol(rol);
-	}
-
 	public void setKamer(Kamer kamer) {
 		this.kamer = kamer;
 	}
