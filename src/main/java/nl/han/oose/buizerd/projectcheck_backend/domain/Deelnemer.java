@@ -35,6 +35,8 @@ public class Deelnemer {
 	@Valid
 	@EmbeddedId
 	private DeelnemerId deelnemerId;
+	private Rol rol;
+
 
 	/**
 	 * De naam van de deelnemer.
@@ -124,6 +126,14 @@ public class Deelnemer {
 	 */
 	void setKamer(Kamer kamer) {
 		this.kamer = kamer;
+	}
+
+	public Rol getRol() {
+		return rol;
+	}
+
+	public void setRol(Rol rol) {
+		this.rol = rol;
 	}
 
 }
