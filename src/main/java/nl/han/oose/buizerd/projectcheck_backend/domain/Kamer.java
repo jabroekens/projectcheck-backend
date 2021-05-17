@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import nl.han.oose.buizerd.projectcheck_backend.exception.RolNietGevondenException;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
 /**
@@ -104,7 +103,7 @@ public class Kamer {
 	 */
 	@ValidateOnExecution
 	public Kamer(@KamerCode String kamerCode, @NotNull @Valid Begeleider begeleider) {
-		// Dit is een uitzondering op de comment bij `Kamer#Kamer(String, LocalDateTime, Begeleider, Set)`
+		// Dit is een uitzondering op de comment bij `Kamer#Kamer(String, LocalDateTime, Begeleider, Set, Set)`
 		this(kamerCode, LocalDateTime.now(), begeleider, new HashSet<>(), EnumSet.noneOf(Rol.class));
 	}
 
@@ -190,18 +189,22 @@ public class Kamer {
 		return deelnemers.size() + 1L;
 	}
 
-	/*
+	/**
 	 * Haal een read-only kopie op van de relevante rollen van de kamer.
 	 *
 	 * @return Een read-only kopie van de relevante rolen van de kamer.
+	 * @see java.util.Collections#unmodifiableSet(Set)
 	 */
 	@ValidateOnExecution
 	public Set<Rol> getRelevanteRollen() {
 		return Collections.unmodifiableSet(relevanteRollen);
 	}
 
-	/*
-	Haal een read-only kopie op van een rol binnen de kamer.
+	/**
+	 * Haal een read-only kopie op van een rol binnen de kamer.
+	 *
+	 * @param rolNaam De naam van de op te halen rol.
+	 * @return Een {@link Optional} van de rol met dezelfde {@code rolNaam} of {@code null} als deze niet is gevonden.
 	 */
 	@ValidateOnExecution
 	public Optional<Rol> getRelevanteRol(@NotNull @Valid String rolNaam) {
@@ -210,16 +213,12 @@ public class Kamer {
 
 	/**
 	 * Schakel een relevante rol in voor de kamer.
+	 *
+	 * @param rol De relevante rol die ingeschakelt moet worden.
 	 */
 	@ValidateOnExecution
-	public void activeerRelevanteRol(Rol rol) {
-		for (Rol mogelijkeRol : Rol.values()) {
-			if (mogelijkeRol.getRolNaam().equals(rol.getRolNaam())) {
-				this.relevanteRollen.add(mogelijkeRol);
-			} else {
-				throw new RolNietGevondenException();
-			}
-		}
+	public void activeerRelevanteRol(@NotNull @Valid Rol rol) {
+		relevanteRollen.add(rol);
 	}
 
 }

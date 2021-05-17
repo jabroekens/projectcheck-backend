@@ -1,7 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Transient;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
@@ -12,10 +11,6 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
  */
 @Entity
 public class Begeleider extends Deelnemer {
-
-	@Transient
-	@Valid
-	private Kamer kamer;
 
 	/**
 	 * Construeert een {@link Begeleider}.
@@ -35,10 +30,6 @@ public class Begeleider extends Deelnemer {
 	@ValidateOnExecution
 	public Begeleider(@NotNull @Valid DeelnemerId deelnemerId, @Naam String naam) {
 		super(deelnemerId, naam);
-	}
-
-	public void setKamer(Kamer kamer) {
-		this.kamer = kamer;
 	}
 
 }

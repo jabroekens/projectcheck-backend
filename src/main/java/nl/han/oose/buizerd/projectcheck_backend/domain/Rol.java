@@ -19,12 +19,11 @@ public enum Rol {
 	 */
 	private final String rolNaam;
 
-
 	/**
-	* Construeert een {@link Rol}.
-	*
-	* @param rolNaam De naam van de rol.
-	*/
+	 * Construeert een {@link Rol}.
+	 *
+	 * @param rolNaam De naam van de rol.
+	 */
 	Rol(String rolNaam) {
 		this.rolNaam = rolNaam;
 	}
