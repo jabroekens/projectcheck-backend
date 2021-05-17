@@ -136,4 +136,12 @@ public class Deelnemer {
 		this.rol = rol;
 	}
 
+	public Rol getRol() {
+		return rol;
+	}
+
+	public void setRol(Rol rol) {
+		this.rol = rol;
+	}
+
 }
