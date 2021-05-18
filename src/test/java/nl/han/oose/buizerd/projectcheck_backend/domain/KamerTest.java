@@ -1,6 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
@@ -32,12 +33,20 @@ public class KamerTest {
 	@Spy
 	private Set<Deelnemer> deelnemers;
 
+	/*
+	 * Deze set kan niet worden gemokt, omdaat er niks kan worden toegevoegd aan een list wanneer deze gemocked is.
+	 * Daarom wordt er hier gebruik gemaakt van een Spy die de Set gedeeltelijk mocked.
+	 */
+	@Spy
+	private Set<Rol> relevanteRollen;
+
 	private Kamer kamer;
 
 	@BeforeEach
 	void setUp() {
 		deelnemers = new HashSet<>();
-		kamer = new Kamer(KamerTest.KAMER_CODE, datum, begeleider, deelnemers);
+		relevanteRollen = EnumSet.noneOf(Rol.class);
+		kamer = new Kamer(KamerTest.KAMER_CODE, datum, begeleider, deelnemers, relevanteRollen);
 	}
 
 	@Test
@@ -89,6 +98,30 @@ public class KamerTest {
 		//Assert
 		Assertions.assertEquals(expectedId, actualId);
 
+	}
+
+	@Test
+	void geeftJuisteRol() {
+		String rolNaam = "";
+		Assertions.assertTrue(kamer.getRelevanteRol(rolNaam).isEmpty());
+	}
+
+	@Test
+	void geeftJuisteRollen() {
+		/*
+		 * Omdat `Kamer#getRelevanteRollen()` een UnmodifiableSet teruggeeft
+		 * (wat in werkelijkheid een UnmodifiableCollection is), en die
+		 * niet een eigen `equals` methode implementeert, moeten
+		 * `expected` en `actual` omgedraaid worden.
+		 *
+		 * Zie: https://stackoverflow.com/a/31733658
+		 */
+
+		Assertions.assertEquals(kamer.getRelevanteRollen(), relevanteRollen);
+		Assertions.assertAll(
+			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getRelevanteRollen().add(null)),
+			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getRelevanteRollen().remove(null))
+		);
 	}
 
 }
