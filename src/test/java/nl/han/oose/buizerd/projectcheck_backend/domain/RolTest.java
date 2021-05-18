@@ -7,11 +7,11 @@ import org.mockito.Mockito;
 
 public class RolTest {
 
-	private Rol rol;
 	private static final String rolNaam = "OPDRACHTGEVER";
+	private Rol rol;
 
 	@BeforeEach
-	void setup() {
+	void setUp() {
 		rol = Mockito.mock(Rol.class);
 	}
 

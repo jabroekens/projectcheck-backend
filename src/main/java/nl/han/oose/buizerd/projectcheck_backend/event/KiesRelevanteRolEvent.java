@@ -24,7 +24,7 @@ public class KiesRelevanteRolEvent extends Event {
 			Begeleider begeleider = kamer.getBegeleider();
 			if (begeleider.getDeelnemerId().equals(deelnemerId)) {
 				kamer.activeerRelevanteRol(rol);
-				String bericht = String.format("de rol %s is ingeschakeld voor de kamer %s", rol.getRolNaam(), kamer.getKamerCode());
+				String bericht = String.format("de rol %s is ingeschakeld voor de kamer %s", rol, kamer.getKamerCode());
 				return new EventResponse(EventResponse.Status.OK).metContext("bericht", bericht);
 			} else {
 				return new EventResponse(EventResponse.Status.VERBODEN).metContext("deelnemer", deelnemerId);

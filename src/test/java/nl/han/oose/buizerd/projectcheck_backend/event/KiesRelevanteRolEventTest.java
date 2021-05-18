@@ -9,23 +9,24 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class KiesRelevanteRolEventTest {
 
+	private final static String rolNaam = "OPDRACHTGEVER";
 	private KiesRelevanteRolEvent kiesRelevanteRolEvent;
 	private Session session;
 	private Kamer kamer;
 	private Begeleider begeleider;
 	private DeelnemerId begeleiderId;
 	private DeelnemerId deelnemerId;
-	private final static String rolNaam = "OPDRACHTGEVER";
 	private Rol rol;
 
 	@BeforeEach
-	void setup() {
+	void setUp() {
 		session = Mockito.mock(Session.class);
 		kamer = Mockito.mock(Kamer.class);
 		begeleider = Mockito.mock(Begeleider.class);
@@ -37,11 +38,10 @@ public class KiesRelevanteRolEventTest {
 	}
 
 	@Test
-	public void voerUit_RolBestaand() {
+	public void voerUit_RolBestaand_VerbodenDeelnemer() {
 		// Arrange
 		Mockito.when(kamer.getBegeleider()).thenReturn(begeleider);
 		Mockito.when(begeleider.getDeelnemerId()).thenReturn(begeleiderId);
-		//Mockito.when(begeleiderId.equals(deelnemerId)).thenReturn(true);
 		String expectedBericht = String.format("de rol %s is ingeschakeld voor de kamer %s", rolNaam, kamer.getKamerCode());
 
 		// Act
@@ -50,6 +50,27 @@ public class KiesRelevanteRolEventTest {
 		// Assert
 		Assertions.assertAll(
 			() -> Mockito.verify(kamer).getBegeleider(),
+			() -> Mockito.verify(begeleider).getDeelnemerId(),
+			() -> Assertions.assertEquals(EventResponse.Status.VERBODEN, response.status),
+			() -> Assertions.assertEquals(deelnemerId, response.context.get("deelnemer"))
+		);
+
+	}
+
+	@Test
+	public void voerUit_RolBestaand_DeelnemerIsBegeleider() {
+		// Arrange
+		Mockito.when(kamer.getBegeleider()).thenReturn(begeleider);
+		Mockito.when(begeleider.getDeelnemerId()).thenReturn(deelnemerId);
+		String expectedBericht = String.format("de rol %s is ingeschakeld voor de kamer %s", rolNaam, kamer.getKamerCode());
+
+		// Act
+		EventResponse response = kiesRelevanteRolEvent.voerUit(kamer, session);
+
+		// Assert
+		Assertions.assertAll(
+			() -> Mockito.verify(kamer).getBegeleider(),
+			() -> Mockito.verify(begeleider).getDeelnemerId(),
 			() -> Assertions.assertEquals(EventResponse.Status.OK, response.status),
 			() -> Assertions.assertEquals(expectedBericht, response.context.get("bericht"))
 		);
@@ -59,17 +80,19 @@ public class KiesRelevanteRolEventTest {
 	@Test
 	public void voerUit_RolNietBestaand() {
 		// Arrange
-		Mockito.when(kamer.getBegeleider()).thenReturn(null);
+		try (MockedStatic<Rol> mock = Mockito.mockStatic(Rol.class)) {
+			mock.when(() -> Rol.valueOf(rolNaam)).thenThrow(new IllegalArgumentException());
 
-		// Act
-		EventResponse response = kiesRelevanteRolEvent.voerUit(kamer, session);
+			// Act
+			EventResponse response = kiesRelevanteRolEvent.voerUit(kamer, session);
 
-		// Assert
-		Assertions.assertAll(
-			() -> Mockito.verify(kamer).getBegeleider(),
-			() -> Assertions.assertEquals(EventResponse.Status.ROL_NIET_GEVONDEN, response.status),
-			() -> Assertions.assertEquals(kiesRelevanteRolEvent.getDeelnemerId(), response.context.get("begeleider"))
-		);
+			// Assert
+			Assertions.assertAll(
+				() -> mock.verify(() -> Rol.valueOf(rolNaam)),
+				() -> Assertions.assertEquals(EventResponse.Status.ROL_NIET_GEVONDEN, response.status),
+				() -> Assertions.assertEquals(rolNaam, response.context.get("rolNaam"))
+			);
+		}
 
 	}
 

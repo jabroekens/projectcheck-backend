@@ -3,44 +3,58 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 public class RolConverterTest {
 
 	private RolConverter rolConverter;
-	private Rol rol;
-	private static final String rolNaam = "OPDRACHTGEVER";
 
 	@BeforeEach
-	void setup() {
-		rolConverter = Mockito.mock(RolConverter.class);
-		rol = Rol.valueOf(rolNaam);
+	void setUp() {
+		rolConverter = new RolConverter();
 	}
 
 	@Test
-	void convertToDatabaseColumnTest() {
-		// Arrange
-		Mockito.when(rolConverter.convertToDatabaseColumn(rol)).thenReturn(rolNaam);
-
+	void convertToDatabaseColumnTest_rolAanwezig() {
+		// Arange
+		Rol rol = Rol.OPDRACHTGEVER;
+		String rolNaam = "Opdrachtgever";
+		// Act
 		var actual = rolConverter.convertToDatabaseColumn(rol);
-		// Act & Assert
-		Assertions.assertAll(
-			() -> Mockito.verify(rolConverter).convertToDatabaseColumn(rol),
-			() -> Assertions.assertEquals(rolNaam, actual)
-		);
+		// Assert
+		Assertions.assertEquals(rolNaam, actual);
 	}
 
 	@Test
-	void convertToEntityAttributeTest() {
-		// Arrange
-		Mockito.when(rolConverter.convertToEntityAttribute(rolNaam)).thenReturn(rol);
+	void convertToDatabaseColumnTest_rolAfwezig() {
+		// Arange
+		Rol rol = null;
+		String rolNaam = null;
+		// Act
+		var actual = rolConverter.convertToDatabaseColumn(rol);
+		// Assert
+		Assertions.assertEquals(rolNaam, actual);
+	}
 
+	@Test
+	void convertToEntityAttributeTest_rolNaamAanwezig() {
+		// Arange
+		String rolNaam = "Opdrachtgever";
+		Rol rol = Rol.OPDRACHTGEVER;
+		// Act
 		var actual = rolConverter.convertToEntityAttribute(rolNaam);
-		// Act & Assert
-		Assertions.assertAll(
-			() -> Mockito.verify(rolConverter).convertToEntityAttribute(rolNaam),
-			() -> Assertions.assertEquals(rol, actual)
-		);
+		// Assert
+		Assertions.assertEquals(rol, actual);
+	}
+
+	@Test
+	void convertToEntityAttributeTest_rolNaamAfwezig() {
+		// Arange
+		String rolNaam = null;
+		Rol rol = null;
+		// Act
+		var actual = rolConverter.convertToEntityAttribute(rolNaam);
+		// Assert
+		Assertions.assertEquals(rol, actual);
 	}
 
 }

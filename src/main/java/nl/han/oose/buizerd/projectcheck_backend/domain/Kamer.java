@@ -79,7 +79,7 @@ public class Kamer {
 	 * De rollen die in de kamer ingeschakeld zijn.
 	 */
 	@ElementCollection
-	private Set<@Valid Rol> relevanteRollen;
+	private Set<@NotNull @Valid Rol> relevanteRollen;
 
 	/**
 	 * De deelnemers van de kamer.
@@ -207,7 +207,7 @@ public class Kamer {
 	 * @return Een {@link Optional} van de rol met dezelfde {@code rolNaam} of {@code null} als deze niet is gevonden.
 	 */
 	@ValidateOnExecution
-	public Optional<Rol> getRelevanteRol(@NotNull @Valid String rolNaam) {
+	public Optional<Rol> getRelevanteRol(@NotNull String rolNaam) {
 		return relevanteRollen.stream().filter(r -> r.getRolNaam().equals(rolNaam)).findAny();
 	}
 
