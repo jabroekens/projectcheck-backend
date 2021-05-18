@@ -32,7 +32,11 @@ public class KamerTest {
 	@Spy
 	private Set<Deelnemer> deelnemers;
 
-	@Mock
+	/*
+	 * Deze set kan niet worden gemokt, omdaat er niks kan worden toegevoegd aan een list wanneer deze gemocked is.
+	 * Daarom wordt er hier gebruik gemaakt van een Spy die de Set gedeeltelijk mocked.
+	 */
+	@Spy
 	private Set<Rol> relevanteRollen;
 
 	private Kamer kamer;
@@ -92,6 +96,29 @@ public class KamerTest {
 		//Assert
 		Assertions.assertEquals(expectedId, actualId);
 
+	}
+
+	@Test
+	void geeftJuisteRol(@Mock Rol relevanteRol) {
+		Assertions.assertTrue(kamer.getRelevanteRol(relevanteRol.getRolNaam()).isEmpty());
+	}
+
+	@Test
+	void geeftJuisteRollen() {
+		/*
+		 * Omdat `Kamer#getRelevanteRollen()` een UnmodifiableSet teruggeeft
+		 * (wat in werkelijkheid een UnmodifiableCollection is), en die
+		 * niet een eigen `equals` methode implementeert, moeten
+		 * `expected` en `actual` omgedraaid worden.
+		 *
+		 * Zie: https://stackoverflow.com/a/31733658
+		 */
+
+		Assertions.assertEquals(kamer.getRelevanteRollen(), relevanteRollen);
+		Assertions.assertAll(
+			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getRelevanteRollen().add(null)),
+			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getRelevanteRollen().remove(null))
+		);
 	}
 
 }
