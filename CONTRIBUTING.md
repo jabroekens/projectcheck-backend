@@ -43,7 +43,9 @@ Het veld `antwoordOp` is optioneel en wordt mogelijk niet meegegeven.
 
 ## Codestijl
 Om de kwaliteit van de code te waarborgen, wordt er een vaste stijl vastgehouden in de code.
-Voor het gemak is er een [Intellij IDEA code style XML](https://confluenceoosevt.aimsites.nl/download/attachments/238631614/Code-Style_De_ProjectCheck.xml) beschikbaar gesteld die gebruikt kan worden.
+Voor het gemak is er een [Intellij IDEA code style XML](https://confluenceoosevt.aimsites.nl/download/attachments/238631614/Code-Style_De_ProjectCheck.xml) beschikbaar gesteld die gebruikt
+kan worden (let erop dat je ook "Add unambiguous imports on the fly" en "Optimize imports on the fly" inschakelt bij Intellij IDEA > Settings > Editor > General > Auto Import).
+
 De java code zal voldoen aan de stijling zoals geschreven in [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html), met de volgende aanpassingen:
 
 #### 2.3.1 Whitespace characters
