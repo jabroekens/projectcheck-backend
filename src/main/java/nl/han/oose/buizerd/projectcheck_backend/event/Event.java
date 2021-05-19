@@ -28,9 +28,10 @@ public abstract class Event {
 	 */
 	transient boolean stuurNaarAlleClients = false;
 
+	// package-private zodat het getest kan worden.
 	@NotNull
 	@Valid
-	private DeelnemerId deelnemerId;
+	DeelnemerId deelnemerId;
 
 	/**
 	 * Haal het {@link DeelnemerId} op van de deelnemer die het event heeft aangeroepen.

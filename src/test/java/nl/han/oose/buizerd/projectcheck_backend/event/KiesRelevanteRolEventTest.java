@@ -22,7 +22,6 @@ public class KiesRelevanteRolEventTest {
 	private Kamer kamer;
 	private Begeleider begeleider;
 	private DeelnemerId begeleiderId;
-	private DeelnemerId deelnemerId;
 	private Rol rol;
 
 	@BeforeEach
@@ -31,10 +30,9 @@ public class KiesRelevanteRolEventTest {
 		kamer = Mockito.mock(Kamer.class);
 		begeleider = Mockito.mock(Begeleider.class);
 		begeleiderId = Mockito.mock(DeelnemerId.class);
-		deelnemerId = Mockito.mock(DeelnemerId.class);
 		kiesRelevanteRolEvent = new KiesRelevanteRolEvent();
 		kiesRelevanteRolEvent.rolNaam = rolNaam;
-		kiesRelevanteRolEvent.deelnemerId = deelnemerId;
+		kiesRelevanteRolEvent.deelnemerId = Mockito.mock(DeelnemerId.class);
 	}
 
 	@Test
@@ -52,7 +50,7 @@ public class KiesRelevanteRolEventTest {
 			() -> Mockito.verify(kamer).getBegeleider(),
 			() -> Mockito.verify(begeleider).getDeelnemerId(),
 			() -> Assertions.assertEquals(EventResponse.Status.VERBODEN, response.status),
-			() -> Assertions.assertEquals(deelnemerId, response.context.get("deelnemer"))
+			() -> Assertions.assertEquals(response.context.get("deelnemer"), kiesRelevanteRolEvent.getDeelnemerId())
 		);
 
 	}
@@ -61,7 +59,7 @@ public class KiesRelevanteRolEventTest {
 	public void voerUit_RolBestaand_DeelnemerIsBegeleider() {
 		// Arrange
 		Mockito.when(kamer.getBegeleider()).thenReturn(begeleider);
-		Mockito.when(begeleider.getDeelnemerId()).thenReturn(deelnemerId);
+		Mockito.when(begeleider.getDeelnemerId()).thenReturn(kiesRelevanteRolEvent.getDeelnemerId());
 		String expectedBericht = String.format("de rol %s is ingeschakeld voor de kamer %s", rolNaam, kamer.getKamerCode());
 
 		// Act
