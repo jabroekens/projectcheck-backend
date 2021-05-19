@@ -1,27 +1,30 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
-import java.io.Serializable;
-import java.util.Map;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.websocket.Session;
+import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import org.java_websocket.WebSocket;
+import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 
 public class KiesRolEvent extends Event {
 
-	public KiesRolEvent(
-		@NotNull EventType eventType,
-		@NotNull DeelnemerId deelnemerId,
-		Map<String, ? extends Serializable> context
-	) {
-		super(eventType, deelnemerId, context);
-	}
+	@NotNull
+	@Valid
+	Rol rol;
 
 	@Override
-	protected void voerUit(@NotNull Kamer kamer, WebSocket conn, @NotNull Rol rol) {
-		deelnemerId.getDeelnemer()
-				   deelnemer.setRol()
+	protected EventResponse voerUit(Kamer kamer, Session session) {
+		Optional<Deelnemer> deelnemer = kamer.getDeelnemer(super.getDeelnemerId());
+		if (deelnemer.isPresent()) {
+			deelnemer.get().setRol(rol);
+			EventResponse antwoord = new EventResponse(EventResponse.Status.OK);
+			antwoord.antwoordOp(this);
+			antwoord.metContext("gekozenRol", rol);
+			return antwoord;
+		}
+		return new EventResponse(EventResponse.Status.DEELNEMER_NIET_GEVONDEN);
 	}
 
 }
