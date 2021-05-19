@@ -125,12 +125,12 @@ public class KamerService {
 			return;
 		}
 
-		Optional<Kamer> kamer = kamerRepository.get(eventKamerCode);
+		Optional<Kamer> kamer = kamerRepository.get(kamerCode);
 		if (kamer.isPresent()) {
 			event.voerUit(kamerRepository, kamer.get(), session);
 		} else {
 			EventResponse response = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
-				.metContext("kamerCode", eventKamerCode)
+				.metContext("kamerCode", kamerCode)
 				.antwoordOp(event);
 			session.getBasicRemote().sendText(response.asJson());
 		}
