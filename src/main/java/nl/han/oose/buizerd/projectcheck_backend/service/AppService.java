@@ -74,14 +74,14 @@ public class AppService extends Application {
 		Optional<Kamer> kamer = kamerRepository.get(kamerCode);
 
 		if (kamer.isPresent()) {
-			long deelnemerId = kamer.get().genereerDeelnemerId();
+			Long deelnemerId = kamer.get().genereerDeelnemerId();
 			Deelnemer deelnemer = new Deelnemer(
 				new DeelnemerId(deelnemerId, kamer.get().getKamerCode()),
 				deelnemerNaam
 			);
 
 			kamer.get().voegDeelnemerToe(deelnemer);
-			return Response.ok(getWebSocketInfo(kamer.get().getKamerCode(),deelnemerId)).build();
+			return Response.ok(getWebSocketInfo(kamer.get().getKamerCode(), deelnemerId)).build();
 		} else {
 			throw new KamerNietGevondenException(kamerCode);
 		}
@@ -93,10 +93,10 @@ public class AppService extends Application {
 		json.addProperty("kamer_url", kamerService.getUrl(kamerCode));
 		return json.toString();
 	}
-	String getWebSocketInfo(String kamerCode,long deelnemerId) {
+	String getWebSocketInfo(String kamerCode,Long deelnemerId) {
 		JsonObject json = new JsonObject();
 		json.addProperty("kamer_url", kamerService.getUrl(kamerCode));
-		json.addProperty("deelnemer_id",deelnemerId);
+		json.addProperty("deelnemer_id", deelnemerId);
 		return json.toString();
 	}
 
