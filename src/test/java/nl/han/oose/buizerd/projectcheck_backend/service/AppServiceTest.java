@@ -69,7 +69,7 @@ public class AppServiceTest {
 		Mockito.when(kamerRepository.get(kamerCode)).thenReturn(Optional.of(kamer));
 
 		try (MockedStatic<Response> mock = Mockito.mockStatic(Response.class)) {
-			mock.when(() -> Response.ok(appService.getWebSocketURL(kamer.getKamerCode()))).thenReturn(responseBuilder);
+			mock.when(() -> Response.ok(appService.getWebSocketInfo(kamer.getKamerCode(), deelnemerId))).thenReturn(responseBuilder);
 			appService.neemDeel(kamerCode, deelnemerNaam);
 			Mockito.verify(kamer).voegDeelnemerToe(deelnemerCaptor.capture());
 
@@ -91,12 +91,15 @@ public class AppServiceTest {
 	}
 
 	@Test
-	void geeftJuisteWebSocketURL() {
+	void geeftJuisteWebSocketInfo() {
 		String kamerCode = "123456";
+		Long deelnemerId = 12l;
 		Mockito.when(kamerService.getUrl(kamerCode)).thenReturn(kamerCode);
 
-		String expected = "{\"kamer_url\":\"" + kamerCode + "\"}";
-		Assertions.assertEquals(expected, appService.getWebSocketURL(kamerCode));
+		String expected = "{\"kamer_url\":\""+ kamerCode +"\",\"deelnemer_id\":" + deelnemerId + "}";
+		Assertions.assertEquals(expected, appService.getWebSocketInfo(kamerCode,deelnemerId));
 	}
+
+
 
 }
