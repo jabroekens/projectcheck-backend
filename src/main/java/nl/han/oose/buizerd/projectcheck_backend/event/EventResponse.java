@@ -38,7 +38,7 @@ public class EventResponse {
 	}
 
 	public EventResponse antwoordOp(Event event) {
-		antwoordOp = Event.Decoder.getEventNaam(event.getClass());
+		antwoordOp = Event.getEventNaam(event.getClass());
 		return this;
 	}
 

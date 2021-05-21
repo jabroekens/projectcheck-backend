@@ -22,6 +22,16 @@ import org.reflections.Reflections;
  */
 public abstract class Event {
 
+	/**
+	 * Geeft de naam van het event dat volgt uit een eventklasse.
+	 *
+	 * @param eventKlasse De eventklasse.
+	 * @return De naam van de {@code eventKlasse} in uppercase snake case.
+	 */
+	protected static String getEventNaam(Class<? extends Event> eventKlasse) {
+		return eventKlasse.getSimpleName().replace("Event", "").replaceAll("(?<!^)(?=[A-Z])", "_").toUpperCase();
+	}
+
 	/*
 	 * `transient` zodat het niet ge(de)serializeerd wordt door Gson.
 	 * package-private zodat het getest kan worden.
@@ -119,15 +129,11 @@ public abstract class Event {
 
 			Reflections reflections = new Reflections(Event.class.getPackage().getName());
 			reflections.getSubTypesOf(Event.class).forEach(
-				event -> eventAdapterFactory.registerSubtype(event, Decoder.getEventNaam(event))
+				event -> eventAdapterFactory.registerSubtype(event, Event.getEventNaam(event))
 			);
 
 			GSON = new GsonBuilder().registerTypeAdapterFactory(eventAdapterFactory).create();
 			VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
-		}
-
-		protected static String getEventNaam(Class<? extends Event> eventKlasse) {
-			return eventKlasse.getSimpleName().replace("Event", "").replaceAll("(?<!^)(?=[A-Z])", "_").toUpperCase();
 		}
 
 		private Event event;
