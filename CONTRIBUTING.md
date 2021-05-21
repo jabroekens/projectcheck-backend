@@ -187,3 +187,9 @@ public class ChatEventTest {
 
 }
 ```
+
+System Sequence Diagram voor ChatEvent:  
+![System Sequence Diagram ChatEvent](https://confluenceoosevt.aimsites.nl/download/attachments/238630728/SSD%20voerUit.png)
+
+Sequence Diagram voor ChatEvent — voerUit:  
+![Sequence Diagram ChatEvent — voerUit](https://confluenceoosevt.aimsites.nl/download/attachments/238630728/SD%20voerUit.png)
