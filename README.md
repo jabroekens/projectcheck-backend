@@ -12,6 +12,7 @@ deelnemers via bijvoorbeeld Zoom of Microsoft Teams bijeenkomen en hun bevinding
 
 ## Setup
 1. Download en installeer Java 12 of hoger, met uitzondering van Java 16 of hoger: <https://adoptopenjdk.net/installation.html>
+    * Zorg dat de omgevingsvariabel `JAVA_HOME` is ingesteld en dat `%JAVA_HOME%\bin` (Windows) of `$JAVA_HOME/bin` (Linux/macOS) toegevoegd zijn aan het systeempad
 2. Download en installeer [Apache TomEE 9.0.0-M3 Plus](https://www.apache.org/dyn/closer.cgi/tomee/tomee-9.0.0-M3/apache-tomee-9.0.0-M3-plus.zip)
     * Zie: <https://tomee.apache.org/tomee-9.0/docs/installing-tomee.html>
     * Voeg `CATALINA_HOME` toe aan de omgevingsvariabelen, met als waarde de locatie van de Apache TomEE-installatiefolder
