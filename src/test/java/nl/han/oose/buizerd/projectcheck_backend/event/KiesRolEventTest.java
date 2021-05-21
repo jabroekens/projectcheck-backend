@@ -5,7 +5,6 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,7 +28,8 @@ public class KiesRolEventTest {
 	}
 
 	//ErrorPath
-	@Test
+
+	//Mockito.when(kamer.getRelevanteRollen()).thenReturn(rollen);
 
 
 }

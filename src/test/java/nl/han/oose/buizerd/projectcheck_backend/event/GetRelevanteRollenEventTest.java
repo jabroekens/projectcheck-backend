@@ -1,5 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
+import jakarta.validation.ValidatorFactory;
 import jakarta.websocket.Session;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,9 +11,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 
 @ExtendWith(MockitoExtension.class)
 public class GetRelevanteRollenEventTest {
@@ -37,10 +38,10 @@ public class GetRelevanteRollenEventTest {
 
 	//HappyPath
 	@Test
-	public void voerUit_GeeftRelevanteRollen() {
+	public void voerUit_GeeftRelevanteRollen(@Mock ValidatorFactory validatorFactory) {
 		// Arrange
 		Mockito.when(kamer.getRelevanteRollen()).thenReturn(rollen);
-		String expectedBericht = String.format("geefRollen",rollen);
+		String expectedBericht = String.format("geefRollen", rollen);
 
 		// Act
 		EventResponse response = getRelevanteRollenEvent.voerUit(kamer, session);
@@ -51,4 +52,5 @@ public class GetRelevanteRollenEventTest {
 			() -> Assertions.assertEquals(EventResponse.Status.OK, response.status)
 		);
 	}
+
 }
