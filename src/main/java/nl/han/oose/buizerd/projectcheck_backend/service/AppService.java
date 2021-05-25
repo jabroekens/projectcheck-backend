@@ -15,6 +15,8 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.domain.KamerFase;
+import nl.han.oose.buizerd.projectcheck_backend.exception.KamerGeslotenException;
 import nl.han.oose.buizerd.projectcheck_backend.exception.KamerNietGevondenException;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
@@ -74,6 +76,10 @@ public class AppService extends Application {
 		Optional<Kamer> kamer = kamerRepository.get(kamerCode);
 
 		if (kamer.isPresent()) {
+			if (kamer.get().getKamerFase() != KamerFase.OPEN) {
+				throw new KamerGeslotenException(kamerCode);
+			}
+
 			Long deelnemerId = kamer.get().genereerDeelnemerId();
 			Deelnemer deelnemer = new Deelnemer(
 				new DeelnemerId(deelnemerId, kamer.get().getKamerCode()),
@@ -85,7 +91,6 @@ public class AppService extends Application {
 		} else {
 			throw new KamerNietGevondenException(kamerCode);
 		}
-
 	}
 
 	String getWebSocketURL(String kamerCode) {
