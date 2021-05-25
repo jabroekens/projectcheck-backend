@@ -36,7 +36,7 @@ public class KiesRolEventTest {
 	@Test
 	public void voerUit_kanDeelnemerNietvindenTest() {
 		// Arrange
-		//UITLEG!!!!!!!!!!!!!!!!!!!!!!!
+		// De deelnemer is wel gemocked in de setUp() maar nog niet toegevoegd aan de kamer. Daarom zal de KiesRolEvent geen deelnemer vinden.
 
 		// Act
 		EventResponse response = kiesRolEvent.voerUit(kamer, session);
