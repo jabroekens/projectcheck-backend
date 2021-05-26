@@ -4,6 +4,8 @@ import jakarta.ws.rs.core.Response;
 import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.domain.KamerFase;
+import nl.han.oose.buizerd.projectcheck_backend.exception.KamerGeslotenException;
 import nl.han.oose.buizerd.projectcheck_backend.exception.KamerNietGevondenException;
 import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 import org.junit.jupiter.api.Assertions;
@@ -61,12 +63,13 @@ public class AppServiceTest {
 	}
 
 	@Test
-	void neemDeel_kamerAanwezig(@Mock Kamer kamer, @Mock Response.ResponseBuilder responseBuilder) {
+	void neemDeel_kamerAanwezig_kamerOpen(@Mock Kamer kamer, @Mock Response.ResponseBuilder responseBuilder) {
 		String kamerCode = "123456";
 		String deelnemerNaam = "Joost";
 		Long deelnemerId = kamer.genereerDeelnemerId();
 
 		Mockito.when(kamerRepository.get(kamerCode)).thenReturn(Optional.of(kamer));
+		Mockito.when(kamer.getKamerFase()).thenReturn(KamerFase.OPEN);
 
 		try (MockedStatic<Response> mock = Mockito.mockStatic(Response.class)) {
 			mock.when(() -> Response.ok(appService.getWebSocketInfo(kamer.getKamerCode(), deelnemerId))).thenReturn(responseBuilder);
@@ -79,6 +82,15 @@ public class AppServiceTest {
 				() -> Assertions.assertEquals(kamer.getKamerCode(), deelnemerCaptor.getValue().getDeelnemerId().getKamerCode())
 			);
 		}
+	}
+
+	@Test
+	void neemDeel_kamerAanwezig_kamerNietOpen(@Mock Kamer kamer, @Mock Response.ResponseBuilder responseBuilder) {
+		String kamerCode = "123456";
+		String deelnemerNaam = "Joost";
+
+		Mockito.when(kamerRepository.get(kamerCode)).thenReturn(Optional.of(kamer));
+		Assertions.assertThrows(KamerGeslotenException.class, () -> appService.neemDeel(kamerCode, deelnemerNaam));
 	}
 
 	@Test
@@ -99,7 +111,5 @@ public class AppServiceTest {
 		String expected = "{\"kamer_url\":\""+ kamerCode +"\",\"deelnemer_id\":" + deelnemerId + "}";
 		Assertions.assertEquals(expected, appService.getWebSocketInfo(kamerCode,deelnemerId));
 	}
-
-
 
 }

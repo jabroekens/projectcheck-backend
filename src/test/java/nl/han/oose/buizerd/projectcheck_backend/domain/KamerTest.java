@@ -21,6 +21,9 @@ public class KamerTest {
 	private LocalDateTime datum;
 
 	@Mock
+	private KamerFase kamerFase;
+
+	@Mock
 	private Begeleider begeleider;
 
 	@Mock
@@ -46,7 +49,7 @@ public class KamerTest {
 	void setUp() {
 		deelnemers = new HashSet<>();
 		relevanteRollen = EnumSet.noneOf(Rol.class);
-		kamer = new Kamer(KamerTest.KAMER_CODE, datum, begeleider, deelnemers, relevanteRollen);
+		kamer = new Kamer(KamerTest.KAMER_CODE, datum, kamerFase, begeleider, deelnemers, relevanteRollen);
 	}
 
 	@Test
@@ -57,6 +60,17 @@ public class KamerTest {
 	@Test
 	void geeftJuisteDatum() {
 		Assertions.assertEquals(datum, kamer.getDatum());
+	}
+
+	@Test
+	void geeftJuisteKamerFase() {
+		Assertions.assertEquals(kamerFase, kamer.getKamerFase());
+	}
+
+	@Test
+	void zetJuisteKamerFase(@Mock KamerFase kamerFase) {
+		kamer.setKamerFase(kamerFase);
+		Assertions.assertEquals(kamerFase, kamer.getKamerFase());
 	}
 
 	@Test

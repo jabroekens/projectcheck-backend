@@ -63,6 +63,10 @@ public class Kamer {
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime datum;
 
+	@NotNull
+	@Valid
+	private KamerFase kamerFase;
+
 	/**
 	 * De begeleider van de kamer.
 	 */
@@ -103,8 +107,8 @@ public class Kamer {
 	 */
 	@ValidateOnExecution
 	public Kamer(@KamerCode String kamerCode, @NotNull @Valid Begeleider begeleider) {
-		// Dit is een uitzondering op de comment bij `Kamer#Kamer(String, LocalDateTime, Begeleider, Set, Set)`
-		this(kamerCode, LocalDateTime.now(), begeleider, new HashSet<>(), EnumSet.noneOf(Rol.class));
+		// Dit is een uitzondering op de comment bij `Kamer#Kamer(String, LocalDateTime, KamerFase, Begeleider, Set, Set)`
+		this(kamerCode, LocalDateTime.now(), KamerFase.SETUP, begeleider, new HashSet<>(), EnumSet.noneOf(Rol.class));
 	}
 
 	/**
@@ -114,13 +118,22 @@ public class Kamer {
 	 *
 	 * @param kamerCode De code van de kamer.
 	 * @param datum De datum waarop de kamer gemaakt is.
+	 * @param kamerFase De status van de kamer.
 	 * @param begeleider De begeleider van de kamer.
 	 * @param deelnemers Een set van deelnemers van de kamer.
 	 * @param relevanteRollen Een set van ingeschakelde rollen van de kamer.
 	 */
-	Kamer(String kamerCode, LocalDateTime datum, Begeleider begeleider, Set<Deelnemer> deelnemers, Set<Rol> relevanteRollen) {
+	Kamer(
+		String kamerCode,
+		LocalDateTime datum,
+		KamerFase kamerFase,
+		Begeleider begeleider,
+		Set<Deelnemer> deelnemers,
+		Set<Rol> relevanteRollen
+	) {
 		this.kamerCode = kamerCode;
 		this.datum = datum;
+		this.kamerFase = kamerFase;
 		this.begeleider = begeleider;
 		this.deelnemers = deelnemers;
 		this.relevanteRollen = relevanteRollen;
@@ -142,6 +155,25 @@ public class Kamer {
 	 */
 	public LocalDateTime getDatum() {
 		return datum;
+	}
+
+	/**
+	 * Haal de fase waarin de kamer zich verkeert op.
+	 *
+	 * @return De fase waarin de kamer zich verkeert.
+	 */
+	public KamerFase getKamerFase() {
+		return kamerFase;
+	}
+
+	/**
+	 * Zet de fase waarin de kamer zich verkeert.
+	 *
+	 * @param kamerFase De {@link KamerFase} waarin de kamer zich verkeert.
+	 */
+	@ValidateOnExecution
+	public void setKamerFase(@NotNull @Valid KamerFase kamerFase) {
+		this.kamerFase = kamerFase;
 	}
 
 	/**
@@ -176,7 +208,6 @@ public class Kamer {
 	@ValidateOnExecution
 	public void voegDeelnemerToe(@NotNull @Valid Deelnemer deelnemer) {
 		deelnemers.add(deelnemer);
-
 	}
 
 	/**
