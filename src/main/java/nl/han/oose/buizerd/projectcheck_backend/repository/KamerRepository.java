@@ -39,7 +39,6 @@ public class KamerRepository implements Repository<Kamer, String> {
 		String kamerCode = Kamer.genereerCode();
 
 		Begeleider begeleider = new Begeleider(new DeelnemerId(1L, kamerCode), begeleiderNaam);
-		begeleiderDAO.create(begeleider);
 
 		Kamer kamer = new Kamer(kamerCode, begeleider);
 		add(kamer);
@@ -53,6 +52,7 @@ public class KamerRepository implements Repository<Kamer, String> {
 	@Override
 	public void add(Kamer kamer) {
 		kamerDAO.create(kamer);
+		begeleiderDAO.create(kamer.getBegeleider());
 	}
 
 	/**
@@ -60,7 +60,15 @@ public class KamerRepository implements Repository<Kamer, String> {
 	 */
 	@Override
 	public Optional<Kamer> get(String kamerCode) {
-		return kamerDAO.read(Kamer.class, kamerCode);
+		Optional<Kamer> kamer = kamerDAO.read(Kamer.class, kamerCode);
+		Optional<Begeleider> begeleider = begeleiderDAO.read(Begeleider.class, new DeelnemerId(1L, kamerCode));
+
+		if (kamer.isPresent() && begeleider.isPresent()) {
+			kamer.get().setBegeleider(begeleider.get());
+			return kamer;
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	/**
@@ -69,6 +77,7 @@ public class KamerRepository implements Repository<Kamer, String> {
 	@Override
 	public void update(Kamer kamer) {
 		kamerDAO.update(kamer);
+		begeleiderDAO.update(kamer.getBegeleider());
 	}
 
 	/**
@@ -77,6 +86,7 @@ public class KamerRepository implements Repository<Kamer, String> {
 	@Override
 	public void remove(String kamerCode) {
 		kamerDAO.delete(kamerCode);
+		begeleiderDAO.delete(new DeelnemerId(1L, kamerCode));
 	}
 
 }

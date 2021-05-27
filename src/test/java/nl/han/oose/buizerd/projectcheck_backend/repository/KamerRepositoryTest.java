@@ -1,5 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.repository;
 
+import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
@@ -18,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  *  * https://stackoverflow.com/questions/12539365/when-to-use-mockito-verify
  */
 @ExtendWith(MockitoExtension.class)
-public class KamerRepositoryTest extends RepositoryTest<Kamer, String> {
+public class KamerRepositoryTest {
 
 	@Mock
 	private DAO<Kamer, String> kamerDAO;
@@ -41,31 +42,88 @@ public class KamerRepositoryTest extends RepositoryTest<Kamer, String> {
 		Assertions.assertNotNull(kamer);
 		Assertions.assertNotNull(kamer.getBegeleider());
 
-		Mockito.verify(begeleiderDAO).create(kamer.getBegeleider());
 		Assertions.assertAll(
 			() -> Assertions.assertEquals(begeleiderNaam, kamer.getBegeleider().getNaam()),
 			() -> Assertions.assertEquals(kamer.getKamerCode(), kamer.getBegeleider().getDeelnemerId().getKamerCode())
 		);
 	}
 
-	void voegtToe(Kamer kamer) {
+	@Test
+	void voegtToe(@Mock Kamer kamer) {
 		kamerRepository.add(kamer);
 		Mockito.verify(kamerDAO).create(kamer);
+		Mockito.verify(begeleiderDAO).create(kamer.getBegeleider());
 	}
 
-	void geeft(String s) {
-		Assertions.assertTrue(kamerRepository.get(s).isEmpty());
-		Mockito.verify(kamerDAO).read(Kamer.class, s);
+	@Test
+	void geeft_kamerAanwezig_begeleiderAanwezig(@Mock Kamer kamer, @Mock Begeleider begeleider) {
+		String kamerCode = "123456";
+		Optional<Kamer> kamerOpt = Optional.of(kamer);
+
+		Mockito.when(kamerDAO.read(Kamer.class, kamerCode)).thenReturn(kamerOpt);
+		Mockito.when(begeleiderDAO.read(Begeleider.class, new DeelnemerId(1L, kamerCode))).thenReturn(Optional.of(begeleider));
+
+		Assertions.assertEquals(kamerOpt, kamerRepository.get(kamerCode));
+
+		Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
+		Mockito.verify(begeleiderDAO).read(Begeleider.class, new DeelnemerId(1L, kamerCode));
+		Mockito.verify(kamer).setBegeleider(begeleider);
 	}
 
-	void updatet(Kamer kamer) {
+	@Test
+	void geeft_kamerAanwezig_begeleiderAfwezig(@Mock Kamer kamer) {
+		String kamerCode = "123456";
+
+		Mockito.when(kamerDAO.read(Kamer.class, kamerCode)).thenReturn(Optional.of(kamer));
+		Mockito.when(begeleiderDAO.read(Begeleider.class, new DeelnemerId(1L, kamerCode))).thenReturn(Optional.empty());
+
+		Assertions.assertEquals(Optional.empty(), kamerRepository.get(kamerCode));
+
+		Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
+		Mockito.verify(begeleiderDAO).read(Begeleider.class, new DeelnemerId(1L, kamerCode));
+	}
+
+	@Test
+	void geeft_kamerAfwezig_begeleiderAanwezig(@Mock Begeleider begeleider) {
+		String kamerCode = "123456";
+
+		Mockito.when(kamerDAO.read(Kamer.class, kamerCode)).thenReturn(Optional.empty());
+		Mockito.when(begeleiderDAO.read(Begeleider.class, new DeelnemerId(1L, kamerCode))).thenReturn(Optional.of(begeleider));
+
+		Assertions.assertEquals(Optional.empty(), kamerRepository.get(kamerCode));
+
+		Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
+		Mockito.verify(begeleiderDAO).read(Begeleider.class, new DeelnemerId(1L, kamerCode));
+	}
+
+	@Test
+	void geeft_kamerAfwezig_begeleiderAfwezig() {
+		String kamerCode = "123456";
+
+		Mockito.when(kamerDAO.read(Kamer.class, kamerCode)).thenReturn(Optional.empty());
+		Mockito.when(begeleiderDAO.read(Begeleider.class, new DeelnemerId(1L, kamerCode))).thenReturn(Optional.empty());
+
+		Assertions.assertEquals(Optional.empty(), kamerRepository.get(kamerCode));
+
+		Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
+		Mockito.verify(begeleiderDAO).read(Begeleider.class, new DeelnemerId(1L, kamerCode));
+	}
+
+	@Test
+	void updatet(@Mock Kamer kamer) {
 		kamerRepository.update(kamer);
 		Mockito.verify(kamerDAO).update(kamer);
+		Mockito.verify(begeleiderDAO).update(kamer.getBegeleider());
 	}
 
-	void verwijdert(String s) {
-		kamerRepository.remove(s);
-		Mockito.verify(kamerDAO).delete(s);
+	@Test
+	void verwijdert() {
+		String kamerCode = "123456";
+
+		kamerRepository.remove(kamerCode);
+
+		Mockito.verify(kamerDAO).delete(kamerCode);
+		Mockito.verify(begeleiderDAO).delete(new DeelnemerId(1L, kamerCode));
 	}
 
 }
