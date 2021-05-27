@@ -254,11 +254,10 @@ public class Kamer {
 	/**
 	 * Schakel een relevante rol in voor de kamer.
 	 *
-	 * @param rol De relevante rol die ingeschakelt moet worden.
+	 * @param rollen De relevante rollen die ingeschakelt moet worden.
 	 */
 	@ValidateOnExecution
-	public void activeerRelevanteRol(@NotNull @Valid Rol rol) {
-		relevanteRollen.add(rol);
+	public void activeerRelevanteRollen(@NotNull @Valid Set<Rol> rollen) {
+		relevanteRollen = rollen;
 	}
-
 }
