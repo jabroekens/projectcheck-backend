@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
@@ -22,6 +23,9 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
  */
 @Entity
 public class Deelnemer {
+
+	@Transient
+	private KaartenSelectie selectie;
 
 	/**
 	 * De identifier van de deelnemer.
@@ -154,6 +158,13 @@ public class Deelnemer {
 		this.rol = rol;
 	}
 
+	public KaartenSelectie getSelectie() {
+		return selectie;
+	}
+
+	public void setSelectie(KaartenSelectie selectie) {
+		this.selectie = selectie;
+	}
 }
 
 

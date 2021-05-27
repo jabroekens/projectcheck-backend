@@ -95,7 +95,8 @@ public class EventResponse {
 		VERBODEN,
 		INVALIDE,
 		KAMER_NIET_GEVONDEN,
-		ROL_NIET_GEVONDEN
+		ROL_NIET_GEVONDEN,
+		SELECTIE_VOL
 	}
 
 }
