@@ -2,6 +2,7 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -16,7 +17,7 @@ public class KaartenSelectie {
 
     @OneToMany
     @Column(nullable = true)
-    private Set<Kaart> kaarten;
+    private Set<Kaart> kaarten = new HashSet<>();
 
     public KaartenSelectie() {
 
@@ -36,7 +37,10 @@ public class KaartenSelectie {
     }
 
     public boolean kaartExists(Kaart kaart) {
-        return kaarten.stream().anyMatch(k -> k.getCode() == kaart.getCode());
+        if(!kaarten.isEmpty()) {
+            return kaarten.stream().anyMatch(k -> k.getCode() == kaart.getCode());
+        }
+        return false;
     }
 
     public int getLength() {
