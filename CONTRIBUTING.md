@@ -129,16 +129,10 @@ public class ChatEvent extends Event {
 	String woord;
 
 	@Override
-	protected EventResponse voerUit(Kamer kamer, Session session) {
-		Optional<Deelnemer> deelnemer = kamer.getDeelnemer(super.getDeelnemerId());
-		if (deelnemer.isPresent()) {
-			String bericht = String.format("%s zegt: \"%s\"", deelnemer.get().getNaam(), woord);
-			super.stuurNaarAlleClients();
-			return new EventResponse(EventResponse.Status.OK).metContext("bericht", bericht);
-		} else {
-			return new EventResponse(EventResponse.Status.DEELNEMER_NIET_GEVONDEN)
-				.metContext("deelnemerId", super.getDeelnemerId());
-		}
+	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
+		String bericht = String.format("%s zegt: \"%s\"", deelnemer.get().getNaam(), woord);
+		super.stuurNaarAlleClients();
+		return new EventResponse(EventResponse.Status.OK).metContext("bericht", bericht);
 	}
 
 }
@@ -158,30 +152,15 @@ public class ChatEventTest {
 	}
 
 	@Test
-	void voerUit_deelnemerAanwezig(@Mock Kamer kamer, @Mock Session session, @Mock Deelnemer deelnemer) {
-		Mockito.when(kamer.getDeelnemer(chatEvent.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
+	void voerUit_stuurtJuisteBerichtNaarAlleClients(@Mock Deelnemer deelnemer, @Mock Session session) {
 		String expectedBericht = String.format("%s zegt: \"%s\"", deelnemer.getNaam(), chatEvent.woord);
 
 		EventResponse response = chatEvent.voerUit(kamer, session);
 
 		Assertions.assertAll(
-			() -> Mockito.verify(kamer).getDeelnemer(chatEvent.getDeelnemerId()),
 			() -> Assertions.assertTrue(chatEvent.stuurNaarAlleClients),
 			() -> Assertions.assertEquals(EventResponse.Status.OK, response.status),
 			() -> Assertions.assertEquals(expectedBericht, response.context.get("bericht"))
-		);
-	}
-
-	@Test
-	void voerUit_deelnemerAfwezig(@Mock Kamer kamer, @Mock Session session) {
-		Mockito.when(kamer.getDeelnemer(chatEvent.getDeelnemerId())).thenReturn(Optional.empty());
-
-		EventResponse response = chatEvent.voerUit(kamer, session);
-
-		Assertions.assertAll(
-			() -> Mockito.verify(kamer).getDeelnemer(chatEvent.getDeelnemerId()),
-			() -> Assertions.assertEquals(EventResponse.Status.DEELNEMER_NIET_GEVONDEN, response.status),
-			() -> Assertions.assertEquals(chatEvent.getDeelnemerId(), response.context.get("deelnemerId"))
 		);
 	}
 

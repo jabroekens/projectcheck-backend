@@ -13,6 +13,7 @@ import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
 import java.util.concurrent.CompletableFuture;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
+import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import org.reflections.Reflections;
@@ -25,7 +26,6 @@ public abstract class Event {
 	/**
 	 * Geeft de naam van het event dat volgt uit een eventklasse.
 	 *
-	 * @param eventKlasse De eventklasse.
 	 * @return De naam van de {@code eventKlasse} in uppercase snake case.
 	 */
 	protected static String getEventNaam(Class<? extends Event> eventKlasse) {
@@ -45,32 +45,30 @@ public abstract class Event {
 
 	/**
 	 * Haal het {@link DeelnemerId} op van de deelnemer die het event heeft aangeroepen.
-	 *
-	 * @return De identifier van de betrokken deelnemer.
 	 */
 	public DeelnemerId getDeelnemerId() {
 		return deelnemerId;
 	}
 
 	/**
-	 * Geeft aan dat de {@link EventResponse} die volgt
-	 * uit {@link Event#voerUit(Kamer, Session)} naar
-	 * alle open sessies gestuurd moet worden.
+	 * Geeft aan dat de {@link EventResponse} die volgt uit
+	 * {@link Event#voerUit(Deelnemer, Session)} naar alle
+	 * open sessies gestuurt moet worden.
 	 */
 	protected void stuurNaarAlleClients() {
 		this.stuurNaarAlleClients = true;
 	}
 
 	/**
-	 * Voert de event in kwestie uit.
+	 * Voert het event in kwestie uit.
 	 *
 	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
-	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
+	 * @param deelnemer De {@link Deelnemer} die het event heeft aangeroepen.
 	 * @param session De betrokken {@link Session}.
 	 */
-	public final void voerUit(DAO<Kamer, String> kamerDAO, Kamer kamer, Session session) {
+	public final void voerUit(DAO<Kamer, String> kamerDAO, Deelnemer deelnemer, Session session) {
 		CompletableFuture.runAsync(() -> {
-			String response = voerUit(kamer, session).antwoordOp(this).asJson();
+			String response = voerUit(deelnemer, session).antwoordOp(this).asJson();
 
 			if (stuurNaarAlleClients) {
 				/*
@@ -86,19 +84,18 @@ public abstract class Event {
 				session.getAsyncRemote().sendText(response);
 			}
 
-			handelAf(kamerDAO, kamer);
+			handelAf(kamerDAO, deelnemer.getKamer());
 		});
 	}
 
 	/**
 	 * Wordt aangeroepen bij het uitvoeren van een event.
 	 *
-	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
+	 * @param deelnemer De {@link Deelnemer} die het event heeft aangeroepen.
 	 * @param session De betrokken {@link Session}.
-	 * @return Een {@link EventResponse}.
 	 */
 	@ValidateOnExecution
-	protected abstract @NotNull @Valid EventResponse voerUit(Kamer kamer, Session session);
+	protected abstract @NotNull @Valid EventResponse voerUit(Deelnemer deelnemer, Session session);
 
 	/**
 	 * Wordt aangeroepen bij het afhandelen van een event.
@@ -108,7 +105,7 @@ public abstract class Event {
 	 * dan moet dit opgeslagen worden met de {@code kamerRepository}.
 	 *
 	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
-	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
+	 * @param kamer De kamer waaraan de deelnemer die het event heeft aangeroepen deelneemt.
 	 */
 	protected void handelAf(DAO<Kamer, String> kamerDAO, Kamer kamer) {
 		// Doe niets
