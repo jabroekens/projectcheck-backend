@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.Optional;
+import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
@@ -18,7 +19,6 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KamerFase;
 import nl.han.oose.buizerd.projectcheck_backend.exception.KamerGeslotenException;
 import nl.han.oose.buizerd.projectcheck_backend.exception.KamerNietGevondenException;
-import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
@@ -26,7 +26,7 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 public class AppService extends Application {
 
 	@Inject
-	private KamerRepository kamerRepository;
+	private DAO<Kamer, String> kamerDAO;
 
 	@Inject
 	private KamerService kamerService;
@@ -44,11 +44,11 @@ public class AppService extends Application {
 	 *
 	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
 	 *
-	 * @param kamerRepository Een {@link KamerRepository}.
+	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
 	 * @param kamerService Een {@link KamerService}.
 	 */
-	AppService(KamerRepository kamerRepository, KamerService kamerService) {
-		this.kamerRepository = kamerRepository;
+	AppService(DAO<Kamer, String> kamerDAO, KamerService kamerService) {
+		this.kamerDAO = kamerDAO;
 		this.kamerService = kamerService;
 	}
 
@@ -57,13 +57,17 @@ public class AppService extends Application {
 	 *
 	 * @param begeleiderNaam De naam van de {@link Begeleider}.
 	 * @return Een JSON string met de WebSocket URL van de {@link Kamer} gewikkelt in {@link Response}.
-	 * @see KamerRepository#maakKamer(String)
 	 */
 	@Path("/kamer/nieuw")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response maakKamer(@FormParam("begeleiderNaam") @Naam String begeleiderNaam) {
-		Kamer kamer = kamerRepository.maakKamer(begeleiderNaam);
+		String kamerCode = Kamer.genereerCode();
+
+		Begeleider begeleider = new Begeleider(new DeelnemerId(1L, kamerCode), begeleiderNaam);
+		Kamer kamer = new Kamer(kamerCode, begeleider);
+
+		kamerDAO.create(kamer);
 		KamerService.registreer(kamer.getKamerCode());
 
 		return Response.ok(getWebSocketURL(kamer.getKamerCode())).build();
@@ -73,7 +77,7 @@ public class AppService extends Application {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response neemDeel(@PathParam("kamerCode") @KamerCode String kamerCode, @FormParam("deelnemerNaam") @Naam String deelnemerNaam) {
-		Optional<Kamer> kamer = kamerRepository.get(kamerCode);
+		Optional<Kamer> kamer = kamerDAO.read(Kamer.class, kamerCode);
 
 		if (kamer.isPresent()) {
 			if (kamer.get().getKamerFase() != KamerFase.OPEN) {
@@ -87,6 +91,7 @@ public class AppService extends Application {
 			);
 
 			kamer.get().voegDeelnemerToe(deelnemer);
+			kamerDAO.update(kamer.get());
 			return Response.ok(getWebSocketInfo(kamer.get().getKamerCode(), deelnemerId)).build();
 		} else {
 			throw new KamerNietGevondenException(kamerCode);

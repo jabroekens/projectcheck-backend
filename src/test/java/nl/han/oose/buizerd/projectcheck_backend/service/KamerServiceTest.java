@@ -4,7 +4,8 @@ import jakarta.websocket.CloseReason;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
 import jakarta.ws.rs.core.UriInfo;
-import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
+import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
+import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,13 +22,13 @@ public class KamerServiceTest {
 	private UriInfo uriInfo;
 
 	@Mock
-	private KamerRepository kamerRepository;
+	private DAO<Kamer, String> kamerDAO;
 
 	private KamerService kamerService;
 
 	@BeforeEach
 	void setUp() {
-		kamerService = new KamerService(uriInfo, kamerRepository);
+		kamerService = new KamerService(uriInfo, kamerDAO);
 	}
 
 	@AfterEach

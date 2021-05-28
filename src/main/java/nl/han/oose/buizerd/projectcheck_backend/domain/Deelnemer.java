@@ -1,6 +1,5 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -9,7 +8,6 @@ import jakarta.persistence.MapsId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
-import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.Util;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
@@ -48,8 +46,8 @@ public class Deelnemer {
 	 * niet gedeserializeerd door JPA, wat wel moet.
 	 */
 	@Util.GsonExclude
+	@ManyToOne(optional = false)
 	@MapsId("kamerCode")
-	@ManyToOne(cascade = CascadeType.ALL)
 	private Kamer kamer;
 
 	/**
@@ -101,13 +99,30 @@ public class Deelnemer {
 	}
 
 	/**
-	 * Haal de kamer waaraan de deelnemer deelneemt op.
-	 * <b>Deze is alleen aanwezig nadat een deelnemer uit de datastore is geladen.</b>
-	 *
-	 * @return De kamer waaraan de deelnemer deelneemt.
+	 * @throws IllegalStateException Als de kamer waaraan de deelnemer deelneemt {@code null} is.
+	 * @see Kamer#voegDeelnemerToe(Deelnemer)
 	 */
-	public Optional<Kamer> getKamer() {
-		return Optional.ofNullable(kamer);
+	public Kamer getKamer() {
+		if (kamer == null) {
+			throw new IllegalStateException("De deelnemer neemt nog niet deel aan een kamer.");
+		}
+
+		return kamer;
+	}
+
+	/**
+	 * Zet de {@link Kamer} waaraan de deelnemer deelneemt.
+	 * <p>
+	 * <em>Deze methode wordt gebruikt door {@link Kamer#voegDeelnemerToe(Deelnemer)}
+	 * en mag hierbuiten niet aangeroepen worden.</em>
+	 * <p>
+	 * Om een kip-en-eiprobleem te voorkomen is het nodig dat de kamer achteraf
+	 * bij de {@link Deelnemer} gezet wordt. Een deelnemer is namelijk altijd
+	 * gekoppeld aan een {@link Kamer}, en een kamer heeft altijd een
+	 * {@link Begeleider}.
+	 */
+	void setKamer(Kamer kamer) {
+		this.kamer = kamer;
 	}
 
 }

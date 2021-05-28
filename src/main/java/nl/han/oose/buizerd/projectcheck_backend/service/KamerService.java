@@ -20,10 +20,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
+import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.event.Event;
 import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
-import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 
 @ServerEndpoint(value = "/kamer/{kamerCode}", decoders = {Event.Decoder.class})
 public class KamerService {
@@ -51,7 +52,7 @@ public class KamerService {
 	private UriInfo uriInfo;
 
 	@Inject
-	private KamerRepository kamerRepository;
+	private DAO<Kamer, String> kamerDAO;
 
 	/**
 	 * Construeert een {@link KamerService}.
@@ -67,11 +68,11 @@ public class KamerService {
 	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
 	 *
 	 * @param uriInfo Een implementatie van {@link UriInfo}.
-	 * @param kamerRepository Een {@link KamerRepository}.
+	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
 	 */
-	KamerService(UriInfo uriInfo, KamerRepository kamerRepository) {
+	KamerService(UriInfo uriInfo, DAO<Kamer, String> kamerDAO) {
 		this.uriInfo = uriInfo;
-		this.kamerRepository = kamerRepository;
+		this.kamerDAO = kamerDAO;
 	}
 
 	/**
@@ -118,21 +119,22 @@ public class KamerService {
 	 */
 	@OnMessage
 	public void message(Event event, @PathParam("kamerCode") String kamerCode, Session session) throws IOException {
-		String eventKamerCode = event.getDeelnemerId().getKamerCode();
-		if (!eventKamerCode.equals(kamerCode)) {
-			EventResponse response = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
-			session.getBasicRemote().sendText(response.asJson());
-			return;
-		}
-
-		Optional<Kamer> kamer = kamerRepository.get(kamerCode);
+		Optional<Kamer> kamer = kamerDAO.read(Kamer.class, kamerCode);
 		if (kamer.isPresent()) {
-			event.voerUit(kamerRepository, kamer.get(), session);
+			Optional<Deelnemer> deelnemer = kamer.get().getDeelnemer(event.getDeelnemerId());
+
+			if (deelnemer.isPresent()) {
+				event.voerUit(kamerDAO, deelnemer.get(), session);
+			} else {
+				session.getBasicRemote().sendText(
+					new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event).asJson()
+				);
+			}
 		} else {
-			EventResponse response = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
-				.metContext("kamerCode", kamerCode)
-				.antwoordOp(event);
-			session.getBasicRemote().sendText(response.asJson());
+			session.getBasicRemote().sendText(
+				new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
+					.metContext("kamerCode", kamerCode).antwoordOp(event).asJson()
+			);
 		}
 	}
 
