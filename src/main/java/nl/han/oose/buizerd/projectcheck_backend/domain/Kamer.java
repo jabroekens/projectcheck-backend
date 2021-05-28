@@ -2,10 +2,10 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +13,6 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.executable.ValidateOnExecution;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -69,7 +68,7 @@ public class Kamer {
 	/**
 	 * De rollen die in de kamer ingeschakeld zijn.
 	 */
-	@ElementCollection
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
 	private Set<@NotNull @Valid Rol> relevanteRollen;
 
 	/**
@@ -95,7 +94,7 @@ public class Kamer {
 	@ValidateOnExecution
 	public Kamer(@KamerCode String kamerCode, @NotNull @Valid Begeleider begeleider) {
 		// Dit is een uitzondering op de comment bij `Kamer#Kamer(String, LocalDateTime, KamerFase, Begeleider, Set, Set)`
-		this(kamerCode, LocalDateTime.now(), KamerFase.SETUP, begeleider, new HashSet<>(), EnumSet.noneOf(Rol.class));
+		this(kamerCode, LocalDateTime.now(), KamerFase.SETUP, begeleider, new HashSet<>(), new HashSet<>());
 	}
 
 	/**
@@ -238,17 +237,6 @@ public class Kamer {
 	@ValidateOnExecution
 	public Set<Rol> getRelevanteRollen() {
 		return Collections.unmodifiableSet(relevanteRollen);
-	}
-
-	/**
-	 * Haal een read-only kopie op van een rol binnen de kamer.
-	 *
-	 * @param rolNaam De naam van de op te halen rol.
-	 * @return Een {@link Optional} van de rol met dezelfde {@code rolNaam} of {@code null} als deze niet is gevonden.
-	 */
-	@ValidateOnExecution
-	public Optional<Rol> getRelevanteRol(@NotNull String rolNaam) {
-		return relevanteRollen.stream().filter(r -> r.getRolNaam().equals(rolNaam)).findAny();
 	}
 
 	/**

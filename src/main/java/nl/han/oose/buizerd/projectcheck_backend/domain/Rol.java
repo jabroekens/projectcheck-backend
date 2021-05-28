@@ -1,30 +1,40 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
+
 /**
  * Een rol is een set van rechten die een {@link Deelnemer} aangewezen kan krijgen of kan kiezen binnen een {@link Kamer}.
  * <p>
  * Elke rol heeft een naam.
  */
-public enum Rol {
-	EINDGEBRUIKER("Eindgebruiker"),
-	PROJECTLEIDER("Projectleider"),
-	OPDRACHTGEVER("Opdrachtgever"),
-	TEAMLID("Teamlid"),
-	EXTERNE_PROJECTBEGELEIDER("Externe Projectbegeleider"),
-	EXTERNE_OPDRACHTGEVER("Externe Opdrachtgever"),
-	PROJECTBUREAU("Projectbureau");
+@Entity
+public class Rol {
 
 	/**
 	 * De naam van de rol.
 	 */
-	private final String rolNaam;
+	@NotNull
+	@Id
+	private String rolNaam;
+
+	/**
+	 * Construeert een {@link Rol}.
+	 * <p>
+	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 */
+	public Rol() {
+	}
 
 	/**
 	 * Construeert een {@link Rol}.
 	 *
 	 * @param rolNaam De naam van de rol.
 	 */
-	Rol(String rolNaam) {
+	@ValidateOnExecution
+	public Rol(@NotNull String rolNaam) {
 		this.rolNaam = rolNaam;
 	}
 
@@ -36,4 +46,5 @@ public enum Rol {
 	public String getRolNaam() {
 		return rolNaam;
 	}
+
 }
