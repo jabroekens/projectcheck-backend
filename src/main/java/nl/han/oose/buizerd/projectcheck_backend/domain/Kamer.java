@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Transient;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -68,18 +67,6 @@ public class Kamer {
 	private KamerFase kamerFase;
 
 	/**
-	 * De begeleider van de kamer.
-	 */
-	/*
-	 * Het is niet nodig om dit bij te houden bij Spel in de datastore,
-	 * maar het is wel nodig in de klasse Spel.
-	 */
-	@NotNull
-	@Valid
-	@Transient
-	private Begeleider begeleider;
-
-	/**
 	 * De rollen die in de kamer ingeschakeld zijn.
 	 */
 	@ElementCollection
@@ -88,7 +75,7 @@ public class Kamer {
 	/**
 	 * De deelnemers van de kamer.
 	 */
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "kamer", orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "kamer", orphanRemoval = true)
 	private Set<@NotNull @Valid Deelnemer> deelnemers;
 
 	/**
@@ -134,9 +121,10 @@ public class Kamer {
 		this.kamerCode = kamerCode;
 		this.datum = datum;
 		this.kamerFase = kamerFase;
-		this.begeleider = begeleider;
 		this.deelnemers = deelnemers;
 		this.relevanteRollen = relevanteRollen;
+
+		voegDeelnemerToe(begeleider);
 	}
 
 	/**
@@ -182,12 +170,22 @@ public class Kamer {
 	 * @return De begeleider van de kamer.
 	 */
 	public Begeleider getBegeleider() {
-		return begeleider;
-	}
+		Optional<Begeleider> begeleider = deelnemers.stream()
+		                                            .filter(Begeleider.class::isInstance)
+		                                            .map(Begeleider.class::cast)
+		                                            .findAny();
 
-	@ValidateOnExecution
-	public Optional<Deelnemer> getDeelnemer(@Valid DeelnemerId deelnemerId) {
-		return deelnemers.stream().filter(d -> d.getDeelnemerId().equals(deelnemerId)).findAny();
+		if (begeleider.isEmpty()) {
+			/*
+			 * Gooi een IllegalStateException, omdat het niet voor hoort
+			 * te komen dat er geen begeleider aanwezig is. Deze wordt
+			 * namelijk normaliter in de constructor toegevoegd aan
+			 * `deelnemers`.
+			 */
+			throw new IllegalStateException("De kamer heeft geen begeleider.");
+		}
+
+		return begeleider.get();
 	}
 
 	/**
@@ -201,13 +199,24 @@ public class Kamer {
 	}
 
 	/**
-	 * Voeg een deelnemer toe aan de kamer.
-	 *
-	 * @param deelnemer De {@link Deelnemer} die toegevoegd moet worden.
+	 * Haal de deelnemer op met {@link DeelnemerId} {@code deelnemerId}.
+	 */
+	@ValidateOnExecution
+	public Optional<Deelnemer> getDeelnemer(@NotNull @Valid DeelnemerId deelnemerId) {
+		return deelnemers.stream().filter(d -> d.getDeelnemerId().equals(deelnemerId)).findAny();
+	}
+
+	/**
+	 * Voegt een deelnemer toe aan de kamer en zet de kamer van de deelnemer.
+	 * <p>
+	 * Om een kip-en-eiprobleem te voorkomen is het nodig dat de kamer <em>achteraf</em>
+	 * bij de {@link Deelnemer} gezet wordt. Zowel {@link Deelnemer} als {@link Kamer}
+	 * zijn namelijk niet geldig zonder elkaar.
 	 */
 	@ValidateOnExecution
 	public void voegDeelnemerToe(@NotNull @Valid Deelnemer deelnemer) {
 		deelnemers.add(deelnemer);
+		deelnemer.setKamer(this);
 	}
 
 	/**

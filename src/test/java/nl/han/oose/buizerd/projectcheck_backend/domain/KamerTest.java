@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -23,25 +24,18 @@ public class KamerTest {
 	@Mock
 	private KamerFase kamerFase;
 
-	@Mock
-	private Begeleider begeleider;
-
-	@Mock
-	private Deelnemer deelnemer;
-
 	/*
-	 * Deze set kan niet worden gemokt, omdat er niks kan worden toegevoegd aan een list wanneer deze gemocked is.
-	 * Daarom wordt er hier gebruik gemaakt van een Spy die de Set gedeeltelijk mocked.
-	 */
-	@Spy
-	private Set<Deelnemer> deelnemers;
-
-	/*
-	 * Deze set kan niet worden gemokt, omdaat er niks kan worden toegevoegd aan een list wanneer deze gemocked is.
-	 * Daarom wordt er hier gebruik gemaakt van een Spy die de Set gedeeltelijk mocked.
+	 * Er wordt gebruikt gemaakt van @Spy voor Collection-objecten,
+	 * omdat deze niets 'bijhouden' als deze gemockt zijn.
 	 */
 	@Spy
 	private Set<Rol> relevanteRollen;
+
+	@Spy
+	private Set<Deelnemer> deelnemers;
+
+	@Mock
+	private Begeleider begeleider;
 
 	private Kamer kamer;
 
@@ -79,11 +73,6 @@ public class KamerTest {
 	}
 
 	@Test
-	void geeftJuisteDeelnemer(@Mock DeelnemerId deelnemerId) {
-		Assertions.assertTrue(kamer.getDeelnemer(deelnemerId).isEmpty());
-	}
-
-	@Test
 	void geeftJuisteDeelnemers() {
 		/*
 		 * Omdat `Kamer#getDeelnemers()` een UnmodifiableSet teruggeeft
@@ -93,17 +82,21 @@ public class KamerTest {
 		 *
 		 * Zie: https://stackoverflow.com/a/31733658
 		 */
-		Assertions.assertEquals(kamer.getDeelnemers(), deelnemers);
+		Set<Deelnemer> actual = kamer.getDeelnemers();
+
+		// Eerst controleren of ze gelijk zijn, anders riskeer je een NPE bij de andere assertions
+		Assertions.assertEquals(deelnemers, actual);
+
 		Assertions.assertAll(
-			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getDeelnemers().add(null)),
-			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getDeelnemers().remove(null))
+			() -> Assertions.assertTrue(actual.contains(begeleider)),
+			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> actual.add(null)),
+			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> actual.remove(null))
 		);
 	}
 
 	@Test
 	void kamerGeeftJuisteDeelnemerId() {
 		//Arrange
-		kamer.voegDeelnemerToe(deelnemer);
 		Long expectedId = 2L;
 
 		//Act
@@ -136,6 +129,22 @@ public class KamerTest {
 			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getRelevanteRollen().add(null)),
 			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getRelevanteRollen().remove(null))
 		);
+	}
+
+	@Nested
+	class getBegeleider {
+
+		@Test
+		void begeleiderAanwezig_geeftJuisteBegeleider() {
+			Assertions.assertEquals(begeleider, kamer.getBegeleider());
+		}
+
+		@Test
+		void begeleiderAfwezig_gooitIllegalStateException() {
+			deelnemers.remove(begeleider);
+			Assertions.assertThrows(IllegalStateException.class, () -> kamer.getBegeleider());
+		}
+
 	}
 
 }

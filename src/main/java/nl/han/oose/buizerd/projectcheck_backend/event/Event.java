@@ -12,9 +12,9 @@ import jakarta.validation.executable.ValidateOnExecution;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
 import java.util.concurrent.CompletableFuture;
+import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import nl.han.oose.buizerd.projectcheck_backend.repository.KamerRepository;
 import org.reflections.Reflections;
 
 /**
@@ -64,11 +64,11 @@ public abstract class Event {
 	/**
 	 * Voert de event in kwestie uit.
 	 *
-	 * @param kamerRepository Een {@link KamerRepository}.
+	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 * @param session De betrokken {@link Session}.
 	 */
-	public final void voerUit(KamerRepository kamerRepository, Kamer kamer, Session session) {
+	public final void voerUit(DAO<Kamer, String> kamerDAO, Kamer kamer, Session session) {
 		CompletableFuture.runAsync(() -> {
 			String response = voerUit(kamer, session).antwoordOp(this).asJson();
 
@@ -86,7 +86,7 @@ public abstract class Event {
 				session.getAsyncRemote().sendText(response);
 			}
 
-			handelAf(kamerRepository, kamer);
+			handelAf(kamerDAO, kamer);
 		});
 	}
 
@@ -107,10 +107,10 @@ public abstract class Event {
 	 * de datastore. Als de staat van de {@code kamer} is veranderd,
 	 * dan moet dit opgeslagen worden met de {@code kamerRepository}.
 	 *
-	 * @param kamerRepository Een {@link KamerRepository}.
+	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
 	 * @param kamer De kamer waarvoor het event aangeroepen wordt.
 	 */
-	protected void handelAf(KamerRepository kamerRepository, Kamer kamer) {
+	protected void handelAf(DAO<Kamer, String> kamerDAO, Kamer kamer) {
 		// Doe niets
 	}
 
