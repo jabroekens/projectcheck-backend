@@ -1,7 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.time.LocalDateTime;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
@@ -42,7 +41,7 @@ public class KamerTest {
 	@BeforeEach
 	void setUp() {
 		deelnemers = new HashSet<>();
-		relevanteRollen = EnumSet.noneOf(Rol.class);
+		relevanteRollen = new HashSet<>();
 		kamer = new Kamer(KamerTest.KAMER_CODE, datum, kamerFase, begeleider, deelnemers, relevanteRollen);
 	}
 
@@ -105,12 +104,6 @@ public class KamerTest {
 		//Assert
 		Assertions.assertEquals(expectedId, actualId);
 
-	}
-
-	@Test
-	void geeftJuisteRol() {
-		String rolNaam = "";
-		Assertions.assertTrue(kamer.getRelevanteRol(rolNaam).isEmpty());
 	}
 
 	@Test
