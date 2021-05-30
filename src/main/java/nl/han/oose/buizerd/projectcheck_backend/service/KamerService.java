@@ -25,13 +25,6 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode
 @ServerEndpoint(value = "/kamer/{kamerCode}", decoders = {Event.Decoder.class})
 public class KamerService {
 
-	// package-private zodat het getest kan worden
-	static final Logger LOGGER;
-
-	static {
-		LOGGER = Logger.getLogger(KamerService.class.getName());
-	}
-
 	private final DAO<Kamer, String> kamerDAO;
 
 	/**
@@ -94,6 +87,8 @@ public class KamerService {
 	 */
 	@OnError
 	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) {
+		Logger logger = Logger.getLogger(KamerService.class.getName());
+
 		if (error instanceof IllegalArgumentException) {
 			/*
 			 * Voer uit in een try/catch-statement zodat `KamerService#error(Session, Throwable, String)`
@@ -101,12 +96,12 @@ public class KamerService {
 			 */
 			try {
 				session.getBasicRemote().sendText(new EventResponse(EventResponse.Status.INVALIDE).asJson());
-			} catch (IOException e) {
-				KamerService.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 
-		KamerService.LOGGER.log(Level.SEVERE, error.getMessage(), error);
+		logger.log(Level.SEVERE, error.getMessage(), error);
 	}
 
 }
