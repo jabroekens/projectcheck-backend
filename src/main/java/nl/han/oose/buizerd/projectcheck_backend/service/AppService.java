@@ -27,9 +27,6 @@ public class AppService {
 	@Inject
 	private DAO<Kamer, String> kamerDAO;
 
-	@Inject
-	private KamerService kamerService;
-
 	/**
 	 * Construeert een {@link AppService}.
 	 * <p>
@@ -44,11 +41,9 @@ public class AppService {
 	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
 	 *
 	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
-	 * @param kamerService Een {@link KamerService}.
 	 */
-	AppService(DAO<Kamer, String> kamerDAO, KamerService kamerService) {
+	AppService(DAO<Kamer, String> kamerDAO) {
 		this.kamerDAO = kamerDAO;
-		this.kamerService = kamerService;
 	}
 
 	/**
@@ -68,8 +63,6 @@ public class AppService {
 		Kamer kamer = new Kamer(kamerCode, begeleider);
 
 		kamerDAO.create(kamer);
-		KamerService.registreer(kamer.getKamerCode());
-
 		return Response.ok(getKamerInfo(kamer.getKamerCode(), deelnemerId.getId())).build();
 	}
 

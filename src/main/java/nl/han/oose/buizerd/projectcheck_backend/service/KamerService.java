@@ -10,99 +10,50 @@ import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.UriBuilder;
-import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.net.URI;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.domain.KamerFase;
 import nl.han.oose.buizerd.projectcheck_backend.event.Event;
 import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
+import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
 @ServerEndpoint(value = "/kamer/{kamerCode}", decoders = {Event.Decoder.class})
 public class KamerService {
 
 	// package-private zodat het getest kan worden
 	static final Logger LOGGER;
-	static final Set<String> GEREGISTREERDE_KAMERS;
 
 	static {
 		LOGGER = Logger.getLogger(KamerService.class.getName());
-		GEREGISTREERDE_KAMERS = new HashSet<>();
 	}
 
-	/**
-	 * Registreert een {@link Kamer} en stelt een WebSocket URL beschikbaar.
-	 *
-	 * @param kamerCode De code van een kamer.
-	 * @see KamerService#getUrl(String)
-	 */
-	public static void registreer(String kamerCode) {
-		KamerService.GEREGISTREERDE_KAMERS.add(kamerCode);
-	}
-
-	@Context
-	private UriInfo uriInfo;
-
-	@Inject
-	private DAO<Kamer, String> kamerDAO;
-
-	/**
-	 * Construeert een {@link KamerService}.
-	 * <p>
-	 * <b>Deze constructor wordt gebruikt door Jakarta WebSockets API en mag niet aangeroepen worden.</b>
-	 */
-	public KamerService() {
-	}
+	private final DAO<Kamer, String> kamerDAO;
 
 	/**
 	 * Construeert een {@link KamerService}.
 	 *
 	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
 	 *
-	 * @param uriInfo Een implementatie van {@link UriInfo}.
 	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
 	 */
-	KamerService(UriInfo uriInfo, DAO<Kamer, String> kamerDAO) {
-		this.uriInfo = uriInfo;
+	@Inject
+	public KamerService(DAO<Kamer, String> kamerDAO) {
 		this.kamerDAO = kamerDAO;
-	}
-
-	/**
-	 * Haalt de WebSocket URL op voor de kamer met de code {@code kamerCode}.
-	 *
-	 * @param kamerCode De code van een kamer.
-	 * @return De WebSocket URL van de kamer.
-	 */
-	@SuppressWarnings("brain-overload")
-	public String getUrl(String kamerCode) {
-		URI uri = uriInfo.getBaseUri();
-
-		return UriBuilder
-			.fromUri(uri)
-			.replacePath(KamerService.class.getAnnotation(ServerEndpoint.class).value())
-			.scheme("https".equals(uri.getScheme()) ? "wss" : "ws")
-			.build(kamerCode).toString();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@OnOpen
-	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") String kamerCode) {
-		if (!KamerService.GEREGISTREERDE_KAMERS.contains(kamerCode)) {
-			try {
-				session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer niet gevonden"));
-			} catch (IOException e) {
-				KamerService.LOGGER.log(Level.SEVERE, e.getMessage(), e);
-			}
+	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") @KamerCode String kamerCode) throws IOException {
+		Optional<Kamer> kamer = kamerDAO.read(Kamer.class, kamerCode);
+		if (kamer.isEmpty() || kamer.get().getKamerFase() == KamerFase.GESLOTEN) {
+			session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer is gesloten of niet gevonden."));
 		}
 	}
 

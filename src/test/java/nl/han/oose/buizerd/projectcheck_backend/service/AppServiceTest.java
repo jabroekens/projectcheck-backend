@@ -25,14 +25,11 @@ class AppServiceTest {
 	@Mock
 	private DAO<Kamer, String> kamerDAO;
 
-	@Mock
-	private KamerService kamerService;
-
 	private AppService appService;
 
 	@BeforeEach
 	void setUp() {
-		appService = new AppService(kamerDAO, kamerService);
+		appService = new AppService(kamerDAO);
 	}
 
 	@Test
@@ -87,22 +84,6 @@ class AppServiceTest {
 				Assertions.assertNotNull(kamerCaptor.getValue().getBegeleider());
 				Assertions.assertEquals(begeleiderNaam, kamerCaptor.getValue().getBegeleider().getNaam());
 			});
-		}
-
-		@Test
-		void registreertKamer() {
-			String kamerCode = "123456";
-			String begeleiderNaam = "Joost";
-
-			try (MockedStatic<Kamer> kamerMock = Mockito.mockStatic(Kamer.class)) {
-				kamerMock.when(Kamer::genereerCode).thenReturn(kamerCode);
-
-				try (MockedStatic<KamerService> kamerServiceMock = Mockito.mockStatic(KamerService.class)) {
-					kamerServiceMock.when(() -> KamerService.registreer(kamerCode)).thenThrow(new RuntimeException());
-					Assertions.assertThrows(RuntimeException.class, () -> appService.maakKamer(begeleiderNaam));
-					kamerServiceMock.verify(() -> KamerService.registreer(kamerCode));
-				}
-			}
 		}
 
 	}
