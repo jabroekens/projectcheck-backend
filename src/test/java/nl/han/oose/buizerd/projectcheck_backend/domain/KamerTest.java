@@ -2,6 +2,7 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,11 +10,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class KamerTest {
+class KamerTest {
 
 	private static final String KAMER_CODE = "123456";
 
@@ -73,24 +75,22 @@ public class KamerTest {
 
 	@Test
 	void geeftJuisteDeelnemers() {
-		/*
-		 * Omdat `Kamer#getDeelnemers()` een UnmodifiableSet teruggeeft
-		 * (wat in werkelijkheid een UnmodifiableCollection is), en die
-		 * niet een eigen `equals` methode implementeert, moeten
-		 * `expected` en `actual` omgedraaid worden.
-		 *
-		 * Zie: https://stackoverflow.com/a/31733658
-		 */
 		Set<Deelnemer> actual = kamer.getDeelnemers();
 
 		// Eerst controleren of ze gelijk zijn, anders riskeer je een NPE bij de andere assertions
-		Assertions.assertEquals(deelnemers, actual);
+		Assertions.assertIterableEquals(actual, deelnemers);
 
 		Assertions.assertAll(
 			() -> Assertions.assertTrue(actual.contains(begeleider)),
 			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> actual.add(null)),
 			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> actual.remove(null))
 		);
+	}
+
+	@Test
+	void getDeelnemer_geeftJuisteDeelnemer(@Mock DeelnemerId deelnemerId) {
+		Mockito.when(begeleider.getDeelnemerId()).thenReturn(deelnemerId);
+		Assertions.assertEquals(Optional.of(begeleider), kamer.getDeelnemer(begeleider.getDeelnemerId()));
 	}
 
 	@Test
@@ -103,25 +103,25 @@ public class KamerTest {
 
 		//Assert
 		Assertions.assertEquals(expectedId, actualId);
-
 	}
 
 	@Test
-	void geeftJuisteRollen() {
-		/*
-		 * Omdat `Kamer#getRelevanteRollen()` een UnmodifiableSet teruggeeft
-		 * (wat in werkelijkheid een UnmodifiableCollection is), en die
-		 * niet een eigen `equals` methode implementeert, moeten
-		 * `expected` en `actual` omgedraaid worden.
-		 *
-		 * Zie: https://stackoverflow.com/a/31733658
-		 */
+	void getRelevanteRollen_geeftJuisteRollen() {
+		Set<Rol> actualRelevanteRollen = kamer.getRelevanteRollen();
 
-		Assertions.assertEquals(kamer.getRelevanteRollen(), relevanteRollen);
+		Assertions.assertIterableEquals(actualRelevanteRollen, relevanteRollen);
+
 		Assertions.assertAll(
-			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getRelevanteRollen().add(null)),
-			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> kamer.getRelevanteRollen().remove(null))
+			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> actualRelevanteRollen.add(null)),
+			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> actualRelevanteRollen.remove(null))
 		);
+	}
+
+	@Test
+	void activeerRelevanteRollen_zetEnGeeftJuisteRelevanteRollen() {
+		Set<Rol> expectedRelevanteRollen = Mockito.spy(new HashSet<>());
+		kamer.activeerRelevanteRollen(expectedRelevanteRollen);
+		Assertions.assertIterableEquals(expectedRelevanteRollen, kamer.getRelevanteRollen());
 	}
 
 	@Nested
