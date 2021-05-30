@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class DeelnemerIdTest {
+class DeelnemerIdTest {
 
 	private static final Long DEELNEMER_ID = 2L;
 	private static final String KAMER_CODE = "123456";

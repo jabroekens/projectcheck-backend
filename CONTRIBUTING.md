@@ -138,7 +138,7 @@ public class ChatEvent extends Event {
 ChatEventTest.java
 ```
 @ExtendWith(MockitoExtension.class)
-public class ChatEventTest {
+class ChatEventTest {
 
 	private ChatEvent chatEvent;
 

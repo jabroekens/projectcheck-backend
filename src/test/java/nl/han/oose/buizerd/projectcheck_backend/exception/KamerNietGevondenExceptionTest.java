@@ -1,6 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.exception;
 
-public class KamerNietGevondenExceptionTest extends ExceptionTest<KamerNietGevondenException> {
+class KamerNietGevondenExceptionTest extends ExceptionTest<KamerNietGevondenException> {
 
 	private static final String KAMER_CODE = "123456";
 
