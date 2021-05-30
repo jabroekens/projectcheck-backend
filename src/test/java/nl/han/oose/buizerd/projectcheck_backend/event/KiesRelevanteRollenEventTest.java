@@ -44,7 +44,7 @@ public class KiesRelevanteRollenEventTest {
 	class voerUit {
 
 		@Test
-		public void deelnemerIsBegeleider(@Mock Begeleider begeleider, @Mock Session session, @Mock Kamer kamer) {
+		void deelnemerIsBegeleider(@Mock Begeleider begeleider, @Mock Session session, @Mock Kamer kamer) {
 			// Arrange
 			// Een gemockte kamer heeft geen deelnemers, dus moeten wij deze zelf toevoegen
 			kamer.voegDeelnemerToe(begeleider);
@@ -57,13 +57,13 @@ public class KiesRelevanteRollenEventTest {
 			// Assert
 			Assertions.assertAll(
 				() -> Mockito.verify(kamer).activeerRelevanteRollen(relevanteRollen),
-				() -> Assertions.assertEquals(EventResponse.Status.OK, response.status),
-				() -> Assertions.assertEquals(expectedContextBericht, response.context.get("bericht"))
+				() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus()),
+				() -> Assertions.assertEquals(expectedContextBericht, response.getContext().get("bericht"))
 			);
 		}
 
 		@Test
-		public void deelnemerIsNietBegeleider(@Mock Deelnemer deelnemer, @Mock Session session) {
+		void deelnemerIsNietBegeleider(@Mock Deelnemer deelnemer, @Mock Session session) {
 			// Arrange
 			DeelnemerId expectedContextDeelnemer = deelnemer.getDeelnemerId();
 
@@ -72,8 +72,8 @@ public class KiesRelevanteRollenEventTest {
 
 			// Assert
 			Assertions.assertAll(
-				() -> Assertions.assertEquals(EventResponse.Status.VERBODEN, response.status),
-				() -> Assertions.assertEquals(expectedContextDeelnemer, response.context.get("deelnemer"))
+				() -> Assertions.assertEquals(EventResponse.Status.VERBODEN, response.getStatus()),
+				() -> Assertions.assertEquals(expectedContextDeelnemer, response.getContext().get("deelnemer"))
 			);
 		}
 

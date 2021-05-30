@@ -32,12 +32,6 @@ public abstract class Event {
 		return eventKlasse.getSimpleName().replace("Event", "").replaceAll("(?<!^)(?=[A-Z])", "_").toUpperCase();
 	}
 
-	/*
-	 * `transient` zodat het niet ge(de)serializeerd wordt door Gson.
-	 * package-private zodat het getest kan worden.
-	 */
-	transient boolean stuurNaarAlleClients = false;
-
 	// package-private zodat het getest kan worden.
 	@NotNull
 	@Valid
@@ -51,15 +45,6 @@ public abstract class Event {
 	}
 
 	/**
-	 * Geeft aan dat de {@link EventResponse} die volgt uit
-	 * {@link Event#voerUit(Deelnemer, Session)} naar alle
-	 * open sessies gestuurt moet worden.
-	 */
-	protected void stuurNaarAlleClients() {
-		this.stuurNaarAlleClients = true;
-	}
-
-	/**
 	 * Voert het event in kwestie uit.
 	 *
 	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
@@ -68,20 +53,20 @@ public abstract class Event {
 	 */
 	public final void voerUit(DAO<Kamer, String> kamerDAO, Deelnemer deelnemer, Session session) {
 		CompletableFuture.runAsync(() -> {
-			String response = voerUit(deelnemer, session).antwoordOp(this).asJson();
+			EventResponse response = voerUit(deelnemer, session).antwoordOp(this);
 
-			if (stuurNaarAlleClients) {
+			if (response.isStuurNaarAlleClients()) {
 				/*
 				 * foreach loop zodat er geen try/catch-statement
 				 * nodig is voor `sendText(String)`
 				 */
 				for (Session s : session.getOpenSessions()) {
 					if (s.isOpen()) {
-						s.getAsyncRemote().sendText(response);
+						s.getAsyncRemote().sendText(response.asJson());
 					}
 				}
 			} else if (session.isOpen()) {
-				session.getAsyncRemote().sendText(response);
+				session.getAsyncRemote().sendText(response.asJson());
 			}
 
 			handelAf(kamerDAO, deelnemer.getKamer());
