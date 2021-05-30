@@ -3,10 +3,10 @@ package nl.han.oose.buizerd.projectcheck_backend.dao;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import jakarta.transaction.UserTransaction;
 import java.io.Serializable;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Een generieke implementatie van {@link DAO}
@@ -20,10 +20,32 @@ public class DAOImpl<T, K extends Serializable> implements DAO<T, K> {
 	private UserTransaction transaction;
 
 	/**
+	 * Construeert een {@link DAOImpl}.
+	 * <p>
+	 * <b>Deze constructor wordt gebruikt door Jakarta CDI en mag niet aangeroepen worden.</b>
+	 */
+	public DAOImpl() {
+	}
+
+	/**
+	 * Construeert een {@link DAOImpl}.
+	 * <p>
+	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
+	 *
+	 * @param entityManager Een {@link EntityManager}.
+	 * @param transaction Een {@link UserTransaction}.
+	 */
+	public DAOImpl(EntityManager entityManager, UserTransaction transaction) {
+		this.entityManager = entityManager;
+		this.transaction = transaction;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
+	@Transactional
 	public void create(T t) {
-		doTransaction(em -> em.persist(t));
+		entityManager.persist(t);
 	}
 
 	/**
@@ -36,38 +58,17 @@ public class DAOImpl<T, K extends Serializable> implements DAO<T, K> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Transactional
 	public void update(T t) {
-		doTransaction(em -> em.merge(t));
+		entityManager.merge(t);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Transactional
 	public void delete(K k) {
-		doTransaction(em -> em.remove(k));
-	}
-
-	private void doTransaction(Consumer<EntityManager> consumer) {
-		try {
-			if (transaction.getStatus() != Status.STATUS_ACTIVE) {
-				transaction.begin();
-			}
-			consumer.accept(entityManager);
-			transaction.commit();
-		} catch (NotSupportedException e) {
-			consumer.accept(entityManager);
-		} catch (HeuristicRollbackException | HeuristicMixedException | SystemException e) {
-			// https://javaee.github.io/tutorial/ejb-basicexamples006.html
-			throw new EJBException(e);
-		} catch (RollbackException e) {
-			try {
-				if (transaction.getStatus() == Status.STATUS_ACTIVE) {
-					transaction.rollback();
-				}
-			} catch (SystemException se) {
-				throw new EJBException(se);
-			}
-		}
+		entityManager.remove(k);
 	}
 
 }
