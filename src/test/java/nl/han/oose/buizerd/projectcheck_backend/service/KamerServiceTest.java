@@ -16,19 +16,26 @@ import nl.han.oose.buizerd.projectcheck_backend.event.Event;
 import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.ThrowingSupplier;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class KamerServiceTest {
+
+	private static Logger logger;
+
+	@BeforeAll
+	static void setUpAll() {
+		logger = Mockito.mock(Logger.class);
+		KamerService.logger = logger;
+	}
 
 	@Mock
 	private DAO<Kamer, String> kamerDAO;
@@ -152,23 +159,10 @@ class KamerServiceTest {
 		@Mock
 		private RemoteEndpoint.Basic remoteEndpoint;
 
-		// ThrowingSupplier omdat `RemoteEndpoint.Basic#sendText(String)` een IOException kan gooien
-		private void metGemockteLogger(ThrowingSupplier<Throwable> supplier) throws Throwable {
-			Logger logger = Mockito.mock(Logger.class);
-
-			try (MockedStatic<Logger> mock = Mockito.mockStatic(Logger.class)) {
-				mock.when(() -> Logger.getLogger(Mockito.anyString())).thenReturn(logger);
-				Throwable throwable = supplier.get();
-				Mockito.verify(logger).log(Level.SEVERE, throwable.getMessage(), throwable);
-			}
-		}
-
 		@Test
-		void logtBijThrowablesAndersDanIllegalArgumentException(@Mock Throwable error) throws Throwable {
-			metGemockteLogger(() -> {
-				kamerService.error(session, error, KAMER_CODE);
-				return error;
-			});
+		void logtBijThrowablesAndersDanIllegalArgumentException(@Mock Throwable error) {
+			kamerService.error(session, error, KAMER_CODE);
+			Mockito.verify(logger).log(Level.SEVERE, error.getMessage(), error);
 		}
 
 		@Nested
@@ -189,13 +183,11 @@ class KamerServiceTest {
 
 			@Test
 			void logtBijException() throws Throwable {
-				metGemockteLogger(() -> {
-					Mockito.when(session.getBasicRemote()).thenReturn(remoteEndpoint);
-					Mockito.doThrow(IllegalArgumentException.class).when(remoteEndpoint).sendText(Mockito.anyString());
+				Mockito.when(session.getBasicRemote()).thenReturn(remoteEndpoint);
+				Mockito.doThrow(IllegalArgumentException.class).when(remoteEndpoint).sendText(Mockito.anyString());
 
-					kamerService.error(session, error, KAMER_CODE);
-					return error;
-				});
+				kamerService.error(session, error, KAMER_CODE);
+				Mockito.verify(logger).log(Level.SEVERE, error.getMessage(), error);
 			}
 
 		}
