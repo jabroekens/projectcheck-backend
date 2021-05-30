@@ -33,6 +33,7 @@ public class StartupListener implements ServletContextListener {
 		this.rolDAO = rolDAO;
 	}
 
+	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		for (StandaardRol standaardRol : StandaardRol.values()) {
 			if (rolDAO.read(Rol.class, standaardRol.getRol().getRolNaam()).isEmpty()) {
