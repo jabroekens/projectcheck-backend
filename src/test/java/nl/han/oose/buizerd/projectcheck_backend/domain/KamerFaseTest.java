@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-public class KamerFaseTest {
+class KamerFaseTest {
 
 	@ParameterizedTest
 	@EnumSource(KamerFase.class)

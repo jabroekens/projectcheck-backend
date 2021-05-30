@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.verification.VerificationMode;
 
 @ExtendWith(MockitoExtension.class)
-public class StartupListenerTest {
+class StartupListenerTest {
 
 	@Mock
 	private DAO<Rol, String> rolDAO;

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class RolTest {
+class RolTest {
 
 	private static final String ROL_NAAM = "OPDRACHTGEVER";
 

@@ -6,22 +6,18 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class DeelnemerTest {
+class DeelnemerTest {
 
+	@Mock
 	private DeelnemerId deelnemerId;
+
 	private Deelnemer deelnemer;
 
 	@BeforeEach
 	void setUp() {
-		deelnemerId = Mockito.mock(
-			DeelnemerId.class,
-			Mockito.withSettings().useConstructor(2L, "123456")
-		);
-
 		deelnemer = new Deelnemer(deelnemerId, "Joost");
 	}
 

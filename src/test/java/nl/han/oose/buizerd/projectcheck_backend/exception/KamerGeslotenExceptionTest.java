@@ -1,6 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.exception;
 
-public class KamerGeslotenExceptionTest extends ExceptionTest<KamerGeslotenException> {
+class KamerGeslotenExceptionTest extends ExceptionTest<KamerGeslotenException> {
 
 	private static final String KAMER_CODE = "123456";
 
