@@ -14,6 +14,10 @@
 		<maven.compiler.source>12</maven.compiler.source>
 		<maven.compiler.target>12</maven.compiler.target>
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+		<sonar.coverage.exclusions>
+			**/event/Event.java,
+			**/event/Event.Decoder.java
+		</sonar.coverage.exclusions>
 		<sonar.junit.reportPaths>target/surefire-reports</sonar.junit.reportPaths>
 	</properties>
 
@@ -93,14 +97,8 @@
 							<rules>
 								<rule>
 									<excludes>
-										<exclude>**.Util.1</exclude>
-										<exclude>**.dao.*</exclude>
 										<exclude>**.event.Event</exclude>
 										<exclude>**.event.Event.Decoder</exclude>
-										<exclude>**.event.EventResponse</exclude>
-										<exclude>**.event.EventResponse.Status</exclude>
-										<exclude>**.event.EventResponse.Encoder</exclude>
-										<exclude>**.service.KamerService</exclude>
 									</excludes>
 									<element>CLASS</element>
 									<limits>
