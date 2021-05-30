@@ -3,8 +3,6 @@ package nl.han.oose.buizerd.projectcheck_backend.dao;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Status;
-import jakarta.transaction.SystemException;
 import jakarta.transaction.UserTransaction;
 import java.io.Serializable;
 import java.util.Optional;
@@ -56,17 +54,19 @@ public class DAOImpl<T, K extends Serializable> implements DAO<T, K> {
 			}
 			consumer.accept(entityManager);
 			transaction.commit();
-		} catch (Exception e) {
+		} catch (NotSupportedException e) {
+			consumer.accept(entityManager);
+		} catch (HeuristicRollbackException | HeuristicMixedException | SystemException e) {
+			// https://javaee.github.io/tutorial/ejb-basicexamples006.html
+			throw new EJBException(e);
+		} catch (RollbackException e) {
 			try {
 				if (transaction.getStatus() == Status.STATUS_ACTIVE) {
 					transaction.rollback();
-					return;
 				}
 			} catch (SystemException se) {
-				throw new RuntimeException(se);
+				throw new EJBException(se);
 			}
-
-			throw new RuntimeException(e);
 		}
 	}
 
