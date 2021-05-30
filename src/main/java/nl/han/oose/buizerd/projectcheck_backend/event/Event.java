@@ -139,7 +139,7 @@ public abstract class Event {
 				if (event == null || !Decoder.VALIDATOR.validate(event).isEmpty()) {
 					return false;
 				}
-			} catch (JsonParseException e) {
+			} catch (JsonParseException ignored) {
 				return false;
 			}
 			return true;

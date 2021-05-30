@@ -64,7 +64,7 @@ class AppServiceTest {
 			String begeleiderNaam = "Joost";
 
 			try (MockedStatic<Kamer> mock = Mockito.mockStatic(Kamer.class)) {
-				mock.when(Kamer::genereerCode).thenThrow(new RuntimeException());
+				mock.when(Kamer::genereerCode).thenThrow(RuntimeException.class);
 				Assertions.assertThrows(RuntimeException.class, () -> appService.maakKamer(begeleiderNaam));
 				mock.verify(Kamer::genereerCode);
 			}
