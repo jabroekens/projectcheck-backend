@@ -1,24 +1,40 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import nl.han.oose.buizerd.projectcheck_backend.Util;
 
 /**
- * Representeert een antwoord op een WebSocket bericht.
+ * Representeert een antwoord op een {@link Event}.
  */
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class EventResponse {
 
-	// package-private zodat het getest kan worden.
-	final EventResponse.Status status;
-	final Map<String, Object> context;
+	private static final Gson GSON;
 
+	static {
+		GSON = new GsonBuilder().enableComplexMapKeySerialization()
+		                        .excludeFieldsWithoutExposeAnnotation()
+		                        .create();
+	}
+
+	@Expose
+	private final EventResponse.Status status;
+
+	@Expose
+	private final Map<String, Object> context;
+
+	@Expose
 	private final LocalDateTime datum;
+
+	@Expose
 	private String antwoordOp;
+
+	private boolean stuurNaarAlleClients;
 
 	/**
 	 * Construeert een {@link EventResponse}.
@@ -32,9 +48,25 @@ public class EventResponse {
 		this.datum = LocalDateTime.now();
 	}
 
+	public Status getStatus() {
+		return status;
+	}
+
+	public Map<String, Object> getContext() {
+		return context;
+	}
+
 	public EventResponse metContext(String sleutel, Object waarde) {
 		context.put(sleutel, waarde);
 		return this;
+	}
+
+	public LocalDateTime getDatum() {
+		return datum;
+	}
+
+	public String getAntwoordOp() {
+		return antwoordOp;
 	}
 
 	public EventResponse antwoordOp(Event event) {
@@ -42,8 +74,17 @@ public class EventResponse {
 		return this;
 	}
 
+	public boolean isStuurNaarAlleClients() {
+		return stuurNaarAlleClients;
+	}
+
+	public EventResponse stuurNaarAlleClients() {
+		this.stuurNaarAlleClients = true;
+		return this;
+	}
+
 	public String asJson() {
-		return Util.getGson().toJson(this);
+		return EventResponse.GSON.toJson(this);
 	}
 
 	/**

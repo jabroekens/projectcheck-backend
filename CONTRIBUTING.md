@@ -93,7 +93,6 @@ De java code zal voldoen aan de stijling zoals geschreven in [Google Java Style 
 
 ### Voorbeelden
 Zie de bestanden onderstaande bestanden voor voorbeelden:
-* `src/main/java/nl/han/oose/buizerd/projectcheck_backend/Util.java`
 * `src/main/java/nl/han/oose/buizerd/projectcheck_backend/domain/Begeleider.java`
 * `src/main/java/nl/han/oose/buizerd/projectcheck_backend/domain/DeelnemerId.java`
 * `src/main/java/nl/han/oose/buizerd/projectcheck_backend/domain/Deelnemer.java`
@@ -103,7 +102,6 @@ Zie de bestanden onderstaande bestanden voor voorbeelden:
 ## Testen
 Er wordt gebruik gemaakt van JUnit5 en Mockito. Bij het schrijven van tests is het noodzakelijk dat alle *dependencies* gemockt worden.
 Zie de bestanden onderstaande bestanden voor voorbeelden:
-* `src/test/java/nl/han/oose/buizerd/projectcheck_backend/UtilTest.java`
 * `src/test/java/nl/han/oose/buizerd/projectcheck_backend/domain/BegeleiderTest.java`
 * `src/test/java/nl/han/oose/buizerd/projectcheck_backend/domain/DeelnemerIdTest.java`
 * `src/test/java/nl/han/oose/buizerd/projectcheck_backend/domain/DeelnemerTest.java`
@@ -131,8 +129,7 @@ public class ChatEvent extends Event {
 	@Override
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
 		String bericht = String.format("%s zegt: \"%s\"", deelnemer.get().getNaam(), woord);
-		super.stuurNaarAlleClients();
-		return new EventResponse(EventResponse.Status.OK).metContext("bericht", bericht);
+		return new EventResponse(EventResponse.Status.OK).metContext("bericht", bericht).stuurNaarAlleClients();
 	}
 
 }
@@ -158,9 +155,9 @@ public class ChatEventTest {
 		EventResponse response = chatEvent.voerUit(kamer, session);
 
 		Assertions.assertAll(
-			() -> Assertions.assertTrue(chatEvent.stuurNaarAlleClients),
-			() -> Assertions.assertEquals(EventResponse.Status.OK, response.status),
-			() -> Assertions.assertEquals(expectedBericht, response.context.get("bericht"))
+			() -> Assertions.assertTrue(response.isStuurNaarAlleClients()),
+			() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus()),
+			() -> Assertions.assertEquals(expectedBericht, response.getContext().get("bericht"))
 		);
 	}
 

@@ -1,5 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import com.google.gson.annotations.Expose;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -8,7 +9,6 @@ import jakarta.persistence.MapsId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
-import nl.han.oose.buizerd.projectcheck_backend.Util;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**
@@ -22,6 +22,15 @@ public class Deelnemer {
 	/**
 	 * De identifier van de deelnemer.
 	 */
+	/*
+	 * Om te voorkomen dat `kamer` gedeserializeert wordt door Gson en een StackOverfowError
+	 * veroorzaakt als gevolg van zelfreferentie (een deelnemer bevat een kamer, en een kamer
+	 * bevat een deelnemer), moeten we alle velden *behalve* `kamer` markeren met `@Expose`.
+	 * Helaas is er geen `@Exclude` standaard inbegrepen bij Gson.
+	 *
+	 * Zie: https://github.com/google/gson/pull/1262
+	 */
+	@Expose
 	@NotNull
 	@Valid
 	@EmbeddedId
@@ -30,6 +39,7 @@ public class Deelnemer {
 	/**
 	 * De naam van de deelnemer.
 	 */
+	@Expose
 	@Naam
 	@Column(nullable = false)
 	private String naam;
@@ -37,15 +47,6 @@ public class Deelnemer {
 	/**
 	 * De {@link Kamer} waaraan de deelnemer deelneemt.
 	 */
-	/*
-	 * `@Util.GsonExclude` om StackOverflowError te voorkomen
-	 * als Gson een Deelnemer serializeert (Deelnemer bevat
-	 * Kamer en Kamer bevat Deelnemer).
-	 *
-	 * Als we het veld als `transient` markeren wordt het ook
-	 * niet gedeserializeerd door JPA, wat wel moet.
-	 */
-	@Util.GsonExclude
 	@ManyToOne(optional = false)
 	@MapsId("kamerCode")
 	private Kamer kamer;
