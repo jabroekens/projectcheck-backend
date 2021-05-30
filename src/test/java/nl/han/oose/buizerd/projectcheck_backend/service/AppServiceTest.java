@@ -20,7 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class AppServiceTest {
+class AppServiceTest {
 
 	@Mock
 	private DAO<Kamer, String> kamerDAO;
@@ -36,13 +36,12 @@ public class AppServiceTest {
 	}
 
 	@Test
-	void getWebSocketInfo_geeftJuisteJSON() {
+	void getKamerInfo_geeftJuisteJson() {
 		String kamerCode = "123456";
 		Long deelnemerId = 12L;
 
-		Mockito.when(kamerService.getUrl(kamerCode)).thenReturn(kamerCode);
-		String expected = "{\"kamer_url\":\"" + kamerCode + "\",\"deelnemer_id\":" + deelnemerId + "}";
-		Assertions.assertEquals(expected, appService.getWebSocketInfo(kamerCode, deelnemerId));
+		String expected = "{\"kamer\":\"" + kamerCode + "\",\"deelnemerId\":" + deelnemerId + "}";
+		Assertions.assertEquals(expected, appService.getKamerInfo(kamerCode, deelnemerId));
 	}
 
 	/*
@@ -56,6 +55,7 @@ public class AppServiceTest {
 		try (MockedStatic<Response> mock = Mockito.mockStatic(Response.class)) {
 			mock.when(() -> Response.ok(Mockito.anyString())).thenReturn(responseBuilder);
 			runnable.run();
+			mock.verify(() -> Response.ok(Mockito.anyString()));
 		}
 	}
 

@@ -7,7 +7,6 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.Optional;
@@ -23,7 +22,7 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 @Path("/")
-public class AppService extends Application {
+public class AppService {
 
 	@Inject
 	private DAO<Kamer, String> kamerDAO;
@@ -58,22 +57,23 @@ public class AppService extends Application {
 	 * @param begeleiderNaam De naam van de {@link Begeleider}.
 	 * @return Een JSON string met de WebSocket URL van de {@link Kamer} gewikkelt in {@link Response}.
 	 */
-	@Path("/kamer/nieuw")
+	@Path("kamer/nieuw")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response maakKamer(@FormParam("begeleiderNaam") @Naam String begeleiderNaam) {
 		String kamerCode = Kamer.genereerCode();
 
-		Begeleider begeleider = new Begeleider(new DeelnemerId(1L, kamerCode), begeleiderNaam);
+		DeelnemerId deelnemerId = new DeelnemerId(1L, kamerCode);
+		Begeleider begeleider = new Begeleider(deelnemerId, begeleiderNaam);
 		Kamer kamer = new Kamer(kamerCode, begeleider);
 
 		kamerDAO.create(kamer);
 		KamerService.registreer(kamer.getKamerCode());
 
-		return Response.ok(getWebSocketURL(kamer.getKamerCode())).build();
+		return Response.ok(getKamerInfo(kamer.getKamerCode(), deelnemerId.getId())).build();
 	}
 
-	@Path("/kamer/neemdeel/{kamerCode}")
+	@Path("kamer/neemdeel/{kamerCode}")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response neemDeel(@PathParam("kamerCode") @KamerCode String kamerCode, @FormParam("deelnemerNaam") @Naam String deelnemerNaam) {
@@ -92,21 +92,16 @@ public class AppService extends Application {
 
 			kamer.get().voegDeelnemerToe(deelnemer);
 			kamerDAO.update(kamer.get());
-			return Response.ok(getWebSocketInfo(kamer.get().getKamerCode(), deelnemerId)).build();
+			return Response.ok(getKamerInfo(kamerCode, deelnemerId)).build();
 		} else {
 			throw new KamerNietGevondenException(kamerCode);
 		}
 	}
 
-	String getWebSocketURL(String kamerCode) {
+	public String getKamerInfo(String kamerCode, Long deelnemerId) {
 		JsonObject json = new JsonObject();
-		json.addProperty("kamer_url", kamerService.getUrl(kamerCode));
-		return json.toString();
-	}
-	String getWebSocketInfo(String kamerCode,Long deelnemerId) {
-		JsonObject json = new JsonObject();
-		json.addProperty("kamer_url", kamerService.getUrl(kamerCode));
-		json.addProperty("deelnemer_id", deelnemerId);
+		json.addProperty("kamer", kamerCode);
+		json.addProperty("deelnemerId", deelnemerId);
 		return json.toString();
 	}
 
