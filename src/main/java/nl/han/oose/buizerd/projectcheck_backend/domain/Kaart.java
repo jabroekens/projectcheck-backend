@@ -2,6 +2,8 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 /**
@@ -12,10 +14,18 @@ import jakarta.persistence.Id;
 public class Kaart {
 
 	/**
-	 * De unieke code waarmee de kaart zal worden geïdentificeerd.
-	 * Deze unieke code kan niet worden aangepast.
+	 * De unieke id waarmee de kaart zal worden geïdentificeerd.
+	 * De id wordt automatisch gegenereerd door de database.
 	 */
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(nullable = false, updatable = false)
+	private Integer id;
+
+	/**
+	 * De code van de kaart, hij is uniek binnen de kaartenset.
+	 * TODO : Duidelijk hebben van de functie van de code.
+	 */
 	@Column(nullable = false, updatable = false)
 	private Integer code;
 
@@ -35,16 +45,27 @@ public class Kaart {
 
 	/**
 	 * Genereert een {@link Kaart}.
-	 * @param code De unieke code van de kaart.
+	 *
+	 * @param code De unieke code (per kaartenset) van de kaart.
 	 * @param text De text die zich op de kaart zal plaatsvinden.
 	 */
-	public Kaart(int code, String text) {
+	public Kaart(Integer code, String text) {
 		this.code = code;
 		this.text = text;
 	}
 
 	/**
+	 * Geeft de id (primary key) van de kaart terug.
+	 *
+	 * @return Het id.
+	 */
+	public Integer getId() {
+		return id;
+	}
+
+	/**
 	 * Geeft de unieke code van de kamer terug.
+	 *
 	 * @return De unieke code van de kamer.
 	 */
 	public int getCode() {
@@ -53,9 +74,11 @@ public class Kaart {
 
 	/**
 	 * Geeft de text van de kaart terug.
+	 *
 	 * @return De text van de kaart.
 	 */
 	public String getText() {
 		return text;
 	}
+
 }

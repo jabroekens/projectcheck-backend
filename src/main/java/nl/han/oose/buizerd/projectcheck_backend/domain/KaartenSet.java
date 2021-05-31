@@ -17,7 +17,7 @@ import java.util.Set;
 public class KaartenSet {
 
 	/**
-	 * Een unieke auto incremented code die de kaartenset onderschijt.
+	 * Een unieke auto incremented code die de kaartenset onderscheid.
 	 * De code is niet nullable en kan ook niet meer aangepast worden.
 	 */
 	@Id
@@ -34,6 +34,14 @@ public class KaartenSet {
 	private Set<Kaart> kaarten;
 
 	/**
+	 * Alle {@link Rol}len die bij deze kaartenset horen.
+	 */
+	@ManyToMany
+	@Column(nullable = false)
+	private Set<Rol> rollen;
+
+
+	/**
 	 * Genereert een {@link KaartenSet}.
 	 * Deze constructor zal alleen gebruikt worden door JPA.
 	 */
@@ -42,10 +50,20 @@ public class KaartenSet {
 
 	/**
 	 * Genereert een {@link KaartenSet}.
+	 *
 	 * @param kaarten De kaarten voor de kaartenset.
 	 */
-	public KaartenSet(Set<Kaart> kaarten) {
+	public KaartenSet(Set<Rol> rollen, Set<Kaart> kaarten) {
+		this.rollen = rollen;
 		this.kaarten = kaarten;
+	}
+
+	/**
+	 * Geeft de auto incremented id van de kaartenset terug.
+	 * @return De auto incremented id.
+	 */
+	public Integer getId() {
+		return id;
 	}
 
 	/**
@@ -57,11 +75,11 @@ public class KaartenSet {
 	}
 
 	/**
-	 * Geeft de auto incremented id van de kaartenset terug.
-	 * @return De auto incremented id.
+	 * Geeft de rollen van de kaartenset terug.
+	 * @return De rollen van de kaartenset.
 	 */
-	public Integer getId() {
-		return id;
+	public Set<Rol> getRollen() {
+		return rollen;
 	}
 
 }
