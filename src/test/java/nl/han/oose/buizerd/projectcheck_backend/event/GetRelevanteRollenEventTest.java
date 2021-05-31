@@ -3,7 +3,7 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 import jakarta.websocket.Session;
 import java.util.HashSet;
 import java.util.Set;
-import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
+import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 import org.junit.jupiter.api.Assertions;
@@ -20,17 +20,15 @@ public class GetRelevanteRollenEventTest {
 	private GetRelevanteRollenEvent getRelevanteRollenEvent;
 	private Session session;
 	private Kamer kamer;
-	private DeelnemerId deelnemerId;
+	private Deelnemer deelnemer;
 	private Rol rol;
 
 	@BeforeEach
 	void setUp() {
 		rollen = new HashSet<>();
-		rollen.add(Rol.TEAMLID);
-		rollen.add(Rol.EINDGEBRUIKER);
+		deelnemer = Mockito.mock(Deelnemer.class);
 		session = Mockito.mock(Session.class);
 		kamer = Mockito.mock(Kamer.class);
-		deelnemerId = Mockito.mock(DeelnemerId.class);
 		getRelevanteRollenEvent = new GetRelevanteRollenEvent();
 	}
 
@@ -38,17 +36,17 @@ public class GetRelevanteRollenEventTest {
 	@Test
 	public void voerUit_GeeftRelevanteRollenTest() {
 		// Arrange
+		Mockito.when(deelnemer.getKamer()).thenReturn(kamer);
 		Mockito.when(kamer.getRelevanteRollen()).thenReturn(rollen);
-		String expectedBericht = String.format("geefRollen", rollen);
 
 		// Act
-		EventResponse response = getRelevanteRollenEvent.voerUit(kamer, session);
+		EventResponse response = getRelevanteRollenEvent.voerUit(deelnemer, session);
 
 		// Assert
 		Assertions.assertAll(
 			() -> Mockito.verify(kamer).getRelevanteRollen(),
-			() -> Assertions.assertEquals(EventResponse.Status.OK, response.status)
+			() -> Assertions.assertEquals(rollen, response.getContext().get("geefRollen")),
+			() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus())
 		);
 	}
-
 }
