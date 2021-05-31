@@ -18,18 +18,15 @@ public class HaalKaartenSetOpEvent extends Event {
 		boolean gekozen = false;
 
 		// Kijk of de deelnemers rollen 'PROJECTBUREAU' bevat.
-		if (deelnemer.getRollen().contains(StandaardRol.PROJECTBUREAU.getRol())) {
+		if (deelnemer.getRol().equals(StandaardRol.PROJECTBUREAU.getRol())) {
 			// Itereer over iedere relevante rol binnen een kamer.
 			for (Rol kamerRol : deelnemer.getKamer().getRelevanteRollen()) {
 				// Voeg iedere kaartenset toe aan het resultaat.
 				kaartenSets.addAll(kamerRol.getKaartenSets());
 			}
 		} else {
-			// Loop over de rollen van de deelnemer.
-			for (Rol rol : deelnemer.getRollen()) {
-				// Voeg iedere kaartenset toe aan het resultaat.
-				kaartenSets = rol.getKaartenSets();
-			}
+			// Voeg de kaartensets toe aan het resultaat.
+			kaartenSets.addAll(deelnemer.getRol().getKaartenSets());
 			gekozen = true;
 		}
 

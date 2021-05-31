@@ -19,7 +19,6 @@ public class Kaart {
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(nullable = false, updatable = false)
 	private Integer id;
 
 	/**

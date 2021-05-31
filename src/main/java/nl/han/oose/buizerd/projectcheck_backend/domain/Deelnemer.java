@@ -40,8 +40,8 @@ public class Deelnemer {
 	@EmbeddedId
 	private DeelnemerId deelnemerId;
 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-	private Set<Rol> rollen;
+	@ManyToOne
+	private Rol rol;
 
 	/**
 	 * De naam van de deelnemer.
@@ -138,17 +138,17 @@ public class Deelnemer {
 	 *
 	 * @return De rollen.
 	 */
-	public Set<Rol> getRollen() {
-		return rollen;
+	public Rol getRol() {
+		return rol;
 	}
 
 	/**
 	 * Zet de rollen die bij de deelnemer past.
 	 *
-	 * @param rollen De nieuwe rollen set.
+	 * @param rol De nieuwe rollen set.
 	 */
-	public void setRollen(Set<Rol> rollen) {
-		this.rollen = rollen;
+	public void setRol(Rol rol) {
+		this.rol = rol;
 	}
 
 }

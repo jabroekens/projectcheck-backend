@@ -50,6 +50,7 @@ public class KaartToelichting {
 
 	/**
 	 * Genereert een {@link KaartToelichting}.
+	 *
 	 * @param kaart De relevante kaart voor de toelichting.
 	 * @param toelichting De toelichting.
 	 */
@@ -60,6 +61,7 @@ public class KaartToelichting {
 
 	/**
 	 * Geeft de unieke autoincrement id terug.
+	 *
 	 * @return De unieke id.
 	 */
 	public Integer getId() {
@@ -68,6 +70,7 @@ public class KaartToelichting {
 
 	/**
 	 * Geeft de relevante kaart die bij de toelichting hoort terug.
+	 *
 	 * @return De relevante kaart.
 	 */
 	public Kaart getKaart() {
@@ -76,6 +79,7 @@ public class KaartToelichting {
 
 	/**
 	 * Geeft de toelichting voor de relevante kaart terug.
+	 *
 	 * @return De toelichgting.
 	 */
 	public String getToelichting() {
@@ -84,9 +88,11 @@ public class KaartToelichting {
 
 	/**
 	 * Zet de toelichting voor de relevante kaart.
+	 *
 	 * @param toelichting De nieuwe toelichting.
 	 */
 	public void setToelichting(String toelichting) {
 		this.toelichting = toelichting;
 	}
+
 }

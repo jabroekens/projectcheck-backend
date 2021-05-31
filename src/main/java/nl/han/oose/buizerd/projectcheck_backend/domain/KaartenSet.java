@@ -1,11 +1,14 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.util.Set;
 
 /**
@@ -22,24 +25,20 @@ public class KaartenSet {
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(nullable = false, updatable = false)
-	private Integer id;
+	private Long id;
 
 	/**
 	 * Een set van meerdere kaarten.
 	 * De kaarten zijn niet nullable, maar kan wel worden aangepast.
 	 */
-	@ManyToMany
-	@Column(nullable = false)
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
 	private Set<Kaart> kaarten;
 
 	/**
-	 * Alle {@link Rol}len die bij deze kaartenset horen.
+	 * De {@link Rol} die bij deze kaartenset horen.
 	 */
-	@ManyToMany
-	@Column(nullable = false)
-	private Set<Rol> rollen;
-
+	@ManyToOne
+	private Rol rol;
 
 	/**
 	 * Genereert een {@link KaartenSet}.
@@ -53,21 +52,23 @@ public class KaartenSet {
 	 *
 	 * @param kaarten De kaarten voor de kaartenset.
 	 */
-	public KaartenSet(Set<Rol> rollen, Set<Kaart> kaarten) {
-		this.rollen = rollen;
+	public KaartenSet(Rol rol, Set<Kaart> kaarten) {
+		this.rol = rol;
 		this.kaarten = kaarten;
 	}
 
 	/**
 	 * Geeft de auto incremented id van de kaartenset terug.
+	 *
 	 * @return De auto incremented id.
 	 */
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
 	/**
 	 * Geeft de kaarten terug die de kaartenset heeft.
+	 *
 	 * @return De kaartenset.
 	 */
 	public Set<Kaart> getKaarten() {
@@ -76,10 +77,11 @@ public class KaartenSet {
 
 	/**
 	 * Geeft de rollen van de kaartenset terug.
+	 *
 	 * @return De rollen van de kaartenset.
 	 */
-	public Set<Rol> getRollen() {
-		return rollen;
+	public Rol getRol() {
+		return rol;
 	}
 
 }
