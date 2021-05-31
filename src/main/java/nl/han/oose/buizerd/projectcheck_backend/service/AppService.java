@@ -93,7 +93,7 @@ public class AppService {
 
 	public String getKamerInfo(String kamerCode, Long deelnemerId) {
 		JsonObject json = new JsonObject();
-		json.addProperty("kamer", kamerCode);
+		json.addProperty("kamerCode", kamerCode);
 		json.addProperty("deelnemerId", deelnemerId);
 		return json.toString();
 	}

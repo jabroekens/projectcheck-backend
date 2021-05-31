@@ -37,7 +37,7 @@ class AppServiceTest {
 		String kamerCode = "123456";
 		Long deelnemerId = 12L;
 
-		String expected = "{\"kamer\":\"" + kamerCode + "\",\"deelnemerId\":" + deelnemerId + "}";
+		String expected = "{\"kamerCode\":\"" + kamerCode + "\",\"deelnemerId\":" + deelnemerId + "}";
 		Assertions.assertEquals(expected, appService.getKamerInfo(kamerCode, deelnemerId));
 	}
 
