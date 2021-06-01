@@ -43,7 +43,8 @@ public class KiesRolEventTest {
 		// Assert
 		Assertions.assertAll(
 			() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus()),
-			() -> Assertions.assertEquals(expectedRol, response.getContext().get("gekozenRol"))
+			() -> Assertions.assertEquals(expectedRol, response.getContext().get("gekozenRol")),
+			() -> Mockito.verify(deelnemer).setRol(rol)
 		);
 	}
 

@@ -37,7 +37,6 @@ public class Deelnemer {
 	private DeelnemerId deelnemerId;
 	private Rol rol;
 
-
 	/**
 	 * De naam van de deelnemer.
 	 */
@@ -132,9 +131,11 @@ public class Deelnemer {
 		return rol;
 	}
 
-	public void setRol(Rol rol) {
+	@ValidateOnExecution
+	public void setRol(@Valid Rol rol) {
 		this.rol = rol;
 	}
+
 }
 
 
