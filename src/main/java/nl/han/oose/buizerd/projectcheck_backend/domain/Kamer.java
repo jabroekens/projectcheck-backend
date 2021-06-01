@@ -7,6 +7,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -64,6 +65,9 @@ public class Kamer {
 	@NotNull
 	@Valid
 	private KamerFase kamerFase;
+
+	@Transient
+	private Ronde huidigeRonde;
 
 	/**
 	 * De rollen die in de kamer ingeschakeld zijn.
@@ -248,4 +252,6 @@ public class Kamer {
 	public void activeerRelevanteRollen(@NotNull @Valid Set<Rol> rollen) {
 		relevanteRollen = rollen;
 	}
+
+	public Ronde getHuidigeRonde(){return  huidigeRonde;}
 }
