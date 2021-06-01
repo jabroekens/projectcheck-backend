@@ -140,24 +140,24 @@ ChatEventTest.java
 @ExtendWith(MockitoExtension.class)
 class ChatEventTest {
 
-	private ChatEvent chatEvent;
+	private ChatEvent sut;
 
 	@BeforeEach
 	void setUp() {
-		chatEvent = new ChatEvent();
-		chatEvent.woord = "Hallo!";
+		sut = new ChatEvent();
+		sut.woord = "Hallo!";
 	}
 
 	@Test
 	void voerUit_stuurtJuisteBerichtNaarAlleClients(@Mock Deelnemer deelnemer, @Mock Session session) {
-		String expectedBericht = String.format("%s zegt: \"%s\"", deelnemer.getNaam(), chatEvent.woord);
+		String expectedBericht = String.format("%s zegt: \"%s\"", deelnemer.getNaam(), sut.woord);
 
-		EventResponse response = chatEvent.voerUit(kamer, session);
+		EventResponse response = sut.voerUit(kamer, session);
 
-		Assertions.assertAll(
-			() -> Assertions.assertTrue(response.isStuurNaarAlleClients()),
-			() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus()),
-			() -> Assertions.assertEquals(expectedBericht, response.getContext().get("bericht"))
+		assertAll(
+			() -> assertTrue(response.isStuurNaarAlleClients()),
+			() -> assertEquals(EventResponse.Status.OK, response.getStatus()),
+			() -> assertEquals(expectedBericht, response.getContext().get("bericht"))
 		);
 	}
 

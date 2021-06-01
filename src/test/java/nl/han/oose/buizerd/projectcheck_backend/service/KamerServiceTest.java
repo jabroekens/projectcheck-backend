@@ -1,5 +1,13 @@
 package nl.han.oose.buizerd.projectcheck_backend.service;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.RemoteEndpoint;
@@ -15,7 +23,6 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.KamerFase;
 import nl.han.oose.buizerd.projectcheck_backend.event.Event;
 import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -23,34 +30,33 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class KamerServiceTest {
 
+	private static final String KAMER_CODE = "123456";
+
 	private static Logger logger;
 
 	@BeforeAll
 	static void setUpAll() {
-		logger = Mockito.mock(Logger.class);
-		KamerService.logger = logger;
+		KamerServiceTest.logger = mock(Logger.class);
+		KamerService.logger = KamerServiceTest.logger;
 	}
 
 	@Mock
 	private DAO dao;
 
-	private KamerService kamerService;
+	private KamerService sut;
 
 	@BeforeEach
 	void setUp() {
-		kamerService = new KamerService(dao);
+		sut = new KamerService(dao);
 	}
 
 	@Nested
 	class open_sluitVerbindingMetReden {
-
-		private static final String KAMER_CODE = "123456";
 
 		@Mock
 		private Session session;
@@ -62,31 +68,31 @@ class KamerServiceTest {
 			CloseReason closeReason = new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer is gesloten of niet gevonden.");
 			ArgumentCaptor<CloseReason> closeReasonCaptor = ArgumentCaptor.forClass(CloseReason.class);
 
-			kamerService.open(session, config, KAMER_CODE);
+			sut.open(session, config, KamerServiceTest.KAMER_CODE);
 
-			Mockito.verify(dao).read(Kamer.class, KAMER_CODE);
-			Mockito.verify(session).close(closeReasonCaptor.capture());
+			verify(dao).read(Kamer.class, KamerServiceTest.KAMER_CODE);
+			verify(session).close(closeReasonCaptor.capture());
 
 			/*
 			 * We moeten handmatig te relevante gegevens controleren omdat CloseReason
 			 * niet zelf `equals` en `hashCode` implementeert maar deze erft van Object.
 			 */
-			Assertions.assertAll(
-				() -> Assertions.assertEquals(closeReason.getCloseCode(), closeReasonCaptor.getValue().getCloseCode()),
-				() -> Assertions.assertEquals(closeReason.getReasonPhrase(), closeReasonCaptor.getValue().getReasonPhrase())
+			assertAll(
+				() -> assertEquals(closeReason.getCloseCode(), closeReasonCaptor.getValue().getCloseCode()),
+				() -> assertEquals(closeReason.getReasonPhrase(), closeReasonCaptor.getValue().getReasonPhrase())
 			);
 		}
 
 		@Test
 		void kamerAfwezig_sluitVerbindingMetReden() throws IOException {
-			Mockito.when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
+			when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.empty());
 			sluitVerbindingMetReden();
 		}
 
 		@Test
 		void kamerAanwezig_kamerFaseGesloten_sluitVerbindingMetReden(@Mock Kamer kamer) throws IOException {
-			Mockito.when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
-			Mockito.when(kamer.getKamerFase()).thenReturn(KamerFase.GESLOTEN);
+			when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.of(kamer));
+			when(kamer.getKamerFase()).thenReturn(KamerFase.GESLOTEN);
 			sluitVerbindingMetReden();
 		}
 
@@ -94,8 +100,6 @@ class KamerServiceTest {
 
 	@Nested
 	class message {
-
-		private static final String KAMER_CODE = "123456";
 
 		@Mock
 		private Event event;
@@ -105,53 +109,51 @@ class KamerServiceTest {
 
 		@AfterEach
 		void tearDown() {
-			Mockito.verify(dao).read(Kamer.class, KAMER_CODE);
+			verify(dao).read(Kamer.class, KamerServiceTest.KAMER_CODE);
 		}
 
 		@Test
 		void kamerAfwezig_stuurtEventResponse(@Mock RemoteEndpoint.Basic remote) throws IOException {
 			EventResponse eventResponse = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
-				.metContext("kamerCode", KAMER_CODE).antwoordOp(event);
+				.metContext("kamerCode", KamerServiceTest.KAMER_CODE).antwoordOp(event);
 
-			Mockito.when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
-			Mockito.when(session.getBasicRemote()).thenReturn(remote);
+			when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.empty());
+			when(session.getBasicRemote()).thenReturn(remote);
 
-			kamerService.message(event, KAMER_CODE, session);
+			sut.message(event, KamerServiceTest.KAMER_CODE, session);
 
-			Mockito.verify(remote).sendText(eventResponse.asJson());
+			verify(remote).sendText(eventResponse.asJson());
 		}
 
 		@Test
 		void kamerAanwezig_deelnemerAfwezig_stuurtEventResponse(@Mock Kamer kamer, @Mock RemoteEndpoint.Basic remote) throws IOException {
 			EventResponse eventResponse = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
 
-			Mockito.when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
-			Mockito.when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.empty());
-			Mockito.when(session.getBasicRemote()).thenReturn(remote);
+			when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.of(kamer));
+			when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.empty());
+			when(session.getBasicRemote()).thenReturn(remote);
 
-			kamerService.message(event, KAMER_CODE, session);
+			sut.message(event, KamerServiceTest.KAMER_CODE, session);
 
-			Mockito.verify(kamer).getDeelnemer(event.getDeelnemerId());
-			Mockito.verify(remote).sendText(eventResponse.asJson());
+			verify(kamer).getDeelnemer(event.getDeelnemerId());
+			verify(remote).sendText(eventResponse.asJson());
 		}
 
 		@Test
 		void kamerAanwezig_deelnemerAanwezig_voertEventUit(@Mock Kamer kamer, @Mock Deelnemer deelnemer) throws IOException {
-			Mockito.when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
-			Mockito.when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
+			when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.of(kamer));
+			when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
 
-			kamerService.message(event, KAMER_CODE, session);
+			sut.message(event, KamerServiceTest.KAMER_CODE, session);
 
-			Mockito.verify(kamer).getDeelnemer(event.getDeelnemerId());
-			Mockito.verify(event).voerUit(dao, deelnemer, session);
+			verify(kamer).getDeelnemer(event.getDeelnemerId());
+			verify(event).voerUit(dao, deelnemer, session);
 		}
 
 	}
 
 	@Nested
 	class error {
-
-		private static final String KAMER_CODE = "123456";
 
 		@Mock
 		private Session session;
@@ -161,8 +163,8 @@ class KamerServiceTest {
 
 		@Test
 		void logtBijThrowablesAndersDanIllegalArgumentException(@Mock Throwable error) {
-			kamerService.error(session, error, KAMER_CODE);
-			Mockito.verify(logger).log(Level.SEVERE, error.getMessage(), error);
+			sut.error(session, error, KamerServiceTest.KAMER_CODE);
+			verify(KamerServiceTest.logger).log(Level.SEVERE, error.getMessage(), error);
 		}
 
 		@Nested
@@ -173,21 +175,21 @@ class KamerServiceTest {
 
 			@Test
 			void stuurtEventResponse() throws IOException {
-				Mockito.when(session.getBasicRemote()).thenReturn(remoteEndpoint);
+				when(session.getBasicRemote()).thenReturn(remoteEndpoint);
 				EventResponse eventResponse = new EventResponse(EventResponse.Status.INVALIDE);
 
-				kamerService.error(session, error, KAMER_CODE);
+				sut.error(session, error, KamerServiceTest.KAMER_CODE);
 
-				Mockito.verify(remoteEndpoint).sendText(eventResponse.asJson());
+				verify(remoteEndpoint).sendText(eventResponse.asJson());
 			}
 
 			@Test
 			void logtBijException() throws Throwable {
-				Mockito.when(session.getBasicRemote()).thenReturn(remoteEndpoint);
-				Mockito.doThrow(IllegalArgumentException.class).when(remoteEndpoint).sendText(Mockito.anyString());
+				when(session.getBasicRemote()).thenReturn(remoteEndpoint);
+				doThrow(IllegalArgumentException.class).when(remoteEndpoint).sendText(anyString());
 
-				kamerService.error(session, error, KAMER_CODE);
-				Mockito.verify(logger).log(Level.SEVERE, error.getMessage(), error);
+				sut.error(session, error, KamerServiceTest.KAMER_CODE);
+				verify(KamerServiceTest.logger).log(Level.SEVERE, error.getMessage(), error);
 			}
 
 		}

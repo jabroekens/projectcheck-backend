@@ -1,5 +1,8 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
@@ -27,7 +30,7 @@ class KaartenSelectieTest {
 	@Test
 	void kaartIsGeselecteerd_geeftTrueAlsDezeGeselecteerdIs(@Mock Kaart kaart) {
 		kaartenSelectie.addKaart(kaart);
-		Assertions.assertTrue(kaartenSelectie.kaartIsGeselecteerd(kaart));
+		assertTrue(kaartenSelectie.kaartIsGeselecteerd(kaart));
 	}
 
 	@Test
@@ -46,13 +49,13 @@ class KaartenSelectieTest {
 
 		kaartenSelectie.removeKaart(kaart);
 
-		Assertions.assertFalse(kaarten.contains(kaart));
+		assertFalse(kaarten.contains(kaart));
 	}
 
 	@Test
 	void isVol_geeftTrueAlsKaartenSelectieVolIs() {
 		Mockito.doReturn(KaartenSelectie.MAX_KAARTEN).when(kaarten).size();
-		Assertions.assertTrue(kaartenSelectie.isVol());
+		assertTrue(kaartenSelectie.isVol());
 	}
 
 }

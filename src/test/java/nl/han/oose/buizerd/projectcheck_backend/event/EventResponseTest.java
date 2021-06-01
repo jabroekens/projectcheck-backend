@@ -1,12 +1,18 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mockStatic;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -15,71 +21,71 @@ class EventResponseTest {
 	@Mock
 	private EventResponse.Status status;
 
-	private EventResponse eventResponse;
+	private EventResponse sut;
 
 	@BeforeEach
 	void setUp() {
-		eventResponse = new EventResponse(status);
+		sut = new EventResponse(status);
 	}
 
 	@Test
-	void getStatus_geeftJuisteStatus() {
-		Assertions.assertEquals(status, eventResponse.getStatus());
+	void getStatus_geeftJuisteWaarde() {
+		assertEquals(status, sut.getStatus());
 	}
 
 	@Test
-	void getContext_contextIsNietNull() {
-		Assertions.assertNotNull(eventResponse.getContext());
+	void getContext_isNietNull() {
+		assertNotNull(sut.getContext());
 	}
 
 	@Test
 	void metContext_voegtAanContextToeEnGeeftZichzelfTerug(@Mock Object object) {
 		String waarde = "";
 
-		Assertions.assertAll(
-			() -> Assertions.assertSame(eventResponse, eventResponse.metContext(waarde, object)),
-			() -> Assertions.assertEquals(object, eventResponse.getContext().get(waarde))
+		assertAll(
+			() -> assertSame(sut, sut.metContext(waarde, object)),
+			() -> assertEquals(object, sut.getContext().get(waarde))
 		);
 	}
 
 	@Test
-	void getDatum_datumIsNietNull() {
-		Assertions.assertNotNull(eventResponse.getDatum());
+	void getDatum_isNietNull() {
+		assertNotNull(sut.getDatum());
 	}
 
 	@Test
-	void getAntwoordOp_geeftJuisteAntwoordOp(@Mock Event event) {
+	void antwoordOp_zetEnGeeftJuisteWaarde(@Mock Event event) {
 		String antwoordOp = "";
 
-		try (MockedStatic<Event> mock = Mockito.mockStatic(Event.class)) {
+		try (MockedStatic<Event> mock = mockStatic(Event.class)) {
 			mock.when(() -> Event.getEventNaam(event.getClass())).thenReturn(antwoordOp);
 
-			EventResponse actualEventResponse = eventResponse.antwoordOp(event);
+			EventResponse actualEventResponse = sut.antwoordOp(event);
 
-			Assertions.assertAll(
+			assertAll(
 				() -> mock.verify(() -> Event.getEventNaam(event.getClass())),
-				() -> Assertions.assertSame(eventResponse, actualEventResponse),
-				() -> Assertions.assertEquals(antwoordOp, eventResponse.getAntwoordOp())
+				() -> assertSame(sut, actualEventResponse),
+				() -> assertEquals(antwoordOp, sut.getAntwoordOp())
 			);
 		}
 	}
 
 	@Test
 	void isStuurNaarAlleClients_isStandaardFalse() {
-		Assertions.assertFalse(eventResponse.isStuurNaarAlleClients());
+		assertFalse(sut.isStuurNaarAlleClients());
 	}
 
 	@Test
 	void stuurNaarAlleClients_zetWaardeOpTrueEnGeeftZichzelfTerug() {
-		Assertions.assertAll(
-			() -> Assertions.assertSame(eventResponse, eventResponse.stuurNaarAlleClients()),
-			() -> Assertions.assertTrue(eventResponse.isStuurNaarAlleClients())
+		assertAll(
+			() -> assertSame(sut, sut.stuurNaarAlleClients()),
+			() -> assertTrue(sut.isStuurNaarAlleClients())
 		);
 	}
 
 	@Test
-	void asJson_geeftIetsTerug() {
-		Assertions.assertNotNull(eventResponse.asJson());
+	void asJson_isNietNull() {
+		assertNotNull(sut.asJson());
 	}
 
 }

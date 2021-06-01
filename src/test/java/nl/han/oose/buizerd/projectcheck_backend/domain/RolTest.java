@@ -1,27 +1,28 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class RolTest {
 
-	private static final String ROL_NAAM = "OPDRACHTGEVER";
+	private static final String ROL_NAAM = "Opdrachtgever";
 
-	private Rol rol;
+	private Rol sut;
 
 	@BeforeEach
 	void setUp() {
-		rol = new Rol(RolTest.ROL_NAAM);
+		sut = new Rol(RolTest.ROL_NAAM);
 	}
 
 	@Test
-	void getRolnaamTest() {
+	void getRolNaam_geeftJuisteWaarde() {
 		// Act
-		var actual = rol.getRolNaam();
+		var actual = sut.getRolNaam();
 
 		// Assert
-		Assertions.assertEquals(RolTest.ROL_NAAM, actual);
+		assertEquals(RolTest.ROL_NAAM, actual);
 	}
 
 }

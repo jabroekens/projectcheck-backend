@@ -1,8 +1,15 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -13,48 +20,79 @@ class DeelnemerIdTest {
 	private static final Long DEELNEMER_ID = 2L;
 	private static final String KAMER_CODE = "123456";
 
-	private DeelnemerId deelnemerId;
+	private DeelnemerId sut;
 
 	@BeforeEach
 	void setUp() {
-		deelnemerId = new DeelnemerId(DeelnemerIdTest.DEELNEMER_ID, DeelnemerIdTest.KAMER_CODE);
+		sut = new DeelnemerId(DeelnemerIdTest.DEELNEMER_ID, DeelnemerIdTest.KAMER_CODE);
 	}
 
 	@Test
-	void geeftJuisteDeelnemerId() {
-		Assertions.assertEquals(DeelnemerIdTest.DEELNEMER_ID, deelnemerId.getId());
+	void getId_geeftJuisteWaarde() {
+		assertEquals(DeelnemerIdTest.DEELNEMER_ID, sut.getId());
 	}
 
 	@Test
-	void geeftJuisteKamerCode() {
-		Assertions.assertEquals(DeelnemerIdTest.KAMER_CODE, deelnemerId.getKamerCode());
+	void getKamerCode_geeftJuisteWaarde() {
+		assertEquals(DeelnemerIdTest.KAMER_CODE, sut.getKamerCode());
 	}
 
-	@Test
-	void implementeertEqualsCorrect(@Mock Object object) {
-		Assertions.assertAll(
-			() -> Assertions.assertEquals(deelnemerId, deelnemerId),
-			() -> Assertions.assertNotEquals(null, deelnemerId),
-			() -> Assertions.assertNotEquals(object, deelnemerId),
-			() -> {
-				DeelnemerId equal = new DeelnemerId(deelnemerId.getId(), deelnemerId.getKamerCode());
-				Assertions.assertEquals(equal, deelnemerId);
-			},
-			() -> {
-				DeelnemerId unequalId = new DeelnemerId(deelnemerId.getId() + 1L, deelnemerId.getKamerCode());
-				Assertions.assertNotEquals(unequalId, deelnemerId);
-			},
-			() -> {
-				DeelnemerId unequalKamerCode = new DeelnemerId(deelnemerId.getId(), deelnemerId.getKamerCode() + " ");
-				Assertions.assertNotEquals(unequalKamerCode, deelnemerId);
-			}
-		);
+	@Nested
+	class equals {
+
+		@Test
+		void gelijkBijDezelfdeReferentie() {
+			assertEquals(sut, sut);
+		}
+
+		@Test
+		void ongelijkBijNullWaarde() {
+			assertNotEquals(null, sut);
+		}
+
+		@Test
+		void ongelijkBijAndereKlasse(@Mock Object object) {
+			assertNotEquals(object, sut);
+		}
+
+		@Test
+		void gelijkBijGelijkeWaarden() {
+			DeelnemerId equal = new DeelnemerId(sut.getId(), sut.getKamerCode());
+			assertEquals(equal, sut);
+		}
+
+		@Test
+		void ongelijkBijOngelijkeId() {
+			DeelnemerId unequal = new DeelnemerId(sut.getId() + 1L, sut.getKamerCode());
+			assertNotEquals(unequal, sut);
+		}
+
+		@Test
+		void ongelijkBijOngelijkeKamerCode() {
+			DeelnemerId unequal = new DeelnemerId(sut.getId(), sut.getKamerCode() + "1");
+			assertNotEquals(unequal, sut);
+		}
+
 	}
 
-	@Test
-	void implementeertHashCodeCorrect() {
-		DeelnemerId equal = new DeelnemerId(deelnemerId.getId(), deelnemerId.getKamerCode());
-		Assertions.assertEquals(equal.hashCode(), deelnemerId.hashCode());
+	@Nested
+	class hashCode {
+
+		@TestFactory
+		Stream<DynamicTest> gelijkBijMeerdereAanroepen() {
+			return Stream.of(
+				dynamicTest("1", () -> assertEquals(sut.hashCode(), sut.hashCode())),
+				dynamicTest("2", () -> assertEquals(sut.hashCode(), sut.hashCode())),
+				dynamicTest("3", () -> assertEquals(sut.hashCode(), sut.hashCode()))
+			);
+		}
+
+		@Test
+		void gelijkBijGelijkeDeelnemerIds() {
+			DeelnemerId equal = new DeelnemerId(sut.getId(), sut.getKamerCode());
+			assertEquals(equal.hashCode(), sut.hashCode());
+		}
+
 	}
 
 }

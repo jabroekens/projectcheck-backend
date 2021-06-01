@@ -1,7 +1,9 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.NoSuchElementException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -9,12 +11,12 @@ class KamerFaseTest {
 
 	@ParameterizedTest
 	@EnumSource(KamerFase.class)
-	void volgendeFase_geeftVolgendeFase(KamerFase kamerFase) {
+	void volgendeFase_geeftVolgendeFaseEnGooitNoSuchElementExceptionBijLaatsteFase(KamerFase kamerFase) {
 		if (kamerFase.ordinal() == KamerFase.values().length - 1) {
-			Assertions.assertThrows(NoSuchElementException.class, kamerFase::volgendeFase);
+			assertThrows(NoSuchElementException.class, kamerFase::volgendeFase);
 		} else {
 			KamerFase volgendeFase = kamerFase.volgendeFase();
-			Assertions.assertEquals(KamerFase.values()[kamerFase.ordinal() + 1], volgendeFase);
+			assertEquals(KamerFase.values()[kamerFase.ordinal() + 1], volgendeFase);
 		}
 	}
 
