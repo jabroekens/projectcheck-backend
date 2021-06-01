@@ -26,9 +26,9 @@ public class VolgendeFaseEventTest {
 	}
 
 	@Test
-	void handelAf_updateKamer(@Mock DAO<Kamer, String> kamerDAO, @Mock Kamer kamer) {
-		volgendeFaseEvent.handelAf(kamerDAO, kamer);
-		Mockito.verify(kamerDAO).update(kamer);
+	void handelAf_updateKamer(@Mock DAO dao, @Mock Kamer kamer) {
+		volgendeFaseEvent.handelAf(dao, kamer);
+		Mockito.verify(dao).update(kamer);
 	}
 
 	@Nested

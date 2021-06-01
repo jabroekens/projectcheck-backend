@@ -23,13 +23,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class AppServiceTest {
 
 	@Mock
-	private DAO<Kamer, String> kamerDAO;
+	private DAO dao;
 
 	private AppService appService;
 
 	@BeforeEach
 	void setUp() {
-		appService = new AppService(kamerDAO);
+		appService = new AppService(dao);
 	}
 
 	@Test
@@ -80,7 +80,7 @@ class AppServiceTest {
 			metGemockteResponseBuilder(() -> {
 				appService.maakKamer(begeleiderNaam);
 
-				Mockito.verify(kamerDAO).create(kamerCaptor.capture());
+				Mockito.verify(dao).create(kamerCaptor.capture());
 				Assertions.assertNotNull(kamerCaptor.getValue().getBegeleider());
 				Assertions.assertEquals(begeleiderNaam, kamerCaptor.getValue().getBegeleider().getNaam());
 			});
@@ -96,9 +96,9 @@ class AppServiceTest {
 			String kamerCode = "123456";
 			String deelnemerNaam = "Joost";
 
-			Mockito.when(kamerDAO.read(Kamer.class, kamerCode)).thenReturn(Optional.empty());
+			Mockito.when(dao.read(Kamer.class, kamerCode)).thenReturn(Optional.empty());
 			Assertions.assertThrows(KamerNietGevondenException.class, () -> appService.neemDeel(kamerCode, deelnemerNaam));
-			Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
+			Mockito.verify(dao).read(Kamer.class, kamerCode);
 		}
 
 		@Nested
@@ -112,13 +112,13 @@ class AppServiceTest {
 				ArgumentCaptor<Deelnemer> deelnemerCaptor = ArgumentCaptor.forClass(Deelnemer.class);
 
 				metGemockteResponseBuilder(() -> {
-					Mockito.when(kamerDAO.read(Kamer.class, kamerCode)).thenReturn(Optional.of(kamer));
+					Mockito.when(dao.read(Kamer.class, kamerCode)).thenReturn(Optional.of(kamer));
 					Mockito.when(kamer.getKamerFase()).thenReturn(KamerFase.OPEN);
 
 					appService.neemDeel(kamerCode, deelnemerNaam);
 
 					Mockito.verify(kamer).voegDeelnemerToe(deelnemerCaptor.capture());
-					Mockito.verify(kamerDAO).update(kamer);
+					Mockito.verify(dao).update(kamer);
 					Assertions.assertEquals(deelnemerNaam, deelnemerCaptor.getValue().getNaam());
 				});
 			}
@@ -128,12 +128,12 @@ class AppServiceTest {
 				String kamerCode = "123456";
 				String deelnemerNaam = "Joost";
 
-				Mockito.when(kamerDAO.read(Kamer.class, kamerCode)).thenReturn(Optional.of(kamer));
+				Mockito.when(dao.read(Kamer.class, kamerCode)).thenReturn(Optional.of(kamer));
 				Mockito.when(kamer.getKamerFase()).thenReturn(kamerFase);
 
 				Assertions.assertThrows(KamerGeslotenException.class, () -> appService.neemDeel(kamerCode, deelnemerNaam));
 
-				Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
+				Mockito.verify(dao).read(Kamer.class, kamerCode);
 			}
 
 		}

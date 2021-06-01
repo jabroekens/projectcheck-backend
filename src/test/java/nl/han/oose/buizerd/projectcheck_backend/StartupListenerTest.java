@@ -17,34 +17,34 @@ import org.mockito.verification.VerificationMode;
 class StartupListenerTest {
 
 	@Mock
-	private DAO<Rol, String> rolDAO;
+	private DAO dao;
 
 	private StartupListener startupListener;
 
 	@BeforeEach
 	void setUp() {
-		this.startupListener = new StartupListener(rolDAO);
+		this.startupListener = new StartupListener(dao);
 	}
 
 	@Test
 	void contextInitialized_rollenBestaanNiet_slaatRollenOp(@Mock ServletContextEvent sce) {
-		Mockito.when(rolDAO.read(Mockito.any(), Mockito.anyString())).thenReturn(Optional.empty());
+		Mockito.when(dao.read(Mockito.any(), Mockito.anyString())).thenReturn(Optional.empty());
 
 		startupListener.contextInitialized(sce);
 
 		VerificationMode times = Mockito.times(StandaardRol.values().length);
-		Mockito.verify(rolDAO, times).read(Mockito.any(), Mockito.anyString());
-		Mockito.verify(rolDAO, times).create(Mockito.any(Rol.class));
+		Mockito.verify(dao, times).read(Mockito.any(), Mockito.anyString());
+		Mockito.verify(dao, times).create(Mockito.any(Rol.class));
 	}
 
 	@Test
 	void contextInitialized_rollenBestaan_slaatRollenNietOp(@Mock ServletContextEvent sce, @Mock Rol rol) {
-		Mockito.when(rolDAO.read(Mockito.any(), Mockito.anyString())).thenReturn(Optional.of(rol));
+		Mockito.when(dao.read(Mockito.any(), Mockito.anyString())).thenReturn(Optional.of(rol));
 
 		startupListener.contextInitialized(sce);
 
-		Mockito.verify(rolDAO, Mockito.times(StandaardRol.values().length)).read(Mockito.any(), Mockito.anyString());
-		Mockito.verifyNoMoreInteractions(rolDAO);
+		Mockito.verify(dao, Mockito.times(StandaardRol.values().length)).read(Mockito.any(), Mockito.anyString());
+		Mockito.verifyNoMoreInteractions(dao);
 	}
 
 }

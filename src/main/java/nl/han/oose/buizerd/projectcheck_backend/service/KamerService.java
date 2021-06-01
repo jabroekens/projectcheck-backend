@@ -32,18 +32,18 @@ public class KamerService {
 		logger = Logger.getLogger(KamerService.class.getName());
 	}
 
-	private final DAO<Kamer, String> kamerDAO;
+	private final DAO dao;
 
 	/**
 	 * Construeert een {@link KamerService}.
 	 *
 	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
 	 *
-	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
+	 * @param dao Een {@link DAO}.
 	 */
 	@Inject
-	public KamerService(DAO<Kamer, String> kamerDAO) {
-		this.kamerDAO = kamerDAO;
+	public KamerService(DAO dao) {
+		this.dao = dao;
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class KamerService {
 	 */
 	@OnOpen
 	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") @KamerCode String kamerCode) throws IOException {
-		Optional<Kamer> kamer = kamerDAO.read(Kamer.class, kamerCode);
+		Optional<Kamer> kamer = dao.read(Kamer.class, kamerCode);
 		if (kamer.isEmpty() || kamer.get().getKamerFase() == KamerFase.GESLOTEN) {
 			session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer is gesloten of niet gevonden."));
 		}
@@ -70,12 +70,12 @@ public class KamerService {
 	 */
 	@OnMessage
 	public void message(Event event, @PathParam("kamerCode") String kamerCode, Session session) throws IOException {
-		Optional<Kamer> kamer = kamerDAO.read(Kamer.class, kamerCode);
+		Optional<Kamer> kamer = dao.read(Kamer.class, kamerCode);
 		if (kamer.isPresent()) {
 			Optional<Deelnemer> deelnemer = kamer.get().getDeelnemer(event.getDeelnemerId());
 
 			if (deelnemer.isPresent()) {
-				event.voerUit(kamerDAO, deelnemer.get(), session);
+				event.voerUit(dao, deelnemer.get(), session);
 			} else {
 				session.getBasicRemote().sendText(
 					new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event).asJson()
@@ -94,6 +94,10 @@ public class KamerService {
 	 */
 	@OnError
 	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) {
+		if (error.getCause() != null) {
+			error = error.getCause();
+		}
+
 		if (error instanceof IllegalArgumentException) {
 			/*
 			 * Voer uit in een try/catch-statement zodat `KamerService#error(Session, Throwable, String)`

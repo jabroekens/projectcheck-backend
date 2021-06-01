@@ -14,10 +14,7 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.StandaardRol;
 public class StartupListener implements ServletContextListener {
 
 	@Inject
-	private DAO<Rol, String> rolDAO;
-
-	@Inject
-	private DAO<KaartenSet, Long> kaartenSetDAO;
+	private DAO dao;
 
 	/**
 	 * Construeert een {@link StartupListener}.
@@ -32,23 +29,23 @@ public class StartupListener implements ServletContextListener {
 	 *
 	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
 	 *
-	 * @param rolDAO Een {@link DAO} voor het domein {@link Rol}.
+	 * @param dao Een {@link DAO}.
 	 */
-	StartupListener(DAO<Rol, String> rolDAO) {
-		this.rolDAO = rolDAO;
+	StartupListener(DAO dao) {
+		this.dao = dao;
 	}
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		for (StandaardRol standaardRol : StandaardRol.values()) {
-			if (rolDAO.read(Rol.class, standaardRol.getRol().getRolNaam()).isEmpty()) {
-				rolDAO.create(standaardRol.getRol());
+			if (dao.read(Rol.class, standaardRol.getRol().getRolNaam()).isEmpty()) {
+				dao.create(standaardRol.getRol());
 			}
 		}
 		for (StandaardKaartenSet standaardKaartenSet : StandaardKaartenSet.values()) {
 			KaartenSet kaartenSet = standaardKaartenSet.getKaartenSet();
-			if (kaartenSetDAO.read(KaartenSet.class, kaartenSet.getId()).isEmpty()) {
-				kaartenSetDAO.create(kaartenSet);
+			if (dao.read(KaartenSet.class, kaartenSet.getId()).isEmpty()) {
+				dao.create(kaartenSet);
 			}
 		}
 	}

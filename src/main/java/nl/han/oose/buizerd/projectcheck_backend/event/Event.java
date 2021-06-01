@@ -47,15 +47,15 @@ public abstract class Event {
 	/**
 	 * Voert het event in kwestie uit.
 	 *
-	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
+	 * @param dao Een {@link DAO}.
 	 * @param deelnemer De {@link Deelnemer} die het event heeft aangeroepen.
 	 * @param session De betrokken {@link Session}.
 	 */
-	public final void voerUit(DAO<Kamer, String> kamerDAO, Deelnemer deelnemer, Session session) {
+	public final void voerUit(DAO dao, Deelnemer deelnemer, Session session) {
 		CompletableFuture.runAsync(() -> {
 			EventResponse response = voerUit(deelnemer, session).antwoordOp(this);
 
-			handelAf(kamerDAO, deelnemer.getKamer());
+			handelAf(dao, deelnemer.getKamer());
 			if (response.isStuurNaarAlleClients()) {
 				/*
 				 * foreach loop zodat er geen try/catch-statement
@@ -88,10 +88,10 @@ public abstract class Event {
 	 * de datastore. Als de staat van de {@code kamer} is veranderd,
 	 * dan moet dit opgeslagen worden met de {@code kamerRepository}.
 	 *
-	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
+	 * @param dao Een {@link DAO}.
 	 * @param kamer De kamer waaraan de deelnemer die het event heeft aangeroepen deelneemt.
 	 */
-	protected void handelAf(DAO<Kamer, String> kamerDAO, Kamer kamer) {
+	protected void handelAf(DAO dao, Kamer kamer) {
 		// Doe niets
 	}
 

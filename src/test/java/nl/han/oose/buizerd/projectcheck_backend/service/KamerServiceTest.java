@@ -38,13 +38,13 @@ class KamerServiceTest {
 	}
 
 	@Mock
-	private DAO<Kamer, String> kamerDAO;
+	private DAO dao;
 
 	private KamerService kamerService;
 
 	@BeforeEach
 	void setUp() {
-		kamerService = new KamerService(kamerDAO);
+		kamerService = new KamerService(dao);
 	}
 
 	@Nested
@@ -64,7 +64,7 @@ class KamerServiceTest {
 
 			kamerService.open(session, config, KAMER_CODE);
 
-			Mockito.verify(kamerDAO).read(Kamer.class, KAMER_CODE);
+			Mockito.verify(dao).read(Kamer.class, KAMER_CODE);
 			Mockito.verify(session).close(closeReasonCaptor.capture());
 
 			/*
@@ -79,13 +79,13 @@ class KamerServiceTest {
 
 		@Test
 		void kamerAfwezig_sluitVerbindingMetReden() throws IOException {
-			Mockito.when(kamerDAO.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
+			Mockito.when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
 			sluitVerbindingMetReden();
 		}
 
 		@Test
 		void kamerAanwezig_kamerFaseGesloten_sluitVerbindingMetReden(@Mock Kamer kamer) throws IOException {
-			Mockito.when(kamerDAO.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
+			Mockito.when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
 			Mockito.when(kamer.getKamerFase()).thenReturn(KamerFase.GESLOTEN);
 			sluitVerbindingMetReden();
 		}
@@ -105,7 +105,7 @@ class KamerServiceTest {
 
 		@AfterEach
 		void tearDown() {
-			Mockito.verify(kamerDAO).read(Kamer.class, KAMER_CODE);
+			Mockito.verify(dao).read(Kamer.class, KAMER_CODE);
 		}
 
 		@Test
@@ -113,7 +113,7 @@ class KamerServiceTest {
 			EventResponse eventResponse = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
 				.metContext("kamerCode", KAMER_CODE).antwoordOp(event);
 
-			Mockito.when(kamerDAO.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
+			Mockito.when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
 			Mockito.when(session.getBasicRemote()).thenReturn(remote);
 
 			kamerService.message(event, KAMER_CODE, session);
@@ -125,7 +125,7 @@ class KamerServiceTest {
 		void kamerAanwezig_deelnemerAfwezig_stuurtEventResponse(@Mock Kamer kamer, @Mock RemoteEndpoint.Basic remote) throws IOException {
 			EventResponse eventResponse = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
 
-			Mockito.when(kamerDAO.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
+			Mockito.when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
 			Mockito.when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.empty());
 			Mockito.when(session.getBasicRemote()).thenReturn(remote);
 
@@ -137,13 +137,13 @@ class KamerServiceTest {
 
 		@Test
 		void kamerAanwezig_deelnemerAanwezig_voertEventUit(@Mock Kamer kamer, @Mock Deelnemer deelnemer) throws IOException {
-			Mockito.when(kamerDAO.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
+			Mockito.when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
 			Mockito.when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
 
 			kamerService.message(event, KAMER_CODE, session);
 
 			Mockito.verify(kamer).getDeelnemer(event.getDeelnemerId());
-			Mockito.verify(event).voerUit(kamerDAO, deelnemer, session);
+			Mockito.verify(event).voerUit(dao, deelnemer, session);
 		}
 
 	}

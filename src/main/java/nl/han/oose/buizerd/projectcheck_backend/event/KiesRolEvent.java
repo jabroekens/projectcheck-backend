@@ -21,8 +21,8 @@ public class KiesRolEvent extends Event {
 	}
 
 	@Override
-	protected void handelAf(DAO<Kamer, String> kamerDAO, Kamer kamer) {
-		kamerDAO.update(kamer);
+	protected void handelAf(DAO dao, Kamer kamer) {
+		dao.update(kamer);
 	}
 
 }

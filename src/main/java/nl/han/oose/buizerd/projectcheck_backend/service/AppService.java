@@ -25,7 +25,7 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 public class AppService {
 
 	@Inject
-	private DAO<Kamer, String> kamerDAO;
+	private DAO dao;
 
 	/**
 	 * Construeert een {@link AppService}.
@@ -40,10 +40,10 @@ public class AppService {
 	 *
 	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
 	 *
-	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
+	 * @param dao Een {@link DAO}.
 	 */
-	AppService(DAO<Kamer, String> kamerDAO) {
-		this.kamerDAO = kamerDAO;
+	AppService(DAO dao) {
+		this.dao = dao;
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class AppService {
 		Begeleider begeleider = new Begeleider(deelnemerId, begeleiderNaam);
 		Kamer kamer = new Kamer(kamerCode, begeleider);
 
-		kamerDAO.create(kamer);
+		dao.create(kamer);
 		return Response.ok(getKamerInfo(kamer.getKamerCode(), deelnemerId.getId())).build();
 	}
 
@@ -70,7 +70,7 @@ public class AppService {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response neemDeel(@PathParam("kamerCode") @KamerCode String kamerCode, @FormParam("deelnemerNaam") @Naam String deelnemerNaam) {
-		Optional<Kamer> kamer = kamerDAO.read(Kamer.class, kamerCode);
+		Optional<Kamer> kamer = dao.read(Kamer.class, kamerCode);
 
 		if (kamer.isPresent()) {
 			if (kamer.get().getKamerFase() != KamerFase.OPEN) {
@@ -84,7 +84,7 @@ public class AppService {
 			);
 
 			kamer.get().voegDeelnemerToe(deelnemer);
-			kamerDAO.update(kamer.get());
+			dao.update(kamer.get());
 			return Response.ok(getKamerInfo(kamerCode, deelnemerId)).build();
 		} else {
 			throw new KamerNietGevondenException(kamerCode);

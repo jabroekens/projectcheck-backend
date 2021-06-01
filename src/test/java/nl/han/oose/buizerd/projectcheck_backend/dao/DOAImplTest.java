@@ -21,11 +21,11 @@ class DOAImplTest {
 	@Mock
 	private UserTransaction userTransaction;
 
-	private DAOImpl<Object, Serializable> daoImpl;
+	private DAOImpl daoImpl;
 
 	@BeforeEach
 	void setUp() {
-		daoImpl = new DAOImpl<>(entityManager, userTransaction);
+		daoImpl = new DAOImpl(entityManager, userTransaction);
 	}
 
 	@Test

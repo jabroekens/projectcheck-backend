@@ -30,9 +30,9 @@ class KaartNaarSelectieEventTest {
 	}
 
 	@Test
-	void handelAf_updateKamer(@Mock DAO<Kamer, String> kamerDAO, @Mock Kamer kamer) {
-		kaartNaarSelectieEvent.handelAf(kamerDAO, kamer);
-		Mockito.verify(kamerDAO).update(kamer);
+	void handelAf_updateKamer(@Mock DAO dao, @Mock Kamer kamer) {
+		kaartNaarSelectieEvent.handelAf(dao, kamer);
+		Mockito.verify(dao).update(kamer);
 	}
 
 	@Nested

@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * Een generieke implementatie van {@link DAO}
  */
-public class DAOImpl<T, K extends Serializable> implements DAO<T, K> {
+public class DAOImpl implements DAO {
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -44,14 +44,14 @@ public class DAOImpl<T, K extends Serializable> implements DAO<T, K> {
 	 * {@inheritDoc}
 	 */
 	@Transactional
-	public void create(T t) {
+	public <T> void create(T t) {
 		entityManager.persist(t);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public Optional<T> read(Class<T> klasseType, K k) {
+	public <T, K extends Serializable> Optional<T> read(Class<T> klasseType, K k) {
 		return Optional.ofNullable(entityManager.find(klasseType, k));
 	}
 
@@ -59,7 +59,7 @@ public class DAOImpl<T, K extends Serializable> implements DAO<T, K> {
 	 * {@inheritDoc}
 	 */
 	@Transactional
-	public void update(T t) {
+	public <T> void update(T t) {
 		entityManager.merge(t);
 	}
 
@@ -67,8 +67,8 @@ public class DAOImpl<T, K extends Serializable> implements DAO<T, K> {
 	 * {@inheritDoc}
 	 */
 	@Transactional
-	public void delete(K k) {
-		entityManager.remove(k);
+	public <T> void delete(T t) {
+		entityManager.remove(t);
 	}
 
 }
