@@ -33,7 +33,7 @@ public class KiesRolEventTest {
 
 	// HappyPath
 	@Test
-	public void voerUit_deelnemerKrijgtRol(){
+	public void voerUit_deelnemerKrijgtRol() {
 		// Arrange
 		Rol expectedRol = rol;
 

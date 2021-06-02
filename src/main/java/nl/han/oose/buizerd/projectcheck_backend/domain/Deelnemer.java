@@ -35,6 +35,9 @@ public class Deelnemer {
 	@Valid
 	@EmbeddedId
 	private DeelnemerId deelnemerId;
+
+	@Expose
+	@Valid
 	private Rol rol;
 
 	/**
