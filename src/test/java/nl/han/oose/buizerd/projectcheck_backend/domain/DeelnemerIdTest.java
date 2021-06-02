@@ -1,17 +1,12 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-import java.util.stream.Stream;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,62 +32,17 @@ class DeelnemerIdTest {
 		assertEquals(DeelnemerIdTest.KAMER_CODE, sut.getKamerCode());
 	}
 
-	@Nested
-	class equals {
-
-		@Test
-		void gelijkBijDezelfdeReferentie() {
-			assertEquals(sut, sut);
-		}
-
-		@Test
-		void ongelijkBijNullWaarde() {
-			assertNotEquals(null, sut);
-		}
-
-		@Test
-		void ongelijkBijAndereKlasse(@Mock Object object) {
-			assertNotEquals(object, sut);
-		}
-
-		@Test
-		void gelijkBijGelijkeWaarden() {
-			DeelnemerId equal = new DeelnemerId(sut.getId(), sut.getKamerCode());
-			assertEquals(equal, sut);
-		}
-
-		@Test
-		void ongelijkBijOngelijkeId() {
-			DeelnemerId unequal = new DeelnemerId(sut.getId() + 1L, sut.getKamerCode());
-			assertNotEquals(unequal, sut);
-		}
-
-		@Test
-		void ongelijkBijOngelijkeKamerCode() {
-			DeelnemerId unequal = new DeelnemerId(sut.getId(), sut.getKamerCode() + "1");
-			assertNotEquals(unequal, sut);
-		}
-
-	}
-
-	@Nested
-	class hashCode {
-
-		@TestFactory
-		Stream<DynamicTest> gelijkBijMeerdereAanroepen() {
-			return Stream.of(
-				dynamicTest("1", () -> assertEquals(sut.hashCode(), sut.hashCode())),
-				dynamicTest("2", () -> assertEquals(sut.hashCode(), sut.hashCode())),
-				dynamicTest("3", () -> assertEquals(sut.hashCode(), sut.hashCode()))
-			);
-		}
-
-		@Test
-		void gelijkBijGelijkeDeelnemerIds() {
-			DeelnemerId equal = new DeelnemerId(sut.getId(), sut.getKamerCode());
-			assertEquals(equal.hashCode(), sut.hashCode());
-		}
-
+	@Test
+	void equalsEnHashCode_isVolgensContract() {
+		/*
+		 * Er is nog geen ondersteuning voor de Jakarta namespace vanuit EqualsVerifier,
+		 * dus moeten wij handmatig de relevante waarschuwing uitschakelen.
+		 *
+		 * Zie: https://0x0.st/NUzv
+		 */
+		EqualsVerifier.forClass(DeelnemerId.class)
+		              .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
+		              .verify();
 	}
 
 }

@@ -84,11 +84,11 @@ public class DeelnemerId implements Serializable {
 		if (this == o) {
 			return true;
 		}
-		if (o == null || getClass() != o.getClass()) {
+		if (!(o instanceof DeelnemerId)) {
 			return false;
 		}
 		DeelnemerId that = (DeelnemerId) o;
-		return id.equals(that.id) && kamerCode.equals(that.kamerCode);
+		return Objects.equals(getId(), that.getId()) && Objects.equals(getKamerCode(), that.getKamerCode());
 	}
 
 	/**
