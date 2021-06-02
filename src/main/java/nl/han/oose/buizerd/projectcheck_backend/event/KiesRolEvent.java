@@ -14,11 +14,11 @@ public class KiesRolEvent extends Event {
 
 	@Override
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
-			deelnemer.setRol(rol);
-			EventResponse antwoord = new EventResponse(EventResponse.Status.OK);
-			antwoord.antwoordOp(this);
-			antwoord.metContext("gekozenRol", rol);
-			return antwoord;
+		deelnemer.setRol(rol);
+		EventResponse antwoord = new EventResponse(EventResponse.Status.OK);
+		antwoord.antwoordOp(this);
+		antwoord.metContext("gekozenRol", rol);
+		return antwoord;
 	}
 
 }
