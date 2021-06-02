@@ -75,7 +75,26 @@ public class KamerService {
 			Optional<Deelnemer> deelnemer = kamer.get().getDeelnemer(event.getDeelnemerId());
 
 			if (deelnemer.isPresent()) {
-				event.voerUit(dao, deelnemer.get(), session);
+				event.voerUit(dao, deelnemer.get(), session)
+				     .whenComplete((response, exception) -> {
+					     if (exception != null) {
+						     /*
+						      * We moeten de methode zelf aanroepen omdat de exception
+						      * wordt gegooit in een andere thread, waardoor deze
+						      * niet automatisch wordt aangeroepen.
+						      */
+						     error(session, exception, kamerCode);
+						     return;
+					     }
+
+					     if (response.isStuurNaarAlleClients()) {
+						     session.getOpenSessions().stream()
+						            .filter(Session::isOpen)
+						            .forEach(s -> s.getAsyncRemote().sendText(response.asJson()));
+					     } else if (session.isOpen()) {
+						     session.getAsyncRemote().sendText(response.asJson());
+					     }
+				     });
 			} else {
 				session.getBasicRemote().sendText(
 					new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event).asJson()

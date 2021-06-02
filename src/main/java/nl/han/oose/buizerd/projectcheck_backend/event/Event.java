@@ -12,6 +12,7 @@ import jakarta.validation.executable.ValidateOnExecution;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
@@ -51,25 +52,13 @@ public abstract class Event {
 	 * @param deelnemer De {@link Deelnemer} die het event heeft aangeroepen.
 	 * @param session De betrokken {@link Session}.
 	 */
-	public final void voerUit(DAO dao, Deelnemer deelnemer, Session session) {
-		CompletableFuture.runAsync(() -> {
-			EventResponse response = voerUit(deelnemer, session).antwoordOp(this);
-
-			handelAf(dao, deelnemer.getKamer());
-			if (response.isStuurNaarAlleClients()) {
-				/*
-				 * foreach loop zodat er geen try/catch-statement
-				 * nodig is voor `sendText(String)`
-				 */
-				for (Session s : session.getOpenSessions()) {
-					if (s.isOpen()) {
-						s.getAsyncRemote().sendText(response.asJson());
-					}
-				}
-			} else if (session.isOpen()) {
-				session.getAsyncRemote().sendText(response.asJson());
-			}
-		});
+	public final CompletionStage<EventResponse> voerUit(DAO dao, Deelnemer deelnemer, Session session) {
+		return CompletableFuture
+			.supplyAsync(() -> voerUit(deelnemer, session))
+			.thenApply((result) -> {
+				handelAf(dao, deelnemer.getKamer());
+				return result;
+			});
 	}
 
 	/**

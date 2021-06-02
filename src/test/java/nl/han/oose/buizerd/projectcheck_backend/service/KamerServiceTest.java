@@ -2,10 +2,14 @@ package nl.han.oose.buizerd.projectcheck_backend.service;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import jakarta.websocket.CloseReason;
@@ -14,6 +18,8 @@ import jakarta.websocket.RemoteEndpoint;
 import jakarta.websocket.Session;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
@@ -139,15 +145,71 @@ class KamerServiceTest {
 			verify(remote).sendText(eventResponse.asJson());
 		}
 
-		@Test
-		void kamerAanwezig_deelnemerAanwezig_voertEventUit(@Mock Kamer kamer, @Mock Deelnemer deelnemer) throws IOException {
-			when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.of(kamer));
-			when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
+		@Nested
+		class kamerAanwezig_deelnemerAanwezig {
 
-			sut.message(event, KamerServiceTest.KAMER_CODE, session);
+			@Mock
+			private Deelnemer deelnemer;
 
-			verify(kamer).getDeelnemer(event.getDeelnemerId());
-			verify(event).voerUit(dao, deelnemer, session);
+			@BeforeEach
+			void setUp(@Mock Kamer kamer) {
+				when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.of(kamer));
+				when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
+			}
+
+			@Test
+			void voertEventUit_logtBijException(@Mock Throwable throwable, @Mock EventResponse eventResponse) throws IOException {
+				when(event.voerUit(dao, deelnemer, session)).thenReturn(CompletableFuture.failedStage(new RuntimeException()));
+				sut.message(event, KamerServiceTest.KAMER_CODE, session);
+			}
+
+			@Test
+			void voertEventUit_isStuurNaarAlleClients_stuurtEventResponseNaarAlleOpenSessions(
+				@Mock EventResponse eventResponse,
+				@Mock RemoteEndpoint.Async remoteEndpoint
+			) throws IOException {
+				when(event.voerUit(dao, deelnemer, session)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
+				when(eventResponse.isStuurNaarAlleClients()).thenReturn(true);
+
+				Set<Session> openSessions = spy(Set.of(mock(Session.class), mock(Session.class)));
+				when(session.getOpenSessions()).thenReturn(openSessions);
+				openSessions.forEach(s -> {
+					when(s.isOpen()).thenReturn(true);
+					when(s.getAsyncRemote()).thenReturn(remoteEndpoint);
+				});
+
+				sut.message(event, KamerServiceTest.KAMER_CODE, session);
+
+				verify(remoteEndpoint, times(2)).sendText(eventResponse.asJson());
+			}
+
+			@Test
+			void voertEventUit_isNietStuurNaarAlleClients_stuurtEventResponseAlsSessionOpenIs(
+				@Mock EventResponse eventResponse,
+				@Mock RemoteEndpoint.Async remoteEndpoint
+			) throws IOException {
+				when(event.voerUit(dao, deelnemer, session)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
+				when(eventResponse.isStuurNaarAlleClients()).thenReturn(false);
+				when(session.isOpen()).thenReturn(true);
+				when(session.getAsyncRemote()).thenReturn(remoteEndpoint);
+
+				sut.message(event, KamerServiceTest.KAMER_CODE, session);
+
+				verify(remoteEndpoint).sendText(eventResponse.asJson());
+				verifyNoMoreInteractions(session);
+			}
+
+			@Test
+			void voertEventUit_isNietStuurNaarAlleClients_doetNietsAlsSessionGeslotenIs(@Mock EventResponse eventResponse) throws IOException {
+				when(event.voerUit(dao, deelnemer, session)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
+				when(eventResponse.isStuurNaarAlleClients()).thenReturn(false);
+				when(session.isOpen()).thenReturn(false);
+
+				sut.message(event, KamerServiceTest.KAMER_CODE, session);
+
+				verifyNoMoreInteractions(session);
+			}
+
 		}
 
 	}
@@ -160,6 +222,16 @@ class KamerServiceTest {
 
 		@Mock
 		private RemoteEndpoint.Basic remoteEndpoint;
+
+		@Test
+		void paktExceptionUitAlsDezeNietNullIs(@Mock Throwable error) {
+			ArgumentCaptor<Throwable> captor = ArgumentCaptor.forClass(Throwable.class);
+
+			sut.error(session, new Throwable(error), KamerServiceTest.KAMER_CODE);
+
+			verify(KamerServiceTest.logger).log(any(), any(), captor.capture());
+			assertEquals(error, captor.getValue());
+		}
 
 		@Test
 		void logtBijThrowablesAndersDanIllegalArgumentException(@Mock Throwable error) {
