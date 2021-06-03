@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.UserTransaction;
 import java.io.Serializable;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,14 +18,11 @@ class DOAImplTest {
 	@Mock
 	private EntityManager entityManager;
 
-	@Mock
-	private UserTransaction userTransaction;
-
 	private DAOImpl sut;
 
 	@BeforeEach
 	void setUp() {
-		sut = new DAOImpl(entityManager, userTransaction);
+		sut = new DAOImpl(entityManager);
 	}
 
 	@Test

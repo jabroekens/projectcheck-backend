@@ -42,7 +42,7 @@ public interface DAO {
 	 * @param <T> het type van de entiteit
 	 */
 	@ValidateOnExecution
-	<T> void update(@NotNull @Valid T t);
+	<T> T update(@NotNull @Valid T t);
 
 	/**
 	 * Verwijdert de entiteit {@code t}.

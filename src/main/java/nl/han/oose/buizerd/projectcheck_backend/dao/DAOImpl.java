@@ -1,10 +1,8 @@
 package nl.han.oose.buizerd.projectcheck_backend.dao;
 
-import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import jakarta.transaction.UserTransaction;
 import java.io.Serializable;
 import java.util.Optional;
 
@@ -15,9 +13,6 @@ public class DAOImpl implements DAO {
 
 	@PersistenceContext
 	private EntityManager entityManager;
-
-	@Resource
-	private UserTransaction transaction;
 
 	/**
 	 * Construeert een {@link DAOImpl}.
@@ -33,11 +28,9 @@ public class DAOImpl implements DAO {
 	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
 	 *
 	 * @param entityManager Een {@link EntityManager}.
-	 * @param transaction Een {@link UserTransaction}.
 	 */
-	public DAOImpl(EntityManager entityManager, UserTransaction transaction) {
+	public DAOImpl(EntityManager entityManager) {
 		this.entityManager = entityManager;
-		this.transaction = transaction;
 	}
 
 	/**
@@ -59,8 +52,8 @@ public class DAOImpl implements DAO {
 	 * {@inheritDoc}
 	 */
 	@Transactional
-	public <T> void update(T t) {
-		entityManager.merge(t);
+	public <T> T update(T t) {
+		return entityManager.merge(t);
 	}
 
 	/**
