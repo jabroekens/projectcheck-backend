@@ -126,6 +126,7 @@ public class KamerService {
 				session.getBasicRemote().sendText(new EventResponse(EventResponse.Status.INVALIDE).asJson());
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, e.getMessage(), e);
+				return;
 			}
 		}
 

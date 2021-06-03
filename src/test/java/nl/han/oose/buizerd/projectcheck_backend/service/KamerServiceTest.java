@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -225,12 +226,8 @@ class KamerServiceTest {
 
 		@Test
 		void paktExceptionUitAlsDezeNietNullIs(@Mock Throwable error) {
-			ArgumentCaptor<Throwable> captor = ArgumentCaptor.forClass(Throwable.class);
-
 			sut.error(session, new Throwable(error), KamerServiceTest.KAMER_CODE);
-
-			verify(KamerServiceTest.logger).log(any(), any(), captor.capture());
-			assertEquals(error, captor.getValue());
+			verify(KamerServiceTest.logger).log(any(), any(), eq(error));
 		}
 
 		@Test
@@ -258,7 +255,7 @@ class KamerServiceTest {
 			@Test
 			void logtBijException() throws Throwable {
 				when(session.getBasicRemote()).thenReturn(remoteEndpoint);
-				doThrow(IllegalArgumentException.class).when(remoteEndpoint).sendText(anyString());
+				doThrow(error).when(remoteEndpoint).sendText(anyString());
 
 				sut.error(session, error, KamerServiceTest.KAMER_CODE);
 				verify(KamerServiceTest.logger).log(Level.SEVERE, error.getMessage(), error);
