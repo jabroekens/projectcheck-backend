@@ -5,7 +5,6 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Kaart;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KaartenSet;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 import nl.han.oose.buizerd.projectcheck_backend.domain.StandaardKaartenSet;

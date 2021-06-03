@@ -20,7 +20,6 @@ public class KaartToelichting {
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(nullable = false, updatable = false)
 	private Integer id;
 
 	/**
@@ -37,9 +36,6 @@ public class KaartToelichting {
 	 */
 	@Column(nullable = false)
 	private String toelichting;
-
-	// TODO : Maak hier een abstracte klasse van.
-	//private Set<String> feedback;
 
 	/**
 	 * Genereert een {@link KaartToelichting}.

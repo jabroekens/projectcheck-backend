@@ -1,36 +1,35 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import com.google.gson.annotations.Expose;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import java.util.Set;
 
 /**
  * Een {@link KaartenSet} is een onderdeel van de ProjectCheck die een bundel
  * kaarten heeft. Deze bundel wordt vervolgens opgeslagen binnen de rol.
- * TODO : @link de rol, wanneer nathan het heeft gecommit.
  */
 @Entity
 public class KaartenSet {
 
 	/**
-	 * Een unieke auto incremented code die de kaartenset onderscheid.
+	 * Een unieke code die de kaartenset onderscheid.
 	 * De code is niet nullable en kan ook niet meer aangepast worden.
 	 */
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(nullable = false, updatable = false)
 	private Long id;
 
 	/**
 	 * Een set van meerdere kaarten.
 	 * De kaarten zijn niet nullable, maar kan wel worden aangepast.
 	 */
+	@Expose
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
 	private Set<Kaart> kaarten;
 
@@ -52,7 +51,8 @@ public class KaartenSet {
 	 *
 	 * @param kaarten De kaarten voor de kaartenset.
 	 */
-	public KaartenSet(Rol rol, Set<Kaart> kaarten) {
+	public KaartenSet(Long id, Rol rol, Set<Kaart> kaarten) {
+		this.id = id;
 		this.rol = rol;
 		this.kaarten = kaarten;
 	}

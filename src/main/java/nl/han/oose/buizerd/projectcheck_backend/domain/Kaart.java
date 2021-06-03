@@ -1,5 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import com.google.gson.annotations.Expose;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,6 +19,7 @@ public class Kaart {
 	 * De id wordt automatisch gegenereerd door de database.
 	 */
 	@Id
+	@Expose
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
@@ -25,6 +27,7 @@ public class Kaart {
 	 * De code van de kaart, hij is uniek binnen de kaartenset.
 	 * TODO : Duidelijk hebben van de functie van de code.
 	 */
+	@Expose
 	@Column(nullable = false, updatable = false)
 	private Integer code;
 
@@ -32,6 +35,7 @@ public class Kaart {
 	 * De text die op de kaart zal plaatsvinden.
 	 * Deze text zal niet aangepast kunnen worden.
 	 */
+	@Expose
 	@Column(nullable = false, updatable = false)
 	private String text;
 
