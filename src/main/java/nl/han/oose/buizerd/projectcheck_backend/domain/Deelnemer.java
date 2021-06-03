@@ -36,6 +36,10 @@ public class Deelnemer {
 	@EmbeddedId
 	private DeelnemerId deelnemerId;
 
+	@Expose
+	@Valid
+	private Rol rol;
+
 	/**
 	 * De naam van de deelnemer.
 	 */
@@ -126,4 +130,15 @@ public class Deelnemer {
 		this.kamer = kamer;
 	}
 
+	public Rol getRol() {
+		return rol;
+	}
+
+	@ValidateOnExecution
+	public void setRol(@Valid Rol rol) {
+		this.rol = rol;
+	}
+
 }
+
+

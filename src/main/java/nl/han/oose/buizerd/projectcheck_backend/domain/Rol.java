@@ -1,5 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import com.google.gson.annotations.Expose;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ public class Rol {
 	/**
 	 * De naam van de rol.
 	 */
+	@Expose
 	@NotNull
 	@Id
 	private String rolNaam;
