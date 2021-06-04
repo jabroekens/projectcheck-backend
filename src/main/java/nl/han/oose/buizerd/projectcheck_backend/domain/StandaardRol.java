@@ -8,6 +8,7 @@ public enum StandaardRol {
 	PROJECT_TEAM_MEMBER(new Rol("Project Team Member")),
 	PROJECTLEIDER(new Rol("Projectleider")),
 	PROJECTTEAMLID(new Rol("Projectteamlid")),
+	PROJECTBUREAU(new Rol("Projectbureau")),
 	OPDRACHTGEVER(new Rol("Opdrachtgever"));
 
 	private final Rol rol;
