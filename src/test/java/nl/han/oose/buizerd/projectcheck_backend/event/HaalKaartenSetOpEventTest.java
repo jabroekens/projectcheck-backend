@@ -8,6 +8,7 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.KaartenSet;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 import nl.han.oose.buizerd.projectcheck_backend.domain.StandaardRol;
+import nl.han.oose.buizerd.projectcheck_backend.exception.DeelnemerRolNietGevondenException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -79,6 +80,14 @@ public class HaalKaartenSetOpEventTest {
 				() -> Assertions.assertFalse((Boolean) response.getContext().get("gekozen")),
 				() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus())
 			);
+		}
+
+		@Test
+		void deelnemerHeeftGeenRolEnGooitEenException(
+			@Mock Deelnemer deelnemer,
+			@Mock Session session
+		) {
+			Assertions.assertThrows(DeelnemerRolNietGevondenException.class, () -> haalKaartenSetOpEvent.voerUit(deelnemer, session));
 		}
 
 	}
