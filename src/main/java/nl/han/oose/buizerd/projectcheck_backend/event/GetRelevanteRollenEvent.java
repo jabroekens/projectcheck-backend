@@ -12,7 +12,6 @@ public class GetRelevanteRollenEvent extends Event {
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
 		Kamer kamer = deelnemer.getKamer();
 		Set<Rol> rollen = kamer.getRelevanteRollen();
-		kamer.activeerRelevanteRollen(rollen);
 		return new EventResponse(EventResponse.Status.OK).metContext("geefRollen", rollen);
 	}
 
