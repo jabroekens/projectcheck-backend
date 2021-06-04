@@ -12,12 +12,7 @@ public class StandaardKaartenSetTest {
 	@ParameterizedTest
 	@EnumSource(StandaardKaartenSet.class)
 	void kaartenSetIsNotNull(StandaardKaartenSet standaardKaartenSet) {
-		Assertions.assertAll(
-			() -> Assertions.assertNotNull(standaardKaartenSet.getKaartenSet()),
-			() -> Assertions.assertNotNull(standaardKaartenSet.getKaartenSet().getKaarten()),
-			() -> Assertions.assertNotNull(standaardKaartenSet.getKaartenSet().getRol()),
-			() -> Assertions.assertNotNull(standaardKaartenSet.getKaartenSet().getId())
-		);
+		Assertions.assertNotNull(standaardKaartenSet.getKaartenSet());
 	}
 
 }
