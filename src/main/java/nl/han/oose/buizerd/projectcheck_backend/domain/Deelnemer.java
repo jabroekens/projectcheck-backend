@@ -1,14 +1,18 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import com.google.gson.annotations.Expose;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
+import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**
@@ -37,6 +41,11 @@ public class Deelnemer {
 	private DeelnemerId deelnemerId;
 	private Rol rol;
 
+
+	@Expose
+	@Valid
+	@ManyToOne
+	private Rol rol;
 
 	/**
 	 * De naam van de deelnemer.
@@ -128,12 +137,25 @@ public class Deelnemer {
 		this.kamer = kamer;
 	}
 
+	/**
+	 * Returned de rollen die bij de deelnemer past.
+	 *
+	 * @return De rollen.
+	 */
 	public Rol getRol() {
 		return rol;
 	}
 
-	public void setRol(Rol rol) {
+	/**
+	 * Zet de rol die bij de deelnemer past.
+	 *
+	 * @param rol De nieuwe rol.
+	 */
+	@ValidateOnExecution
+	public void setRol(@Valid Rol rol) {
 		this.rol = rol;
 	}
 
 }
+
+

@@ -1,6 +1,5 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import com.google.gson.annotations.Expose;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +21,6 @@ public class KaartToelichting {
 	@Expose
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(nullable = false, updatable = false)
 	private Integer id;
 
 	/**

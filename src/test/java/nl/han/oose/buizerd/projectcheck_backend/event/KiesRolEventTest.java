@@ -1,7 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import jakarta.websocket.Session;
-import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
@@ -32,35 +31,20 @@ public class KiesRolEventTest {
 
 	}
 
-	// ErrorPath
-	@Test
-	public void voerUit_kanDeelnemerNietvindenTest() {
-		// Arrange
-		// De deelnemer is wel gemocked in de setUp() maar nog niet toegevoegd aan de kamer. Daarom zal de KiesRolEvent geen deelnemer vinden.
-
-		// Act
-		EventResponse response = kiesRolEvent.voerUit(kamer, session);
-
-		// Assert
-		Assertions.assertAll(
-			() -> Assertions.assertEquals(EventResponse.Status.DEELNEMER_NIET_GEVONDEN, response.status)
-		);
-	}
-
 	// HappyPath
 	@Test
-	public void voerUit_deelnemerKrijgtRol(){
+	public void voerUit_deelnemerKrijgtRol() {
 		// Arrange
 		Rol expectedRol = rol;
-		Mockito.when(kamer.getDeelnemer(kiesRolEvent.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
 
 		// Act
-		EventResponse response = kiesRolEvent.voerUit(kamer, session);
+		EventResponse response = kiesRolEvent.voerUit(deelnemer, session);
 
 		// Assert
 		Assertions.assertAll(
-			() -> Assertions.assertEquals(EventResponse.Status.OK, response.status),
-			() -> Assertions.assertEquals(expectedRol, response.context.get("gekozenRol"))
+			() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus()),
+			() -> Assertions.assertEquals(expectedRol, response.getContext().get("gekozenRol")),
+			() -> Mockito.verify(deelnemer).setRol(rol)
 		);
 	}
 

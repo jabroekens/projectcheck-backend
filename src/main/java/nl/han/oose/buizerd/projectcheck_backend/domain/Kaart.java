@@ -3,6 +3,8 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 import com.google.gson.annotations.Expose;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 /**
@@ -13,11 +15,18 @@ import jakarta.persistence.Id;
 public class Kaart {
 
 	/**
-	 * De unieke code waarmee de kaart zal worden geïdentificeerd.
-	 * Deze unieke code kan niet worden aangepast.
+	 * De unieke id waarmee de kaart zal worden geïdentificeerd.
+	 * De id wordt automatisch gegenereerd door de database.
+	 */
+	@Id
+	@Expose
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
+
+	/**
+	 * De code van de kaart, hij is uniek binnen de kaartenset.
 	 */
 	@Expose
-	@Id
 	@Column(nullable = false, updatable = false)
 	private Integer code;
 
@@ -39,12 +48,21 @@ public class Kaart {
 	/**
 	 * Genereert een {@link Kaart}.
 	 *
-	 * @param code De unieke code van de kaart.
+	 * @param code De unieke code (per kaartenset) van de kaart.
 	 * @param text De text die zich op de kaart zal plaatsvinden.
 	 */
-	public Kaart(int code, String text) {
+	public Kaart(Integer code, String text) {
 		this.code = code;
 		this.text = text;
+	}
+
+	/**
+	 * Geeft de id (primary key) van de kaart terug.
+	 *
+	 * @return Het id.
+	 */
+	public Integer getId() {
+		return id;
 	}
 
 	/**
@@ -66,4 +84,3 @@ public class Kaart {
 	}
 
 }
-
