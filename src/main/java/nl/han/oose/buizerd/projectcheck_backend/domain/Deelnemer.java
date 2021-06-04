@@ -40,6 +40,8 @@ public class Deelnemer {
 	@EmbeddedId
 	private DeelnemerId deelnemerId;
 
+	@Expose
+	@Valid
 	@ManyToOne
 	private Rol rol;
 
@@ -143,11 +145,12 @@ public class Deelnemer {
 	}
 
 	/**
-	 * Zet de rollen die bij de deelnemer past.
+	 * Zet de rol die bij de deelnemer past.
 	 *
-	 * @param rol De nieuwe rollen set.
+	 * @param rol De nieuwe rol.
 	 */
-	public void setRol(Rol rol) {
+	@ValidateOnExecution
+	public void setRol(@Valid Rol rol) {
 		this.rol = rol;
 	}
 
