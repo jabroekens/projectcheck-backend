@@ -32,19 +32,7 @@ public class KamerService {
 		logger = Logger.getLogger(KamerService.class.getName());
 	}
 
-	private final DAO dao;
-
-	/**
-	 * Construeert een {@link KamerService}.
-	 *
-	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
-	 *
-	 * @param dao Een {@link DAO}.
-	 */
-	@Inject
-	public KamerService(DAO dao) {
-		this.dao = dao;
-	}
+	private DAO dao;
 
 	/**
 	 * {@inheritDoc}
@@ -131,6 +119,11 @@ public class KamerService {
 		}
 
 		logger.log(Level.SEVERE, error.getMessage(), error);
+	}
+
+	@Inject
+	public void setDao(DAO dao) {
+		this.dao = dao;
 	}
 
 }

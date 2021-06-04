@@ -24,31 +24,10 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 @Path("/")
 public class AppService {
 
-	@Inject
 	private DAO dao;
 
 	/**
-	 * Construeert een {@link AppService}.
-	 * <p>
-	 * <b>Deze constructor wordt gebruikt door JAX-RS en mag niet aangeroepen worden.</b>
-	 */
-	public AppService() {
-	}
-
-	/**
-	 * Construeert een {@link AppService}.
-	 *
-	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
-	 *
-	 * @param dao Een {@link DAO}.
-	 */
-	AppService(DAO dao) {
-		this.dao = dao;
-	}
-
-	/**
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
-	 *
 	 * @param begeleiderNaam De naam van de {@link Begeleider}.
 	 * @return Een JSON string met de WebSocket URL van de {@link Kamer} gewikkelt in {@link Response}.
 	 */
@@ -96,6 +75,11 @@ public class AppService {
 		json.addProperty("kamerCode", kamerCode);
 		json.addProperty("deelnemerId", deelnemerId);
 		return json.toString();
+	}
+
+	@Inject
+	void setDao(DAO dao) {
+		this.dao = dao;
 	}
 
 }

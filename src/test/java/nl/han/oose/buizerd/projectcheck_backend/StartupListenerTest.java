@@ -29,7 +29,8 @@ class StartupListenerTest {
 
 	@BeforeEach
 	void setUp() {
-		sut = new StartupListener(dao);
+		sut = new StartupListener();
+		sut.setDao(dao);
 	}
 
 	@Test

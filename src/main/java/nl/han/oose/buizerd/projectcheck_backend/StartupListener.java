@@ -13,27 +13,7 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.StandaardRol;
 @WebListener
 public class StartupListener implements ServletContextListener {
 
-	@Inject
 	private DAO dao;
-
-	/**
-	 * Construeert een {@link StartupListener}.
-	 * <p>
-	 * <b>Deze constructor wordt gebruikt door Jakarta EE en mag niet aangeroepen worden.</b>
-	 */
-	public StartupListener() {
-	}
-
-	/**
-	 * Construeert een {@link StartupListener}.
-	 *
-	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
-	 *
-	 * @param dao Een {@link DAO}.
-	 */
-	StartupListener(DAO dao) {
-		this.dao = dao;
-	}
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -42,12 +22,18 @@ public class StartupListener implements ServletContextListener {
 				dao.create(standaardRol.getRol());
 			}
 		}
+
 		for (StandaardKaartenSet standaardKaartenSet : StandaardKaartenSet.values()) {
 			KaartenSet kaartenSet = standaardKaartenSet.getKaartenSet();
 			if (dao.read(KaartenSet.class, kaartenSet.getId()).isEmpty()) {
 				dao.create(kaartenSet);
 			}
 		}
+	}
+
+	@Inject
+	void setDao(DAO dao) {
+		this.dao = dao;
 	}
 
 }

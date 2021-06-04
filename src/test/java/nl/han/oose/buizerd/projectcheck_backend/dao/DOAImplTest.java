@@ -22,7 +22,8 @@ class DOAImplTest {
 
 	@BeforeEach
 	void setUp() {
-		sut = new DAOImpl(entityManager);
+		sut = new DAOImpl();
+		sut.setEntityManager(entityManager);
 	}
 
 	@Test

@@ -59,7 +59,8 @@ class KamerServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		sut = new KamerService(dao);
+		sut = new KamerService();
+		sut.setDao(dao);
 	}
 
 	@Nested

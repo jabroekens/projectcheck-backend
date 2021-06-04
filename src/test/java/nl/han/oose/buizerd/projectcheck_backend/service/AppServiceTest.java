@@ -36,7 +36,8 @@ class AppServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		sut = new AppService(dao);
+		sut = new AppService();
+		sut.setDao(dao);
 	}
 
 	@Test
