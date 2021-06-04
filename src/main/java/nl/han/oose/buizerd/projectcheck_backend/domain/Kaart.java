@@ -25,7 +25,6 @@ public class Kaart {
 
 	/**
 	 * De code van de kaart, hij is uniek binnen de kaartenset.
-	 * TODO : Duidelijk hebben van de functie van de code.
 	 */
 	@Expose
 	@Column(nullable = false, updatable = false)
