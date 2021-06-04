@@ -12,6 +12,10 @@ public  class Ronde {
 
 
 	}
+	public KaartToelichting getGehighlighteKaart(){
+		return this.gehighlighteKaart;
+
+	}
 
 
 
