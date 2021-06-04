@@ -1,5 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import com.google.gson.annotations.Expose;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

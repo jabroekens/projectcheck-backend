@@ -39,7 +39,7 @@ public class Deelnemer {
 	@Valid
 	@EmbeddedId
 	private DeelnemerId deelnemerId;
-	private Rol rol;
+
 
 
 	@Expose
