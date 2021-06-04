@@ -1,5 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ public class KaartenSetTest {
 
 	@BeforeEach
 	void setup() {
+		kaarten = new HashSet<>();
 		kaartenSet = new KaartenSet(ID, rol, kaarten);
 	}
 
@@ -34,7 +36,7 @@ public class KaartenSetTest {
 
 	@Test
 	void geeftJuisteKaartenTerug() {
-		Assertions.assertEquals(kaarten, kaartenSet.getKaarten());
+		Assertions.assertIterableEquals(kaarten, kaartenSet.getKaarten());
 	}
 
 	@Test
