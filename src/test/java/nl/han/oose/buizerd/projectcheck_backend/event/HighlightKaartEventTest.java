@@ -1,20 +1,15 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import jakarta.websocket.Session;
-import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kaart;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KaartToelichting;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Ronde;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 
 public class HighlightKaartEventTest {
 
@@ -46,18 +41,18 @@ public class HighlightKaartEventTest {
 	void kaartKanWordenGehighlightTest() {
 		//Arrange
 		String expectedToelichting = "Testen";
-		kaartToelichting = new KaartToelichting(kaart,expectedToelichting);
+		kaartToelichting = new KaartToelichting(kaart, expectedToelichting);
 		highlightenKaartEvent = new HighlightenKaartEvent();
 		highlightenKaartEvent.kaartToelichting = kaartToelichting;
 		Mockito.when(kamer.getHuidigeRonde()).thenReturn(ronde);
 		Mockito.when(deelnemer.getKamer()).thenReturn(kamer);
 		//Act
-		EventResponse antwoord =  highlightenKaartEvent.voerUit(deelnemer, session);
+		EventResponse antwoord = highlightenKaartEvent.voerUit(deelnemer, session);
 		KaartToelichting kaartUitAntwoord = (KaartToelichting) antwoord.getContext().get("gehighlighteKaart");
 		String actualToelichting = kaartUitAntwoord.getToelichting();
 		//Assert
-		Assertions.assertEquals(expectedToelichting,actualToelichting);
-		Assertions.assertEquals(expectedToelichting,ronde.getGehighlighteKaart().getToelichting());
+		Assertions.assertEquals(expectedToelichting, actualToelichting);
+		Assertions.assertEquals(expectedToelichting, ronde.getGehighlighteKaart().getToelichting());
 
 	}
 

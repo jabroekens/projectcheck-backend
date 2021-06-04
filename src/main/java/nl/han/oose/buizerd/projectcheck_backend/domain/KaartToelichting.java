@@ -41,9 +41,6 @@ public class KaartToelichting {
 	@Column(nullable = false)
 	private String toelichting;
 
-	// TODO : Maak hier een abstracte klasse van.
-	//private Set<String> feedback;
-
 	/**
 	 * Genereert een {@link KaartToelichting}.
 	 * Deze constructor zal alleen gebruikt worden door JPA.
