@@ -7,7 +7,6 @@ import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KaartenSet;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 import nl.han.oose.buizerd.projectcheck_backend.domain.StandaardRol;
-import nl.han.oose.buizerd.projectcheck_backend.exception.DeelnemerRolNietGevondenException;
 
 public class HaalKaartenSetOpEvent extends Event {
 
@@ -15,7 +14,8 @@ public class HaalKaartenSetOpEvent extends Event {
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
 		// Kijk of de deelnemer een rol heeft.
 		if (deelnemer.getRol() == null) {
-			throw new DeelnemerRolNietGevondenException(deelnemer.getNaam());
+			return new EventResponse(EventResponse.Status.ROL_NIET_GEVONDEN)
+				.antwoordOp(this);
 		}
 
 		// Maak een resultaat aan.
