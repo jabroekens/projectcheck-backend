@@ -96,10 +96,10 @@ public class Kamer {
 	}
 
 	public Begeleider getBegeleider() {
-		Optional<Begeleider> begeleider = deelnemers.stream()
-													.filter(Begeleider.class::isInstance)
-													.map(Begeleider.class::cast)
-													.findAny();
+		var begeleider = deelnemers.stream()
+		                           .filter(Begeleider.class::isInstance)
+		                           .map(Begeleider.class::cast)
+		                           .findAny();
 
 		if (begeleider.isEmpty()) {
 			/*
@@ -116,6 +116,7 @@ public class Kamer {
 
 	/**
 	 * Haal een read-only kopie van de deelnemers van de kamer op.
+	 *
 	 * @see Collections#unmodifiableSet(Set)
 	 */
 	public Set<Deelnemer> getDeelnemers() {
@@ -151,6 +152,7 @@ public class Kamer {
 
 	/**
 	 * Haal een read-only kopie van de relevante rollen van de kamer op.
+	 *
 	 * @see Collections#unmodifiableSet(Set)
 	 */
 	@ValidateOnExecution

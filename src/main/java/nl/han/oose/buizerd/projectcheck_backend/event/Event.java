@@ -12,7 +12,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
 import jakarta.websocket.DecodeException;
 import jakarta.websocket.Session;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
@@ -47,11 +46,11 @@ public abstract class Event {
 	 */
 	public final CompletionStage<EventResponse> voerUit(DAO dao, Deelnemer deelnemer, Session session) {
 		return CompletableFuture
-			.supplyAsync(() -> voerUit(deelnemer, session))
-			.thenApply((result) -> {
-				handelAf(dao, deelnemer.getKamer());
-				return result;
-			});
+			       .supplyAsync(() -> voerUit(deelnemer, session))
+			       .thenApply((result) -> {
+				       handelAf(dao, deelnemer.getKamer());
+				       return result;
+			       });
 	}
 
 	/**
@@ -77,26 +76,26 @@ public abstract class Event {
 		private static final Validator VALIDATOR;
 
 		static {
-			RuntimeTypeAdapterFactory<Event> eventAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "event");
+			var eventRuntimeTypeAdapterFactory = RuntimeTypeAdapterFactory.of(Event.class, "event");
 
-			Reflections reflections = new Reflections(Event.class.getPackage().getName());
+			var reflections = new Reflections(Event.class.getPackage().getName());
 			reflections.getSubTypesOf(Event.class).forEach(
-				event -> eventAdapterFactory.registerSubtype(event, getEventNaam(event))
+				event -> eventRuntimeTypeAdapterFactory.registerSubtype(event, getEventNaam(event))
 			);
 
-			GSON = new GsonBuilder().registerTypeAdapterFactory(eventAdapterFactory).create();
+			GSON = new GsonBuilder().registerTypeAdapterFactory(eventRuntimeTypeAdapterFactory).create();
 			VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
 		}
 
 		@Override
 		public Event decode(String s) throws DecodeException {
 			try {
-				Event event = GSON.fromJson(s, Event.class);
+				var event = GSON.fromJson(s, Event.class);
 				if (event == null) {
 					throw new DecodeException(s, "Decoded result is null");
 				}
 
-				Set<ConstraintViolation<Event>> violations = VALIDATOR.validate(event);
+				var violations = VALIDATOR.validate(event);
 				if (!violations.isEmpty()) {
 					throw new DecodeException(
 						s,

@@ -40,11 +40,13 @@ class EventResponseTest {
 
 	@Test
 	void metContext_voegtAanContextToeEnGeeftZichzelfTerug(@Mock Object object) {
-		String waarde = "";
+		var sleutel = "";
+
+		var eventResponse = sut.metContext(sleutel, object);
 
 		assertAll(
-			() -> assertSame(sut, sut.metContext(waarde, object)),
-			() -> assertEquals(object, sut.getContext().get(waarde))
+			() -> assertSame(sut, eventResponse),
+			() -> assertEquals(object, eventResponse.getContext().get(sleutel))
 		);
 	}
 
@@ -55,16 +57,16 @@ class EventResponseTest {
 
 	@Test
 	void antwoordOp_zetEnGeeftJuisteWaarde(@Mock Event event) {
-		String antwoordOp = "";
+		var antwoordOp = "";
 
 		try (MockedStatic<Event> mock = mockStatic(Event.class)) {
 			mock.when(() -> Event.getEventNaam(event.getClass())).thenReturn(antwoordOp);
 
-			EventResponse actualEventResponse = sut.antwoordOp(event);
+			var eventResponse = sut.antwoordOp(event);
 
 			assertAll(
 				() -> mock.verify(() -> Event.getEventNaam(event.getClass())),
-				() -> assertSame(sut, actualEventResponse),
+				() -> assertSame(sut, eventResponse),
 				() -> assertEquals(antwoordOp, sut.getAntwoordOp())
 			);
 		}

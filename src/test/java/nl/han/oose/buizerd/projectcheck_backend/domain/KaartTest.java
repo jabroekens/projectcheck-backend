@@ -9,9 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class KaartTest {
 
-	private Kaart kaart;
 	private static final int CODE = 1;
 	private static final String TEXT = "voorbeeld tekst";
+
+	private Kaart kaart;
 
 	@BeforeEach
 	void setup() {

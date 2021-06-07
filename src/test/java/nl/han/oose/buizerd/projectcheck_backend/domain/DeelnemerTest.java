@@ -30,8 +30,12 @@ class DeelnemerTest {
 
 	@Test
 	void setEnGetNaam_zetEnGeeftJuisteWaarde() {
-		sut.setNaam("Jochem");
-		assertEquals("Jochem", sut.getNaam());
+		var expected = "Jochem";
+
+		sut.setNaam(expected);
+		var actual = sut.getNaam();
+
+		assertEquals(expected, actual);
 	}
 
 	@Nested

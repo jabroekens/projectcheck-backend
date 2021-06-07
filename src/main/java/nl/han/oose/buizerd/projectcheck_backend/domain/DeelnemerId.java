@@ -65,7 +65,7 @@ public class DeelnemerId implements Serializable {
 		if (!(o instanceof DeelnemerId)) {
 			return false;
 		}
-		DeelnemerId that = (DeelnemerId) o;
+		var that = (DeelnemerId) o;
 		return Objects.equals(getId(), that.getId()) && Objects.equals(getKamerCode(), that.getKamerCode());
 	}
 

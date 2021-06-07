@@ -73,8 +73,8 @@ class KamerServiceTest {
 		private EndpointConfig config;
 
 		void sluitVerbindingMetReden() throws IOException {
-			CloseReason closeReason = new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer is gesloten of niet gevonden.");
-			ArgumentCaptor<CloseReason> closeReasonCaptor = ArgumentCaptor.forClass(CloseReason.class);
+			var closeReason = new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer is gesloten of niet gevonden.");
+			var closeReasonCaptor = ArgumentCaptor.forClass(CloseReason.class);
 
 			sut.open(session, config, KAMER_CODE);
 
@@ -122,9 +122,8 @@ class KamerServiceTest {
 
 		@Test
 		void kamerAfwezig_stuurtEventResponse(@Mock RemoteEndpoint.Basic remote) throws IOException {
-			EventResponse eventResponse = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
-				.metContext("kamerCode", KAMER_CODE).antwoordOp(event);
-
+			var eventResponse = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
+				                    .metContext("kamerCode", KAMER_CODE).antwoordOp(event);
 			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
 			when(session.getBasicRemote()).thenReturn(remote);
 
@@ -135,8 +134,7 @@ class KamerServiceTest {
 
 		@Test
 		void kamerAanwezig_deelnemerAfwezig_stuurtEventResponse(@Mock Kamer kamer, @Mock RemoteEndpoint.Basic remote) throws IOException {
-			EventResponse eventResponse = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
-
+			var eventResponse = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
 			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
 			when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.empty());
 			when(session.getBasicRemote()).thenReturn(remote);
@@ -173,12 +171,12 @@ class KamerServiceTest {
 				when(event.voerUit(dao, deelnemer, session)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
 				when(eventResponse.isStuurNaarAlleClients()).thenReturn(true);
 
-				Set<Session> openSessions = spy(Set.of(mock(Session.class), mock(Session.class)));
-				when(session.getOpenSessions()).thenReturn(openSessions);
+				var openSessions = spy(Set.of(mock(Session.class), mock(Session.class)));
 				openSessions.forEach(s -> {
 					when(s.isOpen()).thenReturn(true);
 					when(s.getAsyncRemote()).thenReturn(remoteEndpoint);
 				});
+				when(session.getOpenSessions()).thenReturn(openSessions);
 
 				sut.message(event, KAMER_CODE, session);
 
@@ -245,8 +243,8 @@ class KamerServiceTest {
 
 			@Test
 			void stuurtEventResponse() throws IOException {
+				var eventResponse = new EventResponse(EventResponse.Status.ONGELDIG);
 				when(session.getBasicRemote()).thenReturn(remoteEndpoint);
-				EventResponse eventResponse = new EventResponse(EventResponse.Status.ONGELDIG);
 
 				sut.error(session, error, KAMER_CODE);
 
@@ -259,6 +257,7 @@ class KamerServiceTest {
 				doThrow(error).when(remoteEndpoint).sendText(anyString());
 
 				sut.error(session, error, KAMER_CODE);
+
 				verify(logger).log(Level.SEVERE, error.getMessage(), error);
 			}
 

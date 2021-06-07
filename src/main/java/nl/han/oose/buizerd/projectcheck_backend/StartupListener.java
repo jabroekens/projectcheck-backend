@@ -24,7 +24,7 @@ public class StartupListener implements ServletContextListener {
 		}
 
 		for (StandaardKaartenSet standaardKaartenSet : StandaardKaartenSet.values()) {
-			KaartenSet kaartenSet = standaardKaartenSet.getKaartenSet();
+			var kaartenSet = standaardKaartenSet.getKaartenSet();
 			if (dao.read(KaartenSet.class, kaartenSet.getId()).isEmpty()) {
 				dao.create(kaartenSet);
 			}

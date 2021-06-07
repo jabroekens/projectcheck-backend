@@ -128,7 +128,7 @@ public class ChatEvent extends Event {
 
 	@Override
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
-		String bericht = String.format("%s zegt: \"%s\"", deelnemer.get().getNaam(), woord);
+		var bericht = String.format("%s zegt: \"%s\"", deelnemer.get().getNaam(), woord);
 		return new EventResponse(EventResponse.Status.OK).metContext("bericht", bericht).stuurNaarAlleClients();
 	}
 
@@ -150,14 +150,14 @@ class ChatEventTest {
 
 	@Test
 	void voerUit_stuurtJuisteBerichtNaarAlleClients(@Mock Deelnemer deelnemer, @Mock Session session) {
-		String expectedBericht = String.format("%s zegt: \"%s\"", deelnemer.getNaam(), sut.woord);
+		var expectedBericht = String.format("%s zegt: \"%s\"", deelnemer.getNaam(), sut.woord);
 
-		EventResponse response = sut.voerUit(kamer, session);
+		var eventResponse = sut.voerUit(kamer, session);
 
 		assertAll(
-			() -> assertTrue(response.isStuurNaarAlleClients()),
-			() -> assertEquals(EventResponse.Status.OK, response.getStatus()),
-			() -> assertEquals(expectedBericht, response.getContext().get("bericht"))
+			() -> assertTrue(eventResponse.isStuurNaarAlleClients()),
+			() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),
+			() -> assertEquals(expectedBericht, eventResponse.getContext().get("bericht"))
 		);
 	}
 

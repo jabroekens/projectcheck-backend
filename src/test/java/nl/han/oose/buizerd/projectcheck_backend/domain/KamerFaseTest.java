@@ -15,7 +15,7 @@ class KamerFaseTest {
 		if (kamerFase.ordinal() == KamerFase.values().length - 1) {
 			assertThrows(NoSuchElementException.class, kamerFase::getVolgendeFase);
 		} else {
-			KamerFase volgendeFase = kamerFase.getVolgendeFase();
+			var volgendeFase = kamerFase.getVolgendeFase();
 			assertEquals(KamerFase.values()[kamerFase.ordinal() + 1], volgendeFase);
 		}
 	}

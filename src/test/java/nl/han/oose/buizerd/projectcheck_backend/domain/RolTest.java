@@ -19,20 +19,12 @@ class RolTest {
 
 	@Test
 	void getRolNaam_geeftJuisteWaarde() {
-		// Act
-		var actual = sut.getRolNaam();
-
-		// Assert
-		assertEquals(ROL_NAAM, actual);
+		assertEquals(ROL_NAAM, sut.getRolNaam());
 	}
 
 	@Test
 	void getBeschrijving_geeftJuisteWaarde() {
-		// Act
-		var actual = sut.getBeschrijving();
-
-		// Assert
-		assertEquals(BESCHRIJVING, actual);
+		assertEquals(BESCHRIJVING, sut.getBeschrijving());
 	}
 
 }

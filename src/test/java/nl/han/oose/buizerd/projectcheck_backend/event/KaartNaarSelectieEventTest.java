@@ -82,7 +82,7 @@ class KaartNaarSelectieEventTest {
 			Mockito.when(deelnemer.getKaartenSelectie()).thenReturn(kaartenSelectie);
 			Mockito.when(kaartenSelectie.kaartIsGeselecteerd(geselecteerdeKaart)).thenReturn(false);
 
-			EventResponse eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer, session);
+			var eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer, session);
 
 			assertAll(
 				() -> verify(kaartenSelectie).addKaart(geselecteerdeKaart),
@@ -97,7 +97,7 @@ class KaartNaarSelectieEventTest {
 			Mockito.when(kaartenSelectie.kaartIsGeselecteerd(geselecteerdeKaart)).thenReturn(false);
 			Mockito.when(kaartenSelectie.isVol()).thenReturn(true);
 
-			EventResponse eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer, session);
+			var eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer, session);
 
 			assertAll(
 				() -> assertEquals(geselecteerdeKaart, eventResponse.getContext().get("ongebruikteKaart")),

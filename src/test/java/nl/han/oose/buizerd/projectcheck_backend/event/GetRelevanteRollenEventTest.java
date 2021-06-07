@@ -49,4 +49,5 @@ public class GetRelevanteRollenEventTest {
 			() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus())
 		);
 	}
+
 }

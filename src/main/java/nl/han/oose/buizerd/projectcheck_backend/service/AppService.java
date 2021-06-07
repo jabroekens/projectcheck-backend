@@ -9,7 +9,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.CodeGenerator;
@@ -30,6 +29,7 @@ public class AppService {
 
 	/**
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
+	 *
 	 * @return een {@link Response OK Response} met daarin de kamercode van de aangemaakte kamer
 	 *         en het ID van de begeleider in JSON
 	 */
@@ -37,11 +37,11 @@ public class AppService {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response maakKamer(@FormParam("begeleiderNaam") @Naam String begeleiderNaam) {
-		String kamerCode = codeGenerator.genereerCode(Kamer.KAMER_CODE_MAX_LENGTE);
+		var kamerCode = codeGenerator.genereerCode(Kamer.KAMER_CODE_MAX_LENGTE);
 
-		DeelnemerId deelnemerId = new DeelnemerId(1L, kamerCode);
-		Begeleider begeleider = new Begeleider(deelnemerId, begeleiderNaam);
-		Kamer kamer = new Kamer(kamerCode, begeleider);
+		var deelnemerId = new DeelnemerId(1L, kamerCode);
+		var begeleider = new Begeleider(deelnemerId, begeleiderNaam);
+		var kamer = new Kamer(kamerCode, begeleider);
 
 		dao.create(kamer);
 		return Response.ok(getKamerInfo(kamer.getKamerCode(), deelnemerId.getId())).build();
@@ -55,15 +55,15 @@ public class AppService {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response neemDeel(@PathParam("kamerCode") @KamerCode String kamerCode, @FormParam("deelnemerNaam") @Naam String deelnemerNaam) {
-		Optional<Kamer> kamer = dao.read(Kamer.class, kamerCode);
+		var kamer = dao.read(Kamer.class, kamerCode);
 
 		if (kamer.isPresent()) {
 			if (kamer.get().getKamerFase() != KamerFase.OPEN) {
 				throw new KamerGeslotenException(kamerCode);
 			}
 
-			Long deelnemerId = kamer.get().genereerDeelnemerId();
-			Deelnemer deelnemer = new Deelnemer(
+			var deelnemerId = kamer.get().genereerDeelnemerId();
+			var deelnemer = new Deelnemer(
 				new DeelnemerId(deelnemerId, kamer.get().getKamerCode()),
 				deelnemerNaam
 			);
@@ -80,7 +80,7 @@ public class AppService {
 	 * @return een JSON-string met de waarden {@code kamerCode} en {@code delenemerId}
 	 */
 	public String getKamerInfo(String kamerCode, Long deelnemerId) {
-		JsonObject json = new JsonObject();
+		var json = new JsonObject();
 		json.addProperty("kamerCode", kamerCode);
 		json.addProperty("deelnemerId", deelnemerId);
 		return json.toString();

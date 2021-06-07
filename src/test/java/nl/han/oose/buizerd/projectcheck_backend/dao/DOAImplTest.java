@@ -34,9 +34,12 @@ class DOAImplTest {
 
 	@Test
 	void read_roeptFindAanEnGeeftOptionalTerug(@Mock Serializable serializable) {
-		Class<Object> klasseType = Object.class;
-		Optional<Object> expected = Optional.empty();
-		assertEquals(expected, sut.read(klasseType, serializable));
+		var klasseType = Object.class;
+		var expected = Optional.empty();
+
+		var actual = sut.read(klasseType, serializable);
+
+		assertEquals(expected, actual);
 		verify(entityManager).find(klasseType, serializable);
 	}
 
@@ -47,9 +50,9 @@ class DOAImplTest {
 	}
 
 	@Test
-	void delete_roeptRemoveAan(@Mock Serializable serializable) {
-		sut.delete(serializable);
-		verify(entityManager).remove(serializable);
+	void delete_roeptRemoveAan(@Mock Object object) {
+		sut.delete(object);
+		verify(entityManager).remove(object);
 	}
 
 }

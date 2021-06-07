@@ -5,7 +5,6 @@ import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.KamerFase;
 
 /**
  * Zet de fase van de kamer waaraan de begeleider deelneemt
@@ -19,8 +18,8 @@ public class VolgendeFaseEvent extends Event {
 	@Override
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
 		if (deelnemer instanceof Begeleider) {
-			Kamer kamer = deelnemer.getKamer();
-			KamerFase kamerFase = kamer.getKamerFase();
+			var kamer = deelnemer.getKamer();
+			var kamerFase = kamer.getKamerFase();
 			deelnemer.getKamer().setKamerFase(kamerFase.getVolgendeFase());
 
 			return new EventResponse(EventResponse.Status.OK).metContext("volgendeFase", kamer.getKamerFase());

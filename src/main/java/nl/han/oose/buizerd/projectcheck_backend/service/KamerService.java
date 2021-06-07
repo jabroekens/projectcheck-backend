@@ -11,11 +11,9 @@ import jakarta.websocket.Session;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KamerFase;
 import nl.han.oose.buizerd.projectcheck_backend.event.Event;
@@ -32,7 +30,7 @@ public class KamerService {
 
 	@OnOpen
 	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") @KamerCode String kamerCode) throws IOException {
-		Optional<Kamer> kamer = dao.read(Kamer.class, kamerCode);
+		var kamer = dao.read(Kamer.class, kamerCode);
 		if (kamer.isEmpty() || kamer.get().getKamerFase() == KamerFase.GESLOTEN) {
 			session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer is gesloten of niet gevonden."));
 		}
@@ -45,9 +43,9 @@ public class KamerService {
 
 	@OnMessage
 	public void message(Event event, @PathParam("kamerCode") String kamerCode, Session session) throws IOException {
-		Optional<Kamer> kamer = dao.read(Kamer.class, kamerCode);
+		var kamer = dao.read(Kamer.class, kamerCode);
 		if (kamer.isPresent()) {
-			Optional<Deelnemer> deelnemer = kamer.get().getDeelnemer(event.getDeelnemerId());
+			var deelnemer = kamer.get().getDeelnemer(event.getDeelnemerId());
 
 			if (deelnemer.isPresent()) {
 				event.voerUit(dao, deelnemer.get(), session)

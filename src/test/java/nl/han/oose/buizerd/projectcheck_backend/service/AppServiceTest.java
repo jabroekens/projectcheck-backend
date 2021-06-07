@@ -48,11 +48,13 @@ class AppServiceTest {
 
 	@Test
 	void getKamerInfo_geeftJuisteJson() {
-		String kamerCode = "123456";
-		Long deelnemerId = 12L;
+		var kamerCode = "123456";
+		var deelnemerId = 12L;
+		var expected = "{\"kamerCode\":\"" + kamerCode + "\",\"deelnemerId\":" + deelnemerId + "}";
 
-		String expected = "{\"kamerCode\":\"" + kamerCode + "\",\"deelnemerId\":" + deelnemerId + "}";
-		assertEquals(expected, sut.getKamerInfo(kamerCode, deelnemerId));
+		var actual = sut.getKamerInfo(kamerCode, deelnemerId);
+
+		assertEquals(expected, actual);
 	}
 
 	/*
@@ -73,29 +75,27 @@ class AppServiceTest {
 	@Nested
 	class maakKamer {
 
+		private static final String BEGELEIDER_NAAM = "Joost";
+
 		@Test
 		void genereertCode() {
-			String begeleiderNaam = "Joost";
-
 			metGemockteResponseBuilder(() -> {
-				sut.maakKamer(begeleiderNaam);
+				sut.maakKamer(BEGELEIDER_NAAM);
 				verify(codeGenerator).genereerCode(anyInt());
 			});
 		}
 
 		@Test
 		void maaktBegeleiderAanMetJuisteWaardenEnSlaatKamerOp() {
-			String kamerCode = "123456";
-			String begeleiderNaam = "Joost";
-
+			var kamerCode = "123456";
 			ArgumentCaptor<Kamer> kamerCaptor = ArgumentCaptor.forClass(Kamer.class);
 
 			metGemockteResponseBuilder(() -> {
-				sut.maakKamer(begeleiderNaam);
+				sut.maakKamer(BEGELEIDER_NAAM);
 
 				verify(dao).create(kamerCaptor.capture());
 				assertNotNull(kamerCaptor.getValue().getBegeleider());
-				assertEquals(begeleiderNaam, kamerCaptor.getValue().getBegeleider().getNaam());
+				assertEquals(BEGELEIDER_NAAM, kamerCaptor.getValue().getBegeleider().getNaam());
 			});
 		}
 
@@ -104,14 +104,14 @@ class AppServiceTest {
 	@Nested
 	class neemDeel {
 
+		private static final String KAMER_CODE = "123456";
+		private static final String DEELNEMER_NAAM = "Joost";
+
 		@Test
 		void kamerAfwezig_gooitKamerNietGevondenException() {
-			String kamerCode = "123456";
-			String deelnemerNaam = "Joost";
-
-			when(dao.read(Kamer.class, kamerCode)).thenReturn(Optional.empty());
-			assertThrows(KamerNietGevondenException.class, () -> sut.neemDeel(kamerCode, deelnemerNaam));
-			verify(dao).read(Kamer.class, kamerCode);
+			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
+			assertThrows(KamerNietGevondenException.class, () -> sut.neemDeel(KAMER_CODE, DEELNEMER_NAAM));
+			verify(dao).read(Kamer.class, KAMER_CODE);
 		}
 
 		@Nested
@@ -122,34 +122,27 @@ class AppServiceTest {
 
 			@Test
 			void kamerOpen_voegtDeelnemerMetJuisteWaardenToe() {
-				String kamerCode = "123456";
-				String deelnemerNaam = "Joost";
-
-				ArgumentCaptor<Deelnemer> deelnemerCaptor = ArgumentCaptor.forClass(Deelnemer.class);
+				var deelnemerCaptor = ArgumentCaptor.forClass(Deelnemer.class);
 
 				metGemockteResponseBuilder(() -> {
-					when(dao.read(Kamer.class, kamerCode)).thenReturn(Optional.of(kamer));
+					when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
 					when(kamer.getKamerFase()).thenReturn(KamerFase.OPEN);
 
-					sut.neemDeel(kamerCode, deelnemerNaam);
+					sut.neemDeel(KAMER_CODE, DEELNEMER_NAAM);
 
 					verify(kamer).addDeelnemer(deelnemerCaptor.capture());
 					verify(dao).update(kamer);
-					assertEquals(deelnemerNaam, deelnemerCaptor.getValue().getNaam());
+					assertEquals(DEELNEMER_NAAM, deelnemerCaptor.getValue().getNaam());
 				});
 			}
 
 			@Test
 			void kamerNietOpen_gooitKamerGeslotenException(@Mock KamerFase kamerFase) {
-				String kamerCode = "123456";
-				String deelnemerNaam = "Joost";
-
-				when(dao.read(Kamer.class, kamerCode)).thenReturn(Optional.of(kamer));
+				when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
 				when(kamer.getKamerFase()).thenReturn(kamerFase);
 
-				assertThrows(KamerGeslotenException.class, () -> sut.neemDeel(kamerCode, deelnemerNaam));
-
-				verify(dao).read(Kamer.class, kamerCode);
+				assertThrows(KamerGeslotenException.class, () -> sut.neemDeel(KAMER_CODE, DEELNEMER_NAAM));
+				verify(dao).read(Kamer.class, KAMER_CODE);
 			}
 
 		}

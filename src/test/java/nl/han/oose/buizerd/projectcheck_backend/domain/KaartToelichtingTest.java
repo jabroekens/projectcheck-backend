@@ -10,10 +10,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class KaartToelichtingTest {
 
+	private static final String TOELICHTING = "testing";
+
 	@Mock
 	private Kaart kaart;
-
-	private static final String TOELICHTING = "testing";
 
 	private KaartToelichting kaartToelichting;
 

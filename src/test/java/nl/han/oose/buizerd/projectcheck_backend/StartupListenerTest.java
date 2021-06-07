@@ -13,11 +13,11 @@ import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 import nl.han.oose.buizerd.projectcheck_backend.domain.StandaardRol;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.verification.VerificationMode;
 
 @ExtendWith(MockitoExtension.class)
 class StartupListenerTest {
@@ -33,25 +33,33 @@ class StartupListenerTest {
 		sut.setDao(dao);
 	}
 
-	@Test
-	void contextInitialized_rollenBestaanNiet_slaatRollenOp(@Mock ServletContextEvent sce) {
-		when(dao.read(any(), anyString())).thenReturn(Optional.empty());
+	@Nested
+	class contextInitialized {
 
-		sut.contextInitialized(sce);
+		@Mock
+		private ServletContextEvent servletContextEvent;
 
-		VerificationMode times = times(StandaardRol.values().length);
-		verify(dao, times).read(any(), anyString());
-		verify(dao, times).create(any(Rol.class));
-	}
+		@Test
+		void rollenBestaanNiet_slaatRollenOp() {
+			when(dao.read(any(), anyString())).thenReturn(Optional.empty());
 
-	@Test
-	void contextInitialized_rollenBestaan_slaatRollenNietOp(@Mock ServletContextEvent sce, @Mock Rol rol) {
-		when(dao.read(any(), anyString())).thenReturn(Optional.of(rol));
+			sut.contextInitialized(servletContextEvent);
 
-		sut.contextInitialized(sce);
+			var times = times(StandaardRol.values().length);
+			verify(dao, times).read(any(), anyString());
+			verify(dao, times).create(any(Rol.class));
+		}
 
-		verify(dao, times(StandaardRol.values().length)).read(any(), anyString());
-		verifyNoMoreInteractions(dao);
+		@Test
+		void rollenBestaan_slaatRollenNietOp(@Mock Rol rol) {
+			when(dao.read(any(), anyString())).thenReturn(Optional.of(rol));
+
+			sut.contextInitialized(servletContextEvent);
+
+			verify(dao, times(StandaardRol.values().length)).read(any(), anyString());
+			verifyNoMoreInteractions(dao);
+		}
+
 	}
 
 }

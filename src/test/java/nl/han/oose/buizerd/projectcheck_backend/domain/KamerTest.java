@@ -56,13 +56,12 @@ class KamerTest {
 
 	@Test
 	void getDeelnemers_geeftJuisteWaardenEnVerbiedtToevoegenEnVerwijderen() {
+		var expected = Set.<Deelnemer>of(begeleider);
 
-		Set<Deelnemer> expected = Set.of(begeleider);
-		Set<Deelnemer> actual = sut.getDeelnemers();
+		var actual = sut.getDeelnemers();
 
 		// Eerst controleren of ze gelijk zijn, anders riskeer je een NPE bij de andere assertions
 		assertIterableEquals(expected, actual);
-
 		assertAll(
 			() -> assertThrows(UnsupportedOperationException.class, () -> actual.add(null)),
 			() -> assertThrows(UnsupportedOperationException.class, () -> actual.remove(null))
@@ -71,30 +70,30 @@ class KamerTest {
 
 	@Test
 	void getDeelnemer_geeftJuisteWaarde(@Mock DeelnemerId deelnemerId) {
+		var expected = Optional.of(begeleider);
 		when(begeleider.getDeelnemerId()).thenReturn(deelnemerId);
-		assertEquals(Optional.of(begeleider), sut.getDeelnemer(begeleider.getDeelnemerId()));
+
+		var actual = sut.getDeelnemer(begeleider.getDeelnemerId());
+
+		assertEquals(expected, actual);
 	}
 
 	@Test
 	void genereerDeelnemerId_geeftJuisteWaarde(@Mock Deelnemer deelnemer) {
-		//Arrange
 		for (long expected = 2L; expected < 4L; expected++) {
-			//Act
-			Long actual = sut.genereerDeelnemerId();
+			var actual = sut.genereerDeelnemerId();
 			sut.addDeelnemer(deelnemer);
-
-			//Assert
 			assertEquals(expected, actual);
 		}
 	}
 
 	@Test
 	void getRelevanteRollen_geeftJuisteWaarden() {
-		Set<Rol> expected = Set.of();
-		Set<Rol> actual = sut.getRelevanteRollen();
+		var expected = Set.<Rol>of();
+
+		var actual = sut.getRelevanteRollen();
 
 		assertIterableEquals(expected, actual);
-
 		assertAll(
 			() -> assertThrows(UnsupportedOperationException.class, () -> actual.add(null)),
 			() -> assertThrows(UnsupportedOperationException.class, () -> actual.remove(null))
@@ -103,9 +102,12 @@ class KamerTest {
 
 	@Test
 	void setRelevanteRollen_zetEnGeeftJuisteWaarden() {
-		Set<Rol> expected = spy(new HashSet<>());
+		var expected = spy(new HashSet<Rol>());
+
 		sut.setRelevanteRollen(expected);
-		assertIterableEquals(expected, sut.getRelevanteRollen());
+		var actual = sut.getRelevanteRollen();
+
+		assertIterableEquals(expected, actual);
 	}
 
 	@Test

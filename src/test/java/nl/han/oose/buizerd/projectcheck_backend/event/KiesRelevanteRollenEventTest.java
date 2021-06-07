@@ -11,7 +11,6 @@ import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,13 +25,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class KiesRelevanteRollenEventTest {
 
 	@Spy
-	Set<Rol> relevanteRollen;
+	private Set<Rol> relevanteRollen = new HashSet<>();
 
 	private KiesRelevanteRollenEvent sut;
 
 	@BeforeEach
 	void setUp() {
-		relevanteRollen = new HashSet<>();
 		sut = new KiesRelevanteRollenEvent();
 		sut.relevanteRollen = relevanteRollen;
 	}
@@ -53,31 +51,25 @@ class KiesRelevanteRollenEventTest {
 		void deelnemerIsBegeleider_activeertRelevanteRollenEnGeeftJuisteEventResponseTerug(
 			@Mock Begeleider begeleider, @Mock Kamer kamer
 		) {
-			// Arrange
 			when(begeleider.getKamer()).thenReturn(kamer);
 
-			// Act
-			EventResponse response = sut.voerUit(begeleider, session);
+			var eventResponse = sut.voerUit(begeleider, session);
 
-			// Assert
 			assertAll(
 				() -> verify(kamer).setRelevanteRollen(relevanteRollen),
-				() -> assertEquals(EventResponse.Status.OK, response.getStatus())
+				() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus())
 			);
 		}
 
 		@Test
 		void deelnemerIsNietBegeleider_geeftJuisteEventResponseTerug(@Mock Deelnemer deelnemer) {
-			// Arrange
-			DeelnemerId expected = deelnemer.getDeelnemerId();
+			var expected = deelnemer.getDeelnemerId();
 
-			// Act
-			EventResponse response = sut.voerUit(deelnemer, session);
+			var eventResponse = sut.voerUit(deelnemer, session);
 
-			// Assert
 			assertAll(
-				() -> assertEquals(EventResponse.Status.VERBODEN, response.getStatus()),
-				() -> assertEquals(expected, response.getContext().get("deelnemer"))
+				() -> assertEquals(EventResponse.Status.VERBODEN, eventResponse.getStatus()),
+				() -> assertEquals(expected, eventResponse.getContext().get("deelnemer"))
 			);
 		}
 

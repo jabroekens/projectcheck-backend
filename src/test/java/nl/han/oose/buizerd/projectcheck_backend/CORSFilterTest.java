@@ -29,7 +29,9 @@ class CORSFilterTest {
 		@Mock MultivaluedMap<String, Object> headers
 	) {
 		when(responseContext.getHeaders()).thenReturn(headers);
+
 		sut.filter(requestContext, responseContext);
+
 		verify(responseContext.getHeaders()).add("Access-Control-Allow-Origin", "*");
 		verify(responseContext.getHeaders()).add("Access-Control-Allow-Methods", "GET, POST, HEAD");
 	}

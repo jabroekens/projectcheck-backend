@@ -53,6 +53,7 @@ public class EventResponse {
 
 	/**
 	 * Voegt {@code waarde} toe aan de context onder {@code sleutel}.
+	 *
 	 * @return zichzelf
 	 */
 	public EventResponse metContext(String sleutel, Object waarde) {
@@ -70,6 +71,7 @@ public class EventResponse {
 
 	/**
 	 * Zet de event waarop antwoord wordt gegeven.
+	 *
 	 * @return zichzelf
 	 */
 	public EventResponse antwoordOp(Event event) {
@@ -83,6 +85,7 @@ public class EventResponse {
 
 	/**
 	 * Markeert dat dit {@link EventResponse} naar alle clients gestuurd moet worden.
+	 *
 	 * @return zichzelf
 	 */
 	public EventResponse stuurNaarAlleClients() {

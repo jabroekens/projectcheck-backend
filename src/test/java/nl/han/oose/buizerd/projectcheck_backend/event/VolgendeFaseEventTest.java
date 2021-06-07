@@ -47,11 +47,11 @@ class VolgendeFaseEventTest {
 			when(begeleider.getKamer()).thenReturn(kamer);
 			when(kamer.getKamerFase()).thenReturn(kamerFase);
 
-			EventResponse eventResponse = sut.voerUit(begeleider, session);
+			var eventResponse = sut.voerUit(begeleider, session);
 
 			assertAll(
 				() -> {
-					KamerFase expectedKamerFase = verify(kamerFase).getVolgendeFase();
+					var expectedKamerFase = verify(kamerFase).getVolgendeFase();
 					verify(kamer).setKamerFase(expectedKamerFase);
 				},
 				() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),
