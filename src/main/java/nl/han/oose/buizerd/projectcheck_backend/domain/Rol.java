@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Een rol wordt vertegenwoordigd door een {@link Deelnemer}.
  * <p>
- * Elke rol heeft een naam.
+ * Elke rol heeft een naam en een beschrijving.
  */
 @Entity
 public class Rol {
@@ -22,6 +22,10 @@ public class Rol {
 	@NotEmpty
 	@Id
 	private String rolNaam;
+
+	@Expose
+	@NotEmpty
+	private String beschrijving;
 
 	@OneToMany(mappedBy = "rol", fetch = FetchType.EAGER)
 	private Set<KaartenSet> kaartenSets = new HashSet<>();
@@ -34,12 +38,17 @@ public class Rol {
 	}
 
 	@ValidateOnExecution
-	public Rol(@NotEmpty String rolNaam) {
+	public Rol(@NotEmpty String rolNaam, @NotEmpty String beschrijving) {
 		this.rolNaam = rolNaam;
+		this.beschrijving = beschrijving;
 	}
 
 	public String getRolNaam() {
 		return rolNaam;
+	}
+
+	public String getBeschrijving() {
+		return beschrijving;
 	}
 
 	public Set<KaartenSet> getKaartenSets() {
