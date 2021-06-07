@@ -52,7 +52,7 @@ public class HighlightKaartEventTest {
 		String actualToelichting = kaartUitAntwoord.getToelichting();
 		//Assert
 		Assertions.assertEquals(expectedToelichting, actualToelichting);
-		Assertions.assertEquals(expectedToelichting, ronde.getGehighlighteKaart().getToelichting());
+		Assertions.assertEquals(expectedToelichting, ronde.getGehighlighteKaart().get().getToelichting());
 
 	}
 

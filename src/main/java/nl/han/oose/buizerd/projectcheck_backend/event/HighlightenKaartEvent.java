@@ -17,9 +17,13 @@ public class HighlightenKaartEvent extends Event {
 	@Override
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
 		Kamer huidigeKamer = deelnemer.getKamer();
-		Ronde huidigeRonde = huidigeKamer.getHuidigeRonde(); // voor testen: Ronde huidigeRonde = new Ronde();
-		huidigeRonde.setGehighlighteKaart(kaartToelichting);
-		return new EventResponse(EventResponse.Status.OK).antwoordOp(this).metContext("gehighlighteKaart", kaartToelichting).stuurNaarAlleClients();
+		Ronde huidigeRonde = huidigeKamer.getHuidigeRonde();
+		if (!huidigeRonde.getGehighlighteKaart().isPresent()) {
+			huidigeRonde.setGehighlighteKaart(kaartToelichting);
+			return new EventResponse(EventResponse.Status.OK).antwoordOp(this).metContext("gehighlighteKaart", kaartToelichting).stuurNaarAlleClients();
+		}
+		else return new EventResponse(EventResponse.Status.VERBODEN);
 	}
+
 
 }

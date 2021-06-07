@@ -1,6 +1,8 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import jakarta.websocket.Session;
+import java.util.Optional;
+import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kaart;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KaartToelichting;
@@ -27,7 +29,7 @@ public class HighlightVolgendeKaartEventTest {
 	void setup() {
 		session = Mockito.mock(Session.class);
 		kamer = Mockito.mock(Kamer.class);
-		deelnemer = Mockito.mock(Deelnemer.class);
+		deelnemer = Mockito.mock(Begeleider.class);
 		kaart = Mockito.mock(Kaart.class);
 		ronde = new Ronde();
 
@@ -55,7 +57,7 @@ public class HighlightVolgendeKaartEventTest {
 		highlightVolgendeKaartEvent.voerUit(deelnemer, session);
 
 		//Assert
-		Assertions.assertNull(ronde.getGehighlighteKaart());
+		Assertions.assertEquals(Optional.empty(), ronde.getGehighlighteKaart());
 
 	}
 

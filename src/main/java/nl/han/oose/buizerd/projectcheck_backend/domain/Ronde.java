@@ -1,24 +1,22 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import jakarta.persistence.Transient;
+import java.util.Optional;
 
-public  class Ronde {
+public class Ronde {
+
 	@Transient
-	KaartToelichting gehighlighteKaart;
+	private KaartToelichting gehighlighteKaart;
 
 
-	public void setGehighlighteKaart(KaartToelichting kaartOmTeHighlighten){
+	public void setGehighlighteKaart(KaartToelichting kaartOmTeHighlighten) {
 		this.gehighlighteKaart = kaartOmTeHighlighten;
 
-
-	}
-	public KaartToelichting getGehighlighteKaart(){
-		return this.gehighlighteKaart;
-
 	}
 
+	public Optional<KaartToelichting> getGehighlighteKaart() {
+		return Optional.ofNullable(this.gehighlighteKaart);
 
-
-
+	}
 
 }

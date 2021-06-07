@@ -1,18 +1,14 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import com.google.gson.annotations.Expose;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
-import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**
@@ -39,8 +35,6 @@ public class Deelnemer {
 	@Valid
 	@EmbeddedId
 	private DeelnemerId deelnemerId;
-
-
 
 	@Expose
 	@Valid

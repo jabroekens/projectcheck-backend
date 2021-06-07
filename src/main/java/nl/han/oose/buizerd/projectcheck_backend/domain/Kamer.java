@@ -174,9 +174,9 @@ public class Kamer {
 	 */
 	public Begeleider getBegeleider() {
 		Optional<Begeleider> begeleider = deelnemers.stream()
-		                                            .filter(Begeleider.class::isInstance)
-		                                            .map(Begeleider.class::cast)
-		                                            .findAny();
+													.filter(Begeleider.class::isInstance)
+													.map(Begeleider.class::cast)
+													.findAny();
 
 		if (begeleider.isEmpty()) {
 			/*
@@ -253,5 +253,8 @@ public class Kamer {
 		relevanteRollen = rollen;
 	}
 
-	public Ronde getHuidigeRonde(){return  huidigeRonde;}
+	public Ronde getHuidigeRonde() {
+		return huidigeRonde;
+	}
+
 }
