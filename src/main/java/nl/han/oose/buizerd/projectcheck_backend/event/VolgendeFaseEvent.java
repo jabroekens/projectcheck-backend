@@ -21,7 +21,7 @@ public class VolgendeFaseEvent extends Event {
 		if (deelnemer instanceof Begeleider) {
 			Kamer kamer = deelnemer.getKamer();
 			KamerFase kamerFase = kamer.getKamerFase();
-			deelnemer.getKamer().setKamerFase(kamerFase.volgendeFase());
+			deelnemer.getKamer().setKamerFase(kamerFase.getVolgendeFase());
 
 			return new EventResponse(EventResponse.Status.OK).metContext("volgendeFase", kamer.getKamerFase());
 		}

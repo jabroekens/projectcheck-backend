@@ -11,12 +11,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
 @Min(1)
 @Max(Kamer.KAMER_CODE_MAX)
 @Constraint(validatedBy = {})
-@Documented
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
 public @interface KamerCode {
 
 	String message() default "{nl.han.oose.buizerd.projectcheck_backend.KamerCode.message}";

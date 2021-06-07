@@ -1,14 +1,8 @@
 package nl.han.oose.buizerd.projectcheck_backend.dao;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.executable.ValidateOnExecution;
 import java.io.Serializable;
 import java.util.Optional;
 
-/**
- * Een DAO volgens het DAO pattern.
- */
 public interface DAO {
 
 	/**
@@ -17,8 +11,7 @@ public interface DAO {
 	 * @param t de entiteit die opgeslagen moet worden
 	 * @param <T> het type van de entiteit
 	 */
-	@ValidateOnExecution
-	<T> void create(@NotNull @Valid T t);
+	<T> void create(T t);
 
 	/**
 	 * Haalt een entiteit {@link T} op met de primaire sleutel {@code k}.
@@ -32,8 +25,7 @@ public interface DAO {
 	 *         als er geen entiteit van het type {@link T} is gevonden
 	 *         met de primaire sleutel {@code k}
 	 */
-	@ValidateOnExecution
-	<T, K extends Serializable> Optional<@Valid T> read(@NotNull Class<T> klasseType, @NotNull @Valid K k);
+	<T, K extends Serializable> Optional<T> read(Class<T> klasseType, K k);
 
 	/**
 	 * Updatet de opgeslagen staat van de entiteit {@code t}.
@@ -41,8 +33,7 @@ public interface DAO {
 	 * @param t de entiteit die geüpdatet moet worden
 	 * @param <T> het type van de entiteit
 	 */
-	@ValidateOnExecution
-	<T> T update(@NotNull @Valid T t);
+	<T> T update(T t);
 
 	/**
 	 * Verwijdert de entiteit {@code t}.
@@ -50,7 +41,6 @@ public interface DAO {
 	 * @param t de entiteit die verwijdert moet worden
 	 * @param <T> het type van de entiteit
 	 */
-	@ValidateOnExecution
-	<T> void delete(@NotNull @Valid T t);
+	<T> void delete(T t);
 
 }

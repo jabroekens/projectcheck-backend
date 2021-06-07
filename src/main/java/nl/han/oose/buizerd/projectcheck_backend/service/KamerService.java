@@ -25,18 +25,11 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode
 @ServerEndpoint(value = "/kamer/{kamerCode}", decoders = {Event.Decoder.class})
 public class KamerService {
 
-	// package-private zodat het getest kan worden.
-	static Logger logger;
-
-	static {
-		logger = Logger.getLogger(KamerService.class.getName());
-	}
+	// Package-private zodat het getest kan worden
+	static Logger logger = Logger.getLogger(KamerService.class.getName());
 
 	private DAO dao;
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@OnOpen
 	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") @KamerCode String kamerCode) throws IOException {
 		Optional<Kamer> kamer = dao.read(Kamer.class, kamerCode);
@@ -45,17 +38,11 @@ public class KamerService {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@OnClose
 	public void close(Session session, CloseReason closeReason, @PathParam("kamerCode") String kamerCode) {
 		// XXX Behandelen als iemand (onverwachts) een kamer verlaat, bijv.
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@OnMessage
 	public void message(Event event, @PathParam("kamerCode") String kamerCode, Session session) throws IOException {
 		Optional<Kamer> kamer = dao.read(Kamer.class, kamerCode);
@@ -96,9 +83,6 @@ public class KamerService {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@OnError
 	public void error(Session session, Throwable error, @PathParam("kamerCode") String kamerCode) {
 		if (error.getCause() != null) {

@@ -13,9 +13,9 @@ class KamerFaseTest {
 	@EnumSource(KamerFase.class)
 	void volgendeFase_geeftVolgendeFaseEnGooitNoSuchElementExceptionBijLaatsteFase(KamerFase kamerFase) {
 		if (kamerFase.ordinal() == KamerFase.values().length - 1) {
-			assertThrows(NoSuchElementException.class, kamerFase::volgendeFase);
+			assertThrows(NoSuchElementException.class, kamerFase::getVolgendeFase);
 		} else {
-			KamerFase volgendeFase = kamerFase.volgendeFase();
+			KamerFase volgendeFase = kamerFase.getVolgendeFase();
 			assertEquals(KamerFase.values()[kamerFase.ordinal() + 1], volgendeFase);
 		}
 	}

@@ -122,7 +122,7 @@ ChatEvent.java
 ```
 public class ChatEvent extends Event {
 
-	// package-private zodat het getest kan worden.
+	// Package-private zodat het getest kan worden
 	@NotNull
 	String woord;
 

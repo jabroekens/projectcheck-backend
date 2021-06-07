@@ -48,8 +48,8 @@ class KamerServiceTest {
 
 	@BeforeAll
 	static void setUpAll() {
-		KamerServiceTest.logger = mock(Logger.class);
-		KamerService.logger = KamerServiceTest.logger;
+		logger = mock(Logger.class);
+		KamerService.logger = logger;
 	}
 
 	@Mock
@@ -76,9 +76,9 @@ class KamerServiceTest {
 			CloseReason closeReason = new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer is gesloten of niet gevonden.");
 			ArgumentCaptor<CloseReason> closeReasonCaptor = ArgumentCaptor.forClass(CloseReason.class);
 
-			sut.open(session, config, KamerServiceTest.KAMER_CODE);
+			sut.open(session, config, KAMER_CODE);
 
-			verify(dao).read(Kamer.class, KamerServiceTest.KAMER_CODE);
+			verify(dao).read(Kamer.class, KAMER_CODE);
 			verify(session).close(closeReasonCaptor.capture());
 
 			/*
@@ -93,13 +93,13 @@ class KamerServiceTest {
 
 		@Test
 		void kamerAfwezig_sluitVerbindingMetReden() throws IOException {
-			when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.empty());
+			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
 			sluitVerbindingMetReden();
 		}
 
 		@Test
 		void kamerAanwezig_kamerFaseGesloten_sluitVerbindingMetReden(@Mock Kamer kamer) throws IOException {
-			when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.of(kamer));
+			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
 			when(kamer.getKamerFase()).thenReturn(KamerFase.GESLOTEN);
 			sluitVerbindingMetReden();
 		}
@@ -117,18 +117,18 @@ class KamerServiceTest {
 
 		@AfterEach
 		void tearDown() {
-			verify(dao).read(Kamer.class, KamerServiceTest.KAMER_CODE);
+			verify(dao).read(Kamer.class, KAMER_CODE);
 		}
 
 		@Test
 		void kamerAfwezig_stuurtEventResponse(@Mock RemoteEndpoint.Basic remote) throws IOException {
 			EventResponse eventResponse = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
-				.metContext("kamerCode", KamerServiceTest.KAMER_CODE).antwoordOp(event);
+				.metContext("kamerCode", KAMER_CODE).antwoordOp(event);
 
-			when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.empty());
+			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
 			when(session.getBasicRemote()).thenReturn(remote);
 
-			sut.message(event, KamerServiceTest.KAMER_CODE, session);
+			sut.message(event, KAMER_CODE, session);
 
 			verify(remote).sendText(eventResponse.asJson());
 		}
@@ -137,11 +137,11 @@ class KamerServiceTest {
 		void kamerAanwezig_deelnemerAfwezig_stuurtEventResponse(@Mock Kamer kamer, @Mock RemoteEndpoint.Basic remote) throws IOException {
 			EventResponse eventResponse = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
 
-			when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.of(kamer));
+			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
 			when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.empty());
 			when(session.getBasicRemote()).thenReturn(remote);
 
-			sut.message(event, KamerServiceTest.KAMER_CODE, session);
+			sut.message(event, KAMER_CODE, session);
 
 			verify(kamer).getDeelnemer(event.getDeelnemerId());
 			verify(remote).sendText(eventResponse.asJson());
@@ -155,14 +155,14 @@ class KamerServiceTest {
 
 			@BeforeEach
 			void setUp(@Mock Kamer kamer) {
-				when(dao.read(Kamer.class, KamerServiceTest.KAMER_CODE)).thenReturn(Optional.of(kamer));
+				when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
 				when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
 			}
 
 			@Test
 			void voertEventUit_logtBijException(@Mock Throwable throwable, @Mock EventResponse eventResponse) throws IOException {
 				when(event.voerUit(dao, deelnemer, session)).thenReturn(CompletableFuture.failedStage(new RuntimeException()));
-				sut.message(event, KamerServiceTest.KAMER_CODE, session);
+				sut.message(event, KAMER_CODE, session);
 			}
 
 			@Test
@@ -180,7 +180,7 @@ class KamerServiceTest {
 					when(s.getAsyncRemote()).thenReturn(remoteEndpoint);
 				});
 
-				sut.message(event, KamerServiceTest.KAMER_CODE, session);
+				sut.message(event, KAMER_CODE, session);
 
 				verify(remoteEndpoint, times(2)).sendText(eventResponse.asJson());
 			}
@@ -195,7 +195,7 @@ class KamerServiceTest {
 				when(session.isOpen()).thenReturn(true);
 				when(session.getAsyncRemote()).thenReturn(remoteEndpoint);
 
-				sut.message(event, KamerServiceTest.KAMER_CODE, session);
+				sut.message(event, KAMER_CODE, session);
 
 				verify(remoteEndpoint).sendText(eventResponse.asJson());
 				verifyNoMoreInteractions(session);
@@ -207,7 +207,7 @@ class KamerServiceTest {
 				when(eventResponse.isStuurNaarAlleClients()).thenReturn(false);
 				when(session.isOpen()).thenReturn(false);
 
-				sut.message(event, KamerServiceTest.KAMER_CODE, session);
+				sut.message(event, KAMER_CODE, session);
 
 				verifyNoMoreInteractions(session);
 			}
@@ -227,14 +227,14 @@ class KamerServiceTest {
 
 		@Test
 		void paktExceptionUitAlsDezeNietNullIs(@Mock Throwable error) {
-			sut.error(session, new Throwable(error), KamerServiceTest.KAMER_CODE);
-			verify(KamerServiceTest.logger).log(any(), any(), eq(error));
+			sut.error(session, new Throwable(error), KAMER_CODE);
+			verify(logger).log(any(), any(), eq(error));
 		}
 
 		@Test
 		void logtBijThrowablesAndersDanIllegalArgumentException(@Mock Throwable error) {
-			sut.error(session, error, KamerServiceTest.KAMER_CODE);
-			verify(KamerServiceTest.logger).log(Level.SEVERE, error.getMessage(), error);
+			sut.error(session, error, KAMER_CODE);
+			verify(logger).log(Level.SEVERE, error.getMessage(), error);
 		}
 
 		@Nested
@@ -248,7 +248,7 @@ class KamerServiceTest {
 				when(session.getBasicRemote()).thenReturn(remoteEndpoint);
 				EventResponse eventResponse = new EventResponse(EventResponse.Status.INVALIDE);
 
-				sut.error(session, error, KamerServiceTest.KAMER_CODE);
+				sut.error(session, error, KAMER_CODE);
 
 				verify(remoteEndpoint).sendText(eventResponse.asJson());
 			}
@@ -258,8 +258,8 @@ class KamerServiceTest {
 				when(session.getBasicRemote()).thenReturn(remoteEndpoint);
 				doThrow(error).when(remoteEndpoint).sendText(anyString());
 
-				sut.error(session, error, KamerServiceTest.KAMER_CODE);
-				verify(KamerServiceTest.logger).log(Level.SEVERE, error.getMessage(), error);
+				sut.error(session, error, KAMER_CODE);
+				verify(logger).log(Level.SEVERE, error.getMessage(), error);
 			}
 
 		}

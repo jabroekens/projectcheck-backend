@@ -55,7 +55,10 @@ class KiesRelevanteRollenEventTest {
 		) {
 			// Arrange
 			when(begeleider.getKamer()).thenReturn(kamer);
-			String expected = String.format("de rollen %s zijn ingeschakeld voor de kamer %s", relevanteRollen, begeleider.getKamer().getKamerCode());
+			String expected = String.format(
+				"de rollen %s zijn ingeschakeld voor de kamer %s",
+				relevanteRollen, begeleider.getKamer().getKamerCode()
+			);
 
 			// Act
 			EventResponse response = sut.voerUit(begeleider, session);

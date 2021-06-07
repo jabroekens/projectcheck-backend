@@ -21,10 +21,12 @@ import java.util.concurrent.ThreadLocalRandom;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
 /**
- * Een kamer is een uitvoering van De ProjectCheck waar deelnemers zich aan bij kunnen
- * sluiten doormiddel van een unieke code.
+ * Een kamer is een uitvoering van De ProjectCheck waar deelnemers zich
+ * aan bij kunnen sluiten doormiddel van een unieke code.
  * <p>
- * Elke kamer wordt begeleid door een begeleider.
+ * Elke kamer wordt begeleid door een begeleider en heeft een aantal
+ * relevante rollen die vertegenwoordigd kunnen worden door de
+ * deelnemers.
  */
 @Entity
 public class Kamer {
@@ -33,30 +35,19 @@ public class Kamer {
 	public static final int KAMER_CODE_MAX = 999999;
 
 	/**
-	 * Genereert een unieke code.
-	 *
-	 * @return Een unieke code.
-	 * @see java.util.concurrent.ThreadLocalRandom#nextInt(int)
+	 * Genereert een unieke kamercode.
 	 */
 	@ValidateOnExecution
 	public static @KamerCode
 	String genereerCode() {
-		return String.valueOf(ThreadLocalRandom.current().nextInt(Kamer.KAMER_CODE_MAX + 1));
+		return String.valueOf(ThreadLocalRandom.current().nextInt(KAMER_CODE_MAX + 1));
 	}
 
-	/**
-	 * De unieke code waarmee deelnemers kunnen deelnemen aan de kamer.
-	 * Een unieke code kan niet aangepast worden.
-	 */
 	@KamerCode
 	@Id
 	@Column(nullable = false, updatable = false)
 	private String kamerCode;
 
-	/**
-	 * De datum waarop de kamer is aangemaakt.
-	 * Een datum kan niet aangepast worden.
-	 */
 	@NotNull
 	@PastOrPresent
 	@Column(nullable = false, updatable = false)
@@ -64,114 +55,57 @@ public class Kamer {
 
 	@NotNull
 	@Valid
+	@Column(nullable = false)
 	private KamerFase kamerFase;
 
 	@Transient
 	private Ronde huidigeRonde;
 
-	/**
-	 * De rollen die in de kamer ingeschakeld zijn.
-	 */
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
 	private Set<@NotNull @Valid Rol> relevanteRollen;
 
-	/**
-	 * De deelnemers van de kamer.
-	 */
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "kamer", orphanRemoval = true)
 	private Set<@NotNull @Valid Deelnemer> deelnemers;
 
 	/**
-	 * Construeert een {@link Kamer}.
-	 * <p>
-	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
-	public Kamer() {
+	@Deprecated
+	protected Kamer() {
 	}
 
 	/**
-	 * Construeert een {@link Kamer} onder begeleiding van een {@link Begeleider}.
-	 *
-	 * @param kamerCode De code van de kamer.
-	 * @param begeleider De begeleider die de kamer begeleidt.
+	 * Construeert een {@link Kamer} in de fase {@link KamerFase#SETUP}.
 	 */
 	@ValidateOnExecution
 	public Kamer(@KamerCode String kamerCode, @NotNull @Valid Begeleider begeleider) {
-		// Dit is een uitzondering op de comment bij `Kamer#Kamer(String, LocalDateTime, KamerFase, Begeleider, Set, Set)`
-		this(kamerCode, LocalDateTime.now(), KamerFase.SETUP, begeleider, new HashSet<>(), new HashSet<>());
-	}
-
-	/**
-	 * Construeert een {@link Kamer} met een specifieke kamercode, datum, en set van deelnemers.
-	 * <p>
-	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
-	 *
-	 * @param kamerCode De code van de kamer.
-	 * @param datum De datum waarop de kamer gemaakt is.
-	 * @param kamerFase De status van de kamer.
-	 * @param begeleider De begeleider van de kamer.
-	 * @param deelnemers Een set van deelnemers van de kamer.
-	 * @param relevanteRollen Een set van ingeschakelde rollen van de kamer.
-	 */
-	Kamer(
-		String kamerCode,
-		LocalDateTime datum,
-		KamerFase kamerFase,
-		Begeleider begeleider,
-		Set<Deelnemer> deelnemers,
-		Set<Rol> relevanteRollen
-	) {
 		this.kamerCode = kamerCode;
-		this.datum = datum;
-		this.kamerFase = kamerFase;
-		this.deelnemers = deelnemers;
-		this.relevanteRollen = relevanteRollen;
+
+		datum = LocalDateTime.now();
+		kamerFase = KamerFase.SETUP;
+		relevanteRollen = new HashSet<>();
+		deelnemers = new HashSet<>();
 
 		voegDeelnemerToe(begeleider);
 	}
 
-	/**
-	 * Haal de unieke code van de kamer op.
-	 *
-	 * @return De unieke code van de kamer.
-	 */
 	public String getKamerCode() {
 		return kamerCode;
 	}
 
-	/**
-	 * Haal de datum waarop de kamer is aangemaakt op.
-	 *
-	 * @return De datum waarop de kamer is aangemaakt.
-	 */
 	public LocalDateTime getDatum() {
 		return datum;
 	}
 
-	/**
-	 * Haal de fase waarin de kamer zich verkeert op.
-	 *
-	 * @return De fase waarin de kamer zich verkeert.
-	 */
 	public KamerFase getKamerFase() {
 		return kamerFase;
 	}
 
-	/**
-	 * Zet de fase waarin de kamer zich verkeert.
-	 *
-	 * @param kamerFase De {@link KamerFase} waarin de kamer zich verkeert.
-	 */
 	@ValidateOnExecution
 	public void setKamerFase(@NotNull @Valid KamerFase kamerFase) {
 		this.kamerFase = kamerFase;
 	}
 
-	/**
-	 * Haal de {@link Begeleider} van de kamer op.
-	 *
-	 * @return De begeleider van de kamer.
-	 */
 	public Begeleider getBegeleider() {
 		Optional<Begeleider> begeleider = deelnemers.stream()
 													.filter(Begeleider.class::isInstance)
@@ -193,17 +127,12 @@ public class Kamer {
 
 	/**
 	 * Haal een read-only kopie van de deelnemers van de kamer op.
-	 *
-	 * @return Een read-only kopie van de deelnemers van de kamer.
-	 * @see java.util.Collections#unmodifiableSet(Set)
+	 * @see Collections#unmodifiableSet(Set)
 	 */
 	public Set<Deelnemer> getDeelnemers() {
 		return Collections.unmodifiableSet(deelnemers);
 	}
 
-	/**
-	 * Haal de deelnemer op met {@link DeelnemerId} {@code deelnemerId}.
-	 */
 	@ValidateOnExecution
 	public Optional<Deelnemer> getDeelnemer(@NotNull @Valid DeelnemerId deelnemerId) {
 		return deelnemers.stream().filter(d -> d.getDeelnemerId().equals(deelnemerId)).findAny();
@@ -215,6 +144,8 @@ public class Kamer {
 	 * Om een kip-en-eiprobleem te voorkomen is het nodig dat de kamer <em>achteraf</em>
 	 * bij de {@link Deelnemer} gezet wordt. Zowel {@link Deelnemer} als {@link Kamer}
 	 * zijn namelijk niet geldig zonder elkaar.
+	 *
+	 * @see Deelnemer#setKamer(Kamer)
 	 */
 	@ValidateOnExecution
 	public void voegDeelnemerToe(@NotNull @Valid Deelnemer deelnemer) {
@@ -224,37 +155,27 @@ public class Kamer {
 
 	/**
 	 * Genereert een ID dat gebruikt wordt in {@link DeelnemerId}.
-	 *
-	 * @return Het ID dat gebruikt wordt in {@link DeelnemerId}.
 	 */
 	public Long genereerDeelnemerId() {
-		// Een begeleider heeft altijd het ID `1`, dus het ID van deelnemers begint vanaf `2`
 		return deelnemers.size() + 1L;
 	}
 
 	/**
-	 * Haal een read-only kopie op van de relevante rollen van de kamer.
-	 *
-	 * @return Een read-only kopie van de relevante rolen van de kamer.
-	 * @see java.util.Collections#unmodifiableSet(Set)
+	 * Haal een read-only kopie van de relevante rollen van de kamer op.
+	 * @see Collections#unmodifiableSet(Set)
 	 */
 	@ValidateOnExecution
 	public Set<Rol> getRelevanteRollen() {
 		return Collections.unmodifiableSet(relevanteRollen);
 	}
 
-	/**
-	 * Schakel een relevante rol in voor de kamer.
-	 *
-	 * @param rollen De relevante rollen die ingeschakelt moet worden.
-	 */
 	@ValidateOnExecution
 	public void activeerRelevanteRollen(@NotNull @Valid Set<Rol> rollen) {
 		relevanteRollen = rollen;
 	}
 
 	public Optional<Ronde> getHuidigeRonde() {
-		return Optional.of(huidigeRonde);
+		return Optional.ofNullable(huidigeRonde);
 	}
 
 }

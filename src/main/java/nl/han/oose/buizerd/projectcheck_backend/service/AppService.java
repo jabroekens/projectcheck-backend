@@ -28,8 +28,8 @@ public class AppService {
 
 	/**
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
-	 * @param begeleiderNaam De naam van de {@link Begeleider}.
-	 * @return Een JSON string met de WebSocket URL van de {@link Kamer} gewikkelt in {@link Response}.
+	 * @return een {@link Response OK Response} met daarin de kamercode van de aangemaakte kamer
+	 *         en het ID van de begeleider in JSON
 	 */
 	@Path("kamer/nieuw")
 	@POST
@@ -45,6 +45,10 @@ public class AppService {
 		return Response.ok(getKamerInfo(kamer.getKamerCode(), deelnemerId.getId())).build();
 	}
 
+	/**
+	 * Voegt een deelnemer met de naam {@code deelnemerNaam} toe aan de kamer met kamercode {@code kamerCode}
+	 * als de kamer bestaat en open is.
+	 */
 	@Path("kamer/neemdeel/{kamerCode}")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
@@ -70,6 +74,9 @@ public class AppService {
 		}
 	}
 
+	/**
+	 * @return een JSON-string met de waarden {@code kamerCode} en {@code delenemerId}
+	 */
 	public String getKamerInfo(String kamerCode, Long deelnemerId) {
 		JsonObject json = new JsonObject();
 		json.addProperty("kamerCode", kamerCode);

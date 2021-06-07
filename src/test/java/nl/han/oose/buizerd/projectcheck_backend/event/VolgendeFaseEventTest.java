@@ -51,7 +51,7 @@ class VolgendeFaseEventTest {
 
 			assertAll(
 				() -> {
-					KamerFase expectedKamerFase = verify(kamerFase).volgendeFase();
+					KamerFase expectedKamerFase = verify(kamerFase).getVolgendeFase();
 					verify(kamer).setKamerFase(expectedKamerFase);
 				},
 				() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),

@@ -19,17 +19,17 @@ class DeelnemerIdTest {
 
 	@BeforeEach
 	void setUp() {
-		sut = new DeelnemerId(DeelnemerIdTest.DEELNEMER_ID, DeelnemerIdTest.KAMER_CODE);
+		sut = new DeelnemerId(DEELNEMER_ID, KAMER_CODE);
 	}
 
 	@Test
 	void getId_geeftJuisteWaarde() {
-		assertEquals(DeelnemerIdTest.DEELNEMER_ID, sut.getId());
+		assertEquals(DEELNEMER_ID, sut.getId());
 	}
 
 	@Test
 	void getKamerCode_geeftJuisteWaarde() {
-		assertEquals(DeelnemerIdTest.KAMER_CODE, sut.getKamerCode());
+		assertEquals(KAMER_CODE, sut.getKamerCode());
 	}
 
 	@Test

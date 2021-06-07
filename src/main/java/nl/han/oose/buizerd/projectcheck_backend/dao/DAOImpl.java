@@ -6,39 +6,24 @@ import jakarta.transaction.Transactional;
 import java.io.Serializable;
 import java.util.Optional;
 
-/**
- * Een generieke implementatie van {@link DAO}
- */
 public class DAOImpl implements DAO {
 
 	private EntityManager entityManager;
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Transactional
 	public <T> void create(T t) {
 		entityManager.persist(t);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <T, K extends Serializable> Optional<T> read(Class<T> klasseType, K k) {
 		return Optional.ofNullable(entityManager.find(klasseType, k));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Transactional
 	public <T> T update(T t) {
 		return entityManager.merge(t);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Transactional
 	public <T> void delete(T t) {
 		entityManager.remove(t);

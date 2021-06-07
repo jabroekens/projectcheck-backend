@@ -5,12 +5,12 @@ class KamerNietGevondenExceptionTest extends ExceptionTest<KamerNietGevondenExce
 	private static final String KAMER_CODE = "123456";
 
 	public KamerNietGevondenExceptionTest() {
-		super("Kamer met kamercode {" + KamerNietGevondenExceptionTest.KAMER_CODE + "} is niet gevonden");
+		super("Kamer met kamercode {" + KAMER_CODE + "} is niet gevonden");
 	}
 
 	@Override
 	protected KamerNietGevondenException setUpImpl() {
-		return new KamerNietGevondenException(KamerNietGevondenExceptionTest.KAMER_CODE);
+		return new KamerNietGevondenException(KAMER_CODE);
 	}
 
 }

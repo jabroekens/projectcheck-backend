@@ -5,66 +5,43 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.executable.ValidateOnExecution;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Een rol is een set van rechten die een {@link Deelnemer} aangewezen kan krijgen of kan kiezen binnen een {@link Kamer}.
+ * Een rol wordt vertegenwoordigd door een {@link Deelnemer}.
  * <p>
  * Elke rol heeft een naam.
  */
 @Entity
 public class Rol {
 
-	/**
-	 * De naam van de rol.
-	 */
 	@Expose
-	@NotNull
+	@NotEmpty
 	@Id
 	private String rolNaam;
 
-	/**
-	 * Alle {@link KaartenSet}'s die bij deze rol horen.
-	 */
 	@OneToMany(mappedBy = "rol", fetch = FetchType.EAGER)
-	private Set<KaartenSet> kaartenSets;
+	private Set<KaartenSet> kaartenSets = new HashSet<>();
 
 	/**
-	 * Construeert een {@link Rol}.
-	 * <p>
-	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
-	public Rol() {
+	@Deprecated
+	protected Rol() {
 	}
 
-	/**
-	 * Construeert een {@link Rol}.
-	 *
-	 * @param rolNaam De naam van de rol.
-	 */
 	@ValidateOnExecution
-	public Rol(@NotNull String rolNaam) {
+	public Rol(@NotEmpty String rolNaam) {
 		this.rolNaam = rolNaam;
-		this.kaartenSets = new HashSet<>();
 	}
 
-	/**
-	 * Haal de naam van de rol op.
-	 *
-	 * @return De naam van de rol.
-	 */
 	public String getRolNaam() {
 		return rolNaam;
 	}
 
-	/**
-	 * Geeft de kaartenset die bij de rol past terug.
-	 *
-	 * @return De kaartensets.
-	 */
 	public Set<KaartenSet> getKaartenSets() {
 		return kaartenSets;
 	}

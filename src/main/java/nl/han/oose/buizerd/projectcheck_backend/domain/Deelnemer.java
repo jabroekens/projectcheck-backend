@@ -43,75 +43,45 @@ public class Deelnemer {
 	private DeelnemerId deelnemerId;
 
 	@Expose
-	@Valid
 	@ManyToOne
 	private Rol rol;
 
-	/**
-	 * De naam van de deelnemer.
-	 */
 	@Expose
 	@Naam
 	@Column(nullable = false)
 	private String naam;
 
-	/**
-	 * De {@link Kamer} waaraan de deelnemer deelneemt.
-	 */
 	@ManyToOne(optional = false)
 	@MapsId("kamerCode")
 	private Kamer kamer;
 
 	/**
-	 * Construeert een {@link Deelnemer}.
-	 * <p>
-	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
-	public Deelnemer() {
+	@Deprecated
+	protected Deelnemer() {
 	}
 
-	/**
-	 * Construeert een {@link Deelnemer}.
-	 *
-	 * @param deelnemerId De {@link DeelnemerId} die de deelnemer identificeert.
-	 * @param naam De naam van de deelnemer.
-	 */
 	@ValidateOnExecution
 	public Deelnemer(@NotNull @Valid DeelnemerId deelnemerId, @Naam String naam) {
 		this.deelnemerId = deelnemerId;
 		this.naam = naam;
 	}
 
-	/**
-	 * Haal de identifier van de deelnemer op.
-	 *
-	 * @return De identifier van de deelnemer.
-	 */
 	public DeelnemerId getDeelnemerId() {
 		return deelnemerId;
 	}
 
-	/**
-	 * Haal de naam van de deelnemer op.
-	 *
-	 * @return De naam van de deelnemer.
-	 */
 	public String getNaam() {
 		return naam;
 	}
 
-	/**
-	 * Zet de naam van de deelnemer.
-	 *
-	 * @param naam De nieuwe naam van de deelnemer.
-	 */
 	@ValidateOnExecution
 	public void setNaam(@Naam String naam) {
 		this.naam = naam;
 	}
 
 	/**
-	 * @throws IllegalStateException Als de kamer waaraan de deelnemer deelneemt {@code null} is.
 	 * @see Kamer#voegDeelnemerToe(Deelnemer)
 	 */
 	public Kamer getKamer() {
@@ -137,22 +107,12 @@ public class Deelnemer {
 		this.kamer = kamer;
 	}
 
-	/**
-	 * Returned de rollen die bij de deelnemer past.
-	 *
-	 * @return De rollen.
-	 */
 	public Rol getRol() {
 		return rol;
 	}
 
-	/**
-	 * Zet de rol die bij de deelnemer past.
-	 *
-	 * @param rol De nieuwe rol.
-	 */
 	@ValidateOnExecution
-	public void setRol(@Valid Rol rol) {
+	public void setRol(@NotNull @Valid Rol rol) {
 		this.rol = rol;
 	}
 

@@ -8,34 +8,31 @@ import java.util.NoSuchElementException;
 public enum KamerFase {
 
 	/**
-	 * De kamer is aangemaakt, maar de relevante rollen moeten nog gekozen worden.
+	 * De kamer is aangemaakt maar de relevante rollen moeten nog gekozen worden.
 	 */
 	SETUP,
 	/**
-	 * De relevante rollen zijn gekozen, deelnemers kunnen deelnemen aan de kamer.
+	 * De relevante rollen zijn gekozen. Deelnemers kunnen deelnemen aan de kamer.
 	 */
 	OPEN,
 	/**
-	 * Het spel is begonnen, nieuwe deelnemers kunnen zich niet bij een kamer toevoegen.
+	 * Het spel is begonnen. Nieuwe deelnemers kunnen zich niet meer bij een kamer voegen.
 	 */
 	BEZIG,
 	/**
-	 * Het spel is afgelopen, de kamer is gesloten.
+	 * Het spel is afgelopen. De kamer is gesloten.
 	 */
 	GESLOTEN;
 
 	/**
-	 * Geeft de volgende {@link KamerFase} terug.
-	 *
-	 * @return De volgende {@link KamerFase}.
-	 * @throws NoSuchElementException Als er geen volgende {@link KamerFase} is.
+	 * @return de volgende {@link KamerFase}
 	 */
-	public KamerFase volgendeFase() {
+	public KamerFase getVolgendeFase() {
 		if (ordinal() == values().length - 1) {
 			throw new NoSuchElementException();
 		}
 
-		return KamerFase.values()[this.ordinal() + 1];
+		return values()[ordinal() + 1];
 	}
 
 }
