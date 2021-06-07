@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
+import nl.han.oose.buizerd.projectcheck_backend.ExcludeFromGeneratedCoverageReport;
 
 @Entity
 public class KaartenSelectie {
@@ -25,11 +26,11 @@ public class KaartenSelectie {
 	private Set<Kaart> kaarten = new HashSet<>();
 
 	/**
-	 * Construeert een {@link KaartenSelectie}.
-	 * <p>
-	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
-	public KaartenSelectie() {
+	@ExcludeFromGeneratedCoverageReport(reason = "wordt gebruikt door JPA en mag niet aangeroepen worden")
+	@Deprecated
+	protected KaartenSelectie() {
 	}
 
 	public KaartenSelectie(@NotNull @Valid Set<Kaart> kaarten) {

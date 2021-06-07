@@ -3,6 +3,7 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.websocket.Session;
+import java.util.HashSet;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kaart;
@@ -19,7 +20,7 @@ public class KaartNaarSelectieEvent extends Event {
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
 		var kaartenSelectie = deelnemer.getKaartenSelectie();
 		if (kaartenSelectie == null) {
-			kaartenSelectie = new KaartenSelectie();
+			kaartenSelectie = new KaartenSelectie(new HashSet<>());
 			deelnemer.setKaartenSelectie(kaartenSelectie);
 		}
 

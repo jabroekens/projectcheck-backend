@@ -10,6 +10,7 @@ import jakarta.persistence.MapsId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
+import nl.han.oose.buizerd.projectcheck_backend.ExcludeFromGeneratedCoverageReport;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**
@@ -58,6 +59,7 @@ public class Deelnemer {
 	/**
 	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
+	@ExcludeFromGeneratedCoverageReport(reason = "wordt gebruikt door JPA en mag niet aangeroepen worden")
 	@Deprecated
 	protected Deelnemer() {
 	}

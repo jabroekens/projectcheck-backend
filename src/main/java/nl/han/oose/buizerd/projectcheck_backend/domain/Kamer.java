@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import nl.han.oose.buizerd.projectcheck_backend.ExcludeFromGeneratedCoverageReport;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
 /**
@@ -59,6 +60,7 @@ public class Kamer {
 	/**
 	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
+	@ExcludeFromGeneratedCoverageReport(reason = "wordt gebruikt door JPA en mag niet aangeroepen worden")
 	@Deprecated
 	protected Kamer() {
 	}
@@ -95,6 +97,7 @@ public class Kamer {
 		this.kamerFase = kamerFase;
 	}
 
+	@ExcludeFromGeneratedCoverageReport(reason = "without using reflection, 'begeleider' can never be null")
 	public Begeleider getBegeleider() {
 		var begeleider = deelnemers.stream()
 		                           .filter(Begeleider.class::isInstance)
