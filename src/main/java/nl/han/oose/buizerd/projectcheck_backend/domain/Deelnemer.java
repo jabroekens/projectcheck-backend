@@ -82,7 +82,7 @@ public class Deelnemer {
 	}
 
 	/**
-	 * @see Kamer#voegDeelnemerToe(Deelnemer)
+	 * @see Kamer#addDeelnemer(Deelnemer)
 	 */
 	public Kamer getKamer() {
 		if (kamer == null) {
@@ -95,7 +95,7 @@ public class Deelnemer {
 	/**
 	 * Zet de {@link Kamer} waaraan de deelnemer deelneemt.
 	 * <p>
-	 * <em>Deze methode wordt gebruikt door {@link Kamer#voegDeelnemerToe(Deelnemer)}
+	 * <em>Deze methode wordt gebruikt door {@link Kamer#addDeelnemer(Deelnemer)}
 	 * en mag hierbuiten niet aangeroepen worden.</em>
 	 * <p>
 	 * Om een kip-en-eiprobleem te voorkomen is het nodig dat de kamer achteraf

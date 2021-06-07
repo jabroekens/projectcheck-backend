@@ -81,7 +81,7 @@ class KamerTest {
 		for (long expected = 2L; expected < 4L; expected++) {
 			//Act
 			Long actual = sut.genereerDeelnemerId();
-			sut.voegDeelnemerToe(deelnemer);
+			sut.addDeelnemer(deelnemer);
 
 			//Assert
 			assertEquals(expected, actual);
@@ -104,7 +104,7 @@ class KamerTest {
 	@Test
 	void setRelevanteRollen_zetEnGeeftJuisteWaarden() {
 		Set<Rol> expected = spy(new HashSet<>());
-		sut.activeerRelevanteRollen(expected);
+		sut.setRelevanteRollen(expected);
 		assertIterableEquals(expected, sut.getRelevanteRollen());
 	}
 

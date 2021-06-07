@@ -18,7 +18,7 @@ public class KiesRelevanteRollenEvent extends Event {
 	@Override
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
 		if (deelnemer instanceof Begeleider) {
-			deelnemer.getKamer().activeerRelevanteRollen(relevanteRollen);
+			deelnemer.getKamer().setRelevanteRollen(relevanteRollen);
 
 			return new EventResponse(EventResponse.Status.OK).metContext(
 				"bericht",

@@ -66,7 +66,7 @@ public class AppService {
 				deelnemerNaam
 			);
 
-			kamer.get().voegDeelnemerToe(deelnemer);
+			kamer.get().addDeelnemer(deelnemer);
 			dao.update(kamer.get());
 			return Response.ok(getKamerInfo(kamerCode, deelnemerId)).build();
 		} else {

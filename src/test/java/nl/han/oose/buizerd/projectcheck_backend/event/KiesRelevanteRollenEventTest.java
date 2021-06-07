@@ -65,7 +65,7 @@ class KiesRelevanteRollenEventTest {
 
 			// Assert
 			assertAll(
-				() -> verify(kamer).activeerRelevanteRollen(relevanteRollen),
+				() -> verify(kamer).setRelevanteRollen(relevanteRollen),
 				() -> assertEquals(EventResponse.Status.OK, response.getStatus()),
 				() -> assertEquals(expected, response.getContext().get("bericht"))
 			);

@@ -128,7 +128,7 @@ class AppServiceTest {
 
 					sut.neemDeel(kamerCode, deelnemerNaam);
 
-					verify(kamer).voegDeelnemerToe(deelnemerCaptor.capture());
+					verify(kamer).addDeelnemer(deelnemerCaptor.capture());
 					verify(dao).update(kamer);
 					assertEquals(deelnemerNaam, deelnemerCaptor.getValue().getNaam());
 				});

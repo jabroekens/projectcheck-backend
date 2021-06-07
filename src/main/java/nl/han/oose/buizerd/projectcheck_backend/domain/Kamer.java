@@ -86,7 +86,7 @@ public class Kamer {
 		relevanteRollen = new HashSet<>();
 		deelnemers = new HashSet<>();
 
-		voegDeelnemerToe(begeleider);
+		addDeelnemer(begeleider);
 	}
 
 	public String getKamerCode() {
@@ -148,7 +148,7 @@ public class Kamer {
 	 * @see Deelnemer#setKamer(Kamer)
 	 */
 	@ValidateOnExecution
-	public void voegDeelnemerToe(@NotNull @Valid Deelnemer deelnemer) {
+	public void addDeelnemer(@NotNull @Valid Deelnemer deelnemer) {
 		deelnemers.add(deelnemer);
 		deelnemer.setKamer(this);
 	}
@@ -170,7 +170,7 @@ public class Kamer {
 	}
 
 	@ValidateOnExecution
-	public void activeerRelevanteRollen(@NotNull @Valid Set<Rol> rollen) {
+	public void setRelevanteRollen(@NotNull @Valid Set<Rol> rollen) {
 		relevanteRollen = rollen;
 	}
 
