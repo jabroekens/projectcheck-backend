@@ -246,7 +246,7 @@ class KamerServiceTest {
 			@Test
 			void stuurtEventResponse() throws IOException {
 				when(session.getBasicRemote()).thenReturn(remoteEndpoint);
-				EventResponse eventResponse = new EventResponse(EventResponse.Status.INVALIDE);
+				EventResponse eventResponse = new EventResponse(EventResponse.Status.ONGELDIG);
 
 				sut.error(session, error, KAMER_CODE);
 

@@ -95,7 +95,7 @@ public class KamerService {
 			 * niet opnieuw aangeroepen wordt, wat tot een StackOverflowError zou leiden.
 			 */
 			try {
-				session.getBasicRemote().sendText(new EventResponse(EventResponse.Status.INVALIDE).asJson());
+				session.getBasicRemote().sendText(new EventResponse(EventResponse.Status.ONGELDIG).asJson());
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, e.getMessage(), e);
 				return;

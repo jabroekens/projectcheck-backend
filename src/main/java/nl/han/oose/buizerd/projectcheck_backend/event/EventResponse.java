@@ -103,7 +103,7 @@ public class EventResponse {
 	public enum Status {
 		OK,
 		VERBODEN,
-		INVALIDE,
+		ONGELDIG,
 		KAMER_NIET_GEVONDEN,
 		ROL_NIET_GEVONDEN,
 		SELECTIE_VOL,
