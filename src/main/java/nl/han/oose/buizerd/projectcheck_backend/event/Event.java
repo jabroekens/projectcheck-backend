@@ -4,13 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
-import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.DecodeException;
 import jakarta.websocket.Session;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
@@ -99,21 +101,39 @@ public abstract class Event {
 
 			Reflections reflections = new Reflections(Event.class.getPackage().getName());
 			reflections.getSubTypesOf(Event.class).forEach(
-				event -> eventAdapterFactory.registerSubtype(event, Event.getEventNaam(event))
+				event -> eventAdapterFactory.registerSubtype(event, getEventNaam(event))
 			);
 
 			GSON = new GsonBuilder().registerTypeAdapterFactory(eventAdapterFactory).create();
 			VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
 		}
 
-		private Event event;
-
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Event decode(String s) {
-			return event;
+		public Event decode(String s) throws DecodeException {
+			try {
+				Event event = GSON.fromJson(s, Event.class);
+				if (event == null) {
+					throw new DecodeException(s, "Decoded result is null");
+				}
+
+				Set<ConstraintViolation<Event>> violations = VALIDATOR.validate(event);
+				if (!violations.isEmpty()) {
+					throw new DecodeException(
+						s,
+						String.format(
+							"Decoded event has constraint violations: %s",
+							violations.stream().map(ConstraintViolation::getMessage).toArray()
+						)
+					);
+				}
+
+				return event;
+			} catch (JsonParseException e) {
+				throw new DecodeException(s, e.getMessage(), e);
+			}
 		}
 
 		/**
@@ -121,32 +141,7 @@ public abstract class Event {
 		 */
 		@Override
 		public boolean willDecode(String s) {
-			// Probeer te deserializeren en cache het resultaat als het wel lukt.
-			try {
-				event = Decoder.GSON.fromJson(s, Event.class);
-				if (event == null || !Decoder.VALIDATOR.validate(event).isEmpty()) {
-					return false;
-				}
-			} catch (JsonParseException ignored) {
-				return false;
-			}
-			return true;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void init(EndpointConfig config) {
-			// Wordt niet gebruikt
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void destroy() {
-			// Wordt niet gebruikt
+			return s != null && !s.isEmpty();
 		}
 
 	}
