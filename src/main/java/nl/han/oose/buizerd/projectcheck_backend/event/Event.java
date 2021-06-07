@@ -47,7 +47,7 @@ public abstract class Event {
 	public final CompletionStage<EventResponse> voerUit(DAO dao, Deelnemer deelnemer, Session session) {
 		return CompletableFuture
 			       .supplyAsync(() -> voerUit(deelnemer, session))
-			       .thenApply((result) -> {
+			       .thenApply(result -> {
 				       handelAf(dao, deelnemer.getKamer());
 				       return result;
 			       });

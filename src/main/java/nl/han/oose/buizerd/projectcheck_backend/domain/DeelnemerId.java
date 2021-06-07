@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
 import java.io.Serializable;
 import java.util.Objects;
+import nl.han.oose.buizerd.projectcheck_backend.ExcludeFromGeneratedCoverageReport;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
 /**
@@ -39,6 +40,7 @@ public class DeelnemerId implements Serializable {
 	/**
 	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
+	@ExcludeFromGeneratedCoverageReport(reason = "wordt gebruikt door JPA en mag niet aangeroepen worden")
 	@Deprecated
 	public DeelnemerId() {
 	}

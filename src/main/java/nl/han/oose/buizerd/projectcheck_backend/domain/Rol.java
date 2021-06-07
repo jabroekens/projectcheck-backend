@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.executable.ValidateOnExecution;
 import java.util.HashSet;
 import java.util.Set;
+import nl.han.oose.buizerd.projectcheck_backend.ExcludeFromGeneratedCoverageReport;
 
 /**
  * Een rol wordt vertegenwoordigd door een {@link Deelnemer}.
@@ -33,6 +34,7 @@ public class Rol {
 	/**
 	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
+	@ExcludeFromGeneratedCoverageReport(reason = "wordt gebruikt door JPA en mag niet aangeroepen worden")
 	@Deprecated
 	protected Rol() {
 	}
