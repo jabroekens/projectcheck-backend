@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode;
 
 /**
@@ -31,17 +30,7 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.KamerCode
 @Entity
 public class Kamer {
 
-	// Wordt gebruikt voor het genereren van kamercodes
-	public static final int KAMER_CODE_MAX = 999999;
-
-	/**
-	 * Genereert een unieke kamercode.
-	 */
-	@ValidateOnExecution
-	public static @KamerCode
-	String genereerCode() {
-		return String.valueOf(ThreadLocalRandom.current().nextInt(KAMER_CODE_MAX + 1));
-	}
+	public static final int KAMER_CODE_MAX_LENGTE = 6;
 
 	@KamerCode
 	@Id

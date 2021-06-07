@@ -3,6 +3,7 @@ package nl.han.oose.buizerd.projectcheck_backend.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 import jakarta.ws.rs.core.Response;
 import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
+import nl.han.oose.buizerd.projectcheck_backend.domain.CodeGenerator;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KamerFase;
@@ -32,12 +34,16 @@ class AppServiceTest {
 	@Mock
 	private DAO dao;
 
+	@Mock
+	private CodeGenerator codeGenerator;
+
 	private AppService sut;
 
 	@BeforeEach
 	void setUp() {
 		sut = new AppService();
 		sut.setDao(dao);
+		sut.setCodeGenerator(codeGenerator);
 	}
 
 	@Test
@@ -71,11 +77,10 @@ class AppServiceTest {
 		void genereertCode() {
 			String begeleiderNaam = "Joost";
 
-			try (MockedStatic<Kamer> mock = mockStatic(Kamer.class)) {
-				mock.when(Kamer::genereerCode).thenThrow(RuntimeException.class);
-				assertThrows(RuntimeException.class, () -> sut.maakKamer(begeleiderNaam));
-				mock.verify(Kamer::genereerCode);
-			}
+			metGemockteResponseBuilder(() -> {
+				sut.maakKamer(begeleiderNaam);
+				verify(codeGenerator).genereerCode(anyInt());
+			});
 		}
 
 		@Test

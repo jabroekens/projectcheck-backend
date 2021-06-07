@@ -12,6 +12,7 @@ import jakarta.ws.rs.core.Response;
 import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
+import nl.han.oose.buizerd.projectcheck_backend.domain.CodeGenerator;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
@@ -25,6 +26,7 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 public class AppService {
 
 	private DAO dao;
+	private CodeGenerator codeGenerator;
 
 	/**
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
@@ -35,7 +37,7 @@ public class AppService {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response maakKamer(@FormParam("begeleiderNaam") @Naam String begeleiderNaam) {
-		String kamerCode = Kamer.genereerCode();
+		String kamerCode = codeGenerator.genereerCode(Kamer.KAMER_CODE_MAX_LENGTE);
 
 		DeelnemerId deelnemerId = new DeelnemerId(1L, kamerCode);
 		Begeleider begeleider = new Begeleider(deelnemerId, begeleiderNaam);
@@ -87,6 +89,11 @@ public class AppService {
 	@Inject
 	void setDao(DAO dao) {
 		this.dao = dao;
+	}
+
+	@Inject
+	void setCodeGenerator(CodeGenerator codeGenerator) {
+		this.codeGenerator = codeGenerator;
 	}
 
 }

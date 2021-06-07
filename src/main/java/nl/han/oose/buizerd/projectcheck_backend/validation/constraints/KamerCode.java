@@ -2,8 +2,7 @@ package nl.han.oose.buizerd.projectcheck_backend.validation.constraints;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,8 +13,7 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Min(1)
-@Max(Kamer.KAMER_CODE_MAX)
+@Pattern(regexp = "^[a-zA-Z0-9]{1," + Kamer.KAMER_CODE_MAX_LENGTE + "}$")
 @Constraint(validatedBy = {})
 public @interface KamerCode {
 
