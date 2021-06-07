@@ -55,10 +55,6 @@ class KiesRelevanteRollenEventTest {
 		) {
 			// Arrange
 			when(begeleider.getKamer()).thenReturn(kamer);
-			String expected = String.format(
-				"de rollen %s zijn ingeschakeld voor de kamer %s",
-				relevanteRollen, begeleider.getKamer().getKamerCode()
-			);
 
 			// Act
 			EventResponse response = sut.voerUit(begeleider, session);
@@ -66,8 +62,7 @@ class KiesRelevanteRollenEventTest {
 			// Assert
 			assertAll(
 				() -> verify(kamer).setRelevanteRollen(relevanteRollen),
-				() -> assertEquals(EventResponse.Status.OK, response.getStatus()),
-				() -> assertEquals(expected, response.getContext().get("bericht"))
+				() -> assertEquals(EventResponse.Status.OK, response.getStatus())
 			);
 		}
 

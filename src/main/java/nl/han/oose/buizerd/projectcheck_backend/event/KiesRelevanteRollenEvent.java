@@ -19,13 +19,9 @@ public class KiesRelevanteRollenEvent extends Event {
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
 		if (deelnemer instanceof Begeleider) {
 			deelnemer.getKamer().setRelevanteRollen(relevanteRollen);
-
-			return new EventResponse(EventResponse.Status.OK).metContext(
-				"bericht",
-				String.format("de rollen %s zijn ingeschakeld voor de kamer %s", relevanteRollen, deelnemer.getKamer().getKamerCode())
-			);
+			return new EventResponse(EventResponse.Status.OK);
 		} else {
-			return new EventResponse(EventResponse.Status.VERBODEN).metContext("deelnemer", deelnemer.getDeelnemerId());
+			return new EventResponse(EventResponse.Status.VERBODEN);
 		}
 	}
 
