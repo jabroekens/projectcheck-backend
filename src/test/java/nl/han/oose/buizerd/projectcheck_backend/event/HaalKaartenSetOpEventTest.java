@@ -1,7 +1,12 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
 import jakarta.websocket.Session;
-import java.util.HashSet;
 import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KaartenSet;
@@ -14,83 +19,72 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class HaalKaartenSetOpEventTest {
+class HaalKaartenSetOpEventTest {
 
-	private HaalKaartenSetOpEvent haalKaartenSetOpEvent;
+	private HaalKaartenSetOpEvent sut;
 
 	@BeforeEach
-	void setup() {
-		haalKaartenSetOpEvent = new HaalKaartenSetOpEvent();
+	void setUp() {
+		sut = new HaalKaartenSetOpEvent();
 	}
 
 	@Nested
 	class voerUit {
 
+		@Mock
+		private Deelnemer deelnemer;
+
+		@Mock
+		private Session session;
+
 		@Test
-		void deelnemerKrijgtDeRelevanteKaartenSetsVoorExternProjectTeamlid(
-			@Mock Deelnemer deelnemer, @Mock Session session,
-			@Mock Rol rol, @Mock KaartenSet kaartenSet
-		) {
-			// Assign.
-			Set<KaartenSet> expectedContextKaartenSets = new HashSet<>();
-			expectedContextKaartenSets.add(kaartenSet);
+		void deelnemerHeeftGeenRol_geeftJuisteEventResponseTerug() {
+			var eventResponse = sut.voerUit(deelnemer, session);
+			assertEquals(EventResponse.Status.ROL_NIET_GEVONDEN, eventResponse.getStatus());
+		}
 
-			Mockito.when(deelnemer.getRol()).thenReturn(rol);
-			Mockito.when(rol.getKaartenSets()).thenReturn(expectedContextKaartenSets);
+		@Test
+		void deelnemerHeeftRolAndersDanProjectBureau_geeftJuisteRollenTerug(@Mock Rol rol, @Mock KaartenSet kaartenSet) {
+			var expectedKaartenSets = Set.of(kaartenSet);
+			when(deelnemer.getRol()).thenReturn(rol);
+			when(rol.getKaartenSets()).thenReturn(expectedKaartenSets);
 
-			// Act.
-			EventResponse response = haalKaartenSetOpEvent.voerUit(deelnemer, session);
+			var eventResponse = sut.voerUit(deelnemer, session);
 
-			// Assert.
-			Assertions.assertAll(
-				() -> Assertions.assertTrue(response.getContext().get("kaartensets") instanceof Iterable<?>),
-				() -> Assertions.assertIterableEquals(expectedContextKaartenSets, (Iterable<?>) response.getContext().get("kaartensets")),
-				() -> Assertions.assertTrue(response.getContext().get("gekozen") instanceof Boolean),
-				() -> Assertions.assertTrue((Boolean) response.getContext().get("gekozen")),
-				() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus())
+			assertAll(
+				() -> assertTrue(eventResponse.getContext().get("kaartensets") instanceof Iterable<?>),
+				() -> assertIterableEquals(expectedKaartenSets, (Iterable<?>) eventResponse.getContext().get("kaartensets")),
+				() -> assertTrue(eventResponse.getContext().get("gekozen") instanceof Boolean),
+				() -> assertTrue((Boolean) eventResponse.getContext().get("gekozen")),
+				() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus())
 			);
 		}
 
 		@Test
-		void deelnemerKrijgtDeRelevanteKaartenSetsVoorProjectBureau(
-			@Mock Deelnemer deelnemer, @Mock Session session,
-			@Mock Rol rol, @Mock Kamer kamer
-		) {
-			// Assign.
-			Set<KaartenSet> expectedContextKaartenSets = new HashSet<>();
-
-			Mockito.when(deelnemer.getKamer()).thenReturn(kamer);
-			Mockito.when(kamer.getRelevanteRollen()).thenReturn(Set.of(rol));
-			Mockito.when(deelnemer.getRol()).thenReturn(StandaardRol.PROJECTBUREAU.getRol());
-			Mockito.when(rol.getKaartenSets()).thenReturn(expectedContextKaartenSets);
-
-			// Act.
-			EventResponse response = haalKaartenSetOpEvent.voerUit(deelnemer, session);
-
-			// Assert.
-			Assertions.assertAll(
-				() -> Assertions.assertTrue(response.getContext().get("kaartensets") instanceof Iterable<?>),
-				() -> Assertions.assertIterableEquals(expectedContextKaartenSets, (Iterable<?>) response.getContext().get("kaartensets")),
-				() -> Assertions.assertTrue(response.getContext().get("gekozen") instanceof Boolean),
-				() -> Assertions.assertFalse((Boolean) response.getContext().get("gekozen")),
-				() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus())
-			);
-		}
-
-		@Test
-		void deelnemerHeeftGeenRolEnGooitEenException(
+		void deelnemerHeeftRolProjectBurea_geeftJuisteRollenTerug(
 			@Mock Deelnemer deelnemer,
-			@Mock Session session
+			@Mock Session session,
+			@Mock Rol rol,
+			@Mock Kamer kamer
 		) {
-			// Act.
-			EventResponse response = haalKaartenSetOpEvent.voerUit(deelnemer, session);
+			var expectedKaartenSets = Set.<KaartenSet>of();
+			when(deelnemer.getKamer()).thenReturn(kamer);
+			when(kamer.getRelevanteRollen()).thenReturn(Set.of(rol));
+			when(deelnemer.getRol()).thenReturn(StandaardRol.PROJECTBUREAU.getRol());
+			when(rol.getKaartenSets()).thenReturn(expectedKaartenSets);
 
-			// Assert.
-			Assertions.assertEquals(EventResponse.Status.ROL_NIET_GEVONDEN, response.getStatus());
+			var eventResponse = sut.voerUit(deelnemer, session);
+
+			assertAll(
+				() -> assertTrue(eventResponse.getContext().get("kaartensets") instanceof Iterable<?>),
+				() -> assertIterableEquals(expectedKaartenSets, (Iterable<?>) eventResponse.getContext().get("kaartensets")),
+				() -> assertTrue(eventResponse.getContext().get("gekozen") instanceof Boolean),
+				() -> Assertions.assertFalse((Boolean) eventResponse.getContext().get("gekozen")),
+				() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus())
+			);
 		}
 
 	}

@@ -10,6 +10,11 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 
+/**
+ * Zet de relevante rollen van de {@link Kamer} waaraan de {@link Deelnemer} deelneemt.
+ * <p>
+ * Als de deelnemer geen begeleider is, dan wordt er een {@link EventResponse.Status#VERBODEN VERBODEN} status teruggegeven.
+ */
 public class KiesRelevanteRollenEvent extends Event {
 
 	@NotNull

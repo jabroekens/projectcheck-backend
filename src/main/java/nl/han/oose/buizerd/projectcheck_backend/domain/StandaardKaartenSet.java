@@ -2,6 +2,9 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import java.util.Set;
 
+/**
+ * De standaard {@link KaartenSet KaartenSet(s)} van De ProjectCheck.
+ */
 public enum StandaardKaartenSet {
 
 	DIRECTIE_MANAGEMENT(

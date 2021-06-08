@@ -24,9 +24,6 @@ public enum KamerFase {
 	 */
 	GESLOTEN;
 
-	/**
-	 * @return de volgende {@link KamerFase}
-	 */
 	public KamerFase getVolgendeFase() {
 		if (ordinal() == values().length - 1) {
 			throw new NoSuchElementException();

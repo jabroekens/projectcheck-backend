@@ -1,32 +1,30 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
-public class KaartTest {
+class KaartTest {
 
 	private static final int CODE = 1;
 	private static final String TEXT = "voorbeeld tekst";
 
-	private Kaart kaart;
+	private Kaart sut;
 
 	@BeforeEach
-	void setup() {
-		kaart = new Kaart(CODE, TEXT);
+	void setUp() {
+		sut = new Kaart(CODE, TEXT);
 	}
 
 	@Test
-	void geeftJuisteCodeTerug() {
-		Assertions.assertEquals(CODE, kaart.getCode());
+	void getCode_geeftJuisteWaarde() {
+		assertEquals(CODE, sut.getCode());
 	}
 
 	@Test
-	void geeftJuisteTextTerug() {
-		Assertions.assertEquals(TEXT, kaart.getText());
+	void getText_geeftJuisteWaarde() {
+		assertEquals(TEXT, sut.getText());
 	}
 
 }

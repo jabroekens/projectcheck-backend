@@ -7,11 +7,9 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 
 /**
- * Zet de fase van de kamer waaraan de begeleider deelneemt
- * naar de volgende fase en geeft deze terug.
+ * Zet de fase van de kamer waaraan de begeleider deelneemt naar de volgende fase en geeft deze terug.
  * <p>
- * Als de deelnemer geen begeleider is, dan wordt er een
- * {@code VERBODEN} status teruggegeven.
+ * Als de deelnemer geen begeleider is, dan wordt er een {@link EventResponse.Status#VERBODEN VERBODEN} status teruggegeven.
  */
 public class VolgendeFaseEvent extends Event {
 
