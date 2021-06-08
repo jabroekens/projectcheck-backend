@@ -1,6 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,35 +9,33 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class KaartToelichtingTest {
+class KaartToelichtingTest {
 
 	private static final String TOELICHTING = "testing";
 
 	@Mock
 	private Kaart kaart;
 
-	private KaartToelichting kaartToelichting;
+	private KaartToelichting sut;
 
 	@BeforeEach
-	void setup() {
-		kaartToelichting = new KaartToelichting(kaart, TOELICHTING);
+	void setUp() {
+		sut = new KaartToelichting(kaart, TOELICHTING);
 	}
 
 	@Test
-	void zetDeJuisteToelichting() {
-		String expecting = "testing 2";
-		kaartToelichting.setToelichting(expecting);
-		Assertions.assertEquals(expecting, kaartToelichting.getToelichting());
+	void getKaart_geeftJuisteWaarde() {
+		assertEquals(kaart, sut.getKaart());
 	}
 
 	@Test
-	void geeftJuisteToelichtingTerug() {
-		Assertions.assertEquals(TOELICHTING, kaartToelichting.getToelichting());
-	}
+	void setEnGetToelichting_zetEnGeeftJuisteWaarde() {
+		var expected = "testing 2";
 
-	@Test
-	void geeftJuisteKaartTerug() {
-		Assertions.assertEquals(kaart, kaartToelichting.getKaart());
+		sut.setToelichting(expected);
+		var actual = sut.getToelichting();
+
+		assertEquals(expected, actual);
 	}
 
 }

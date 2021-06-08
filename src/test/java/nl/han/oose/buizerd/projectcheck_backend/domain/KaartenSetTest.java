@@ -1,8 +1,10 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +13,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class KaartenSetTest {
+class KaartenSetTest {
 
 	private static final long ID = 1L;
 
@@ -19,29 +21,28 @@ public class KaartenSetTest {
 	private Rol rol;
 
 	@Spy
-	private Set<Kaart> kaarten;
+	private Set<Kaart> kaarten = new HashSet<>();
 
-	private KaartenSet kaartenSet;
+	private KaartenSet sut;
 
 	@BeforeEach
-	void setup() {
-		kaarten = new HashSet<>();
-		kaartenSet = new KaartenSet(ID, rol, kaarten);
+	void setUp() {
+		sut = new KaartenSet(ID, rol, kaarten);
 	}
 
 	@Test
-	void geeftJuisteIdTerug() {
-		Assertions.assertEquals(ID, kaartenSet.getId());
+	void getId_geeftJuisteWaarde() {
+		assertEquals(ID, sut.getId());
 	}
 
 	@Test
-	void geeftJuisteKaartenTerug() {
-		Assertions.assertIterableEquals(kaarten, kaartenSet.getKaarten());
+	void getKaarten_geeftJuisteWaarden() {
+		assertIterableEquals(kaarten, sut.getKaarten());
 	}
 
 	@Test
-	void geeftJuisteRolTerug() {
-		Assertions.assertEquals(rol, kaartenSet.getRol());
+	void getRol_geeftJuisteWaarde() {
+		assertEquals(rol, sut.getRol());
 	}
 
 }

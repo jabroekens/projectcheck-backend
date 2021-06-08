@@ -6,79 +6,58 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.executable.ValidateOnExecution;
+import nl.han.oose.buizerd.projectcheck_backend.ExcludeFromGeneratedCoverageReport;
 
 /**
- * Een {@link Kaart} is een onderdeel van de ProjectCheck die kan worden
- * getoond op de frontend, met behulp van een custom text.
+ * Een {@link Kaart} kan ingezet worden door een {@link Deelnemer}.
+ * <p>
+ * Elke kaart heeft een code en een beschrijving.
  */
 @Entity
 public class Kaart {
 
-	/**
-	 * De unieke id waarmee de kaart zal worden geïdentificeerd.
-	 * De id wordt automatisch gegenereerd door de database.
-	 */
-	@Id
 	@Expose
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	/**
-	 * De code van de kaart, hij is uniek binnen de kaartenset.
-	 */
 	@Expose
+	@NotNull
 	@Column(nullable = false, updatable = false)
 	private Integer code;
 
-	/**
-	 * De text die op de kaart zal plaatsvinden.
-	 * Deze text zal niet aangepast kunnen worden.
-	 */
 	@Expose
+	@NotNull
 	@Column(nullable = false, updatable = false)
 	private String text;
 
 	/**
-	 * Genereert een {@link Kaart}.
-	 * Deze constructor zal alleen gebruikt worden door JPA.
+	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
-	public Kaart() {
+	@ExcludeFromGeneratedCoverageReport(reason = "wordt gebruikt door JPA en mag niet aangeroepen worden")
+	@Deprecated
+	protected Kaart() {
 	}
 
-	/**
-	 * Genereert een {@link Kaart}.
-	 *
-	 * @param code De unieke code (per kaartenset) van de kaart.
-	 * @param text De text die zich op de kaart zal plaatsvinden.
-	 */
-	public Kaart(Integer code, String text) {
+	@ValidateOnExecution
+	public Kaart(@NotNull Integer code, @NotNull String text) {
 		this.code = code;
 		this.text = text;
 	}
 
 	/**
-	 * Geeft de id (primary key) van de kaart terug.
-	 *
-	 * @return Het id.
+	 * @return het ID van de kaart of {@code null} als deze nog niet gegenereerd is
 	 */
 	public Integer getId() {
 		return id;
 	}
 
-	/**
-	 * Geeft de unieke code van de kamer terug.
-	 *
-	 * @return De unieke code van de kamer.
-	 */
 	public int getCode() {
 		return code;
 	}
 
-	/**
-	 * Geeft de text van de kaart terug.
-	 *
-	 * @return De text van de kaart.
-	 */
 	public String getText() {
 		return text;
 	}

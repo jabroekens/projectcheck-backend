@@ -16,7 +16,7 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 /**
  * Een deelnemer is iemand die deelneemt aan een {@link Kamer}.
  * <p>
- * Elke deelnemer heeft een naam.
+ * Elke deelnemer heeft een naam en een rol.
  */
 @Entity
 public class Deelnemer {

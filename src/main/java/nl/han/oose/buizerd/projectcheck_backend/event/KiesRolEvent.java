@@ -8,6 +8,9 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 
+/**
+ * Zet de rol van de {@link Deelnemer}.
+ */
 public class KiesRolEvent extends Event {
 
 	@NotNull
