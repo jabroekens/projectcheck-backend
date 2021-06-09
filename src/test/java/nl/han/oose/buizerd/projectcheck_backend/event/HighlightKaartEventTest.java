@@ -44,7 +44,7 @@ public class HighlightKaartEventTest {
 		kaartToelichting = new KaartToelichting(kaart, expectedToelichting);
 		highlightenKaartEvent = new HighlightenKaartEvent();
 		highlightenKaartEvent.kaartToelichting = kaartToelichting;
-		Mockito.when(kamer.getHuidigeRonde()).thenReturn(ronde);
+		Mockito.when(kamer.getHuidigeRonde()).thenReturn(java.util.Optional.ofNullable(ronde));
 		Mockito.when(deelnemer.getKamer()).thenReturn(kamer);
 		//Act
 		EventResponse antwoord = highlightenKaartEvent.voerUit(deelnemer, session);

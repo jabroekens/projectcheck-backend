@@ -1,6 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import jakarta.websocket.Session;
+import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
@@ -12,14 +13,13 @@ public class HighlightVolgendeKaartEvent extends Event {
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
 		if (deelnemer instanceof Begeleider) {
 			Kamer huidigeKamer = deelnemer.getKamer();
-			Ronde huidigeRonde = huidigeKamer.getHuidigeRonde();
-			huidigeRonde.setGehighlighteKaart(null);
+			Optional<Ronde> huidigeRonde = huidigeKamer.getHuidigeRonde();
+			huidigeRonde.get().setGehighlighteKaart(null);
 			return new EventResponse(EventResponse.Status.OK)
-				.antwoordOp(this)
 				.metContext("gehighlighteKaart", null).stuurNaarAlleClients();
+		} else {
+			return new EventResponse(EventResponse.Status.VERBODEN);
 		}
-		else return new EventResponse(EventResponse.Status.VERBODEN);
 	}
-
 
 }

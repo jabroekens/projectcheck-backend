@@ -253,8 +253,8 @@ public class Kamer {
 		relevanteRollen = rollen;
 	}
 
-	public Ronde getHuidigeRonde() {
-		return huidigeRonde;
+	public Optional<Ronde> getHuidigeRonde() {
+		return Optional.of(huidigeRonde);
 	}
 
 }

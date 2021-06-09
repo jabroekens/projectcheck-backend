@@ -46,7 +46,7 @@ public class HighlightVolgendeKaartEventTest {
 		highlightVolgendeKaartEvent = new HighlightVolgendeKaartEvent();
 		highlightenKaartEvent = new HighlightenKaartEvent();
 
-		Mockito.when(kamer.getHuidigeRonde()).thenReturn(ronde);
+		Mockito.when(kamer.getHuidigeRonde()).thenReturn(Optional.ofNullable(ronde));
 		Mockito.when(deelnemer.getKamer()).thenReturn(kamer);
 
 		highlightenKaartEvent.kaartToelichting = Mockito.mock(KaartToelichting.class);
