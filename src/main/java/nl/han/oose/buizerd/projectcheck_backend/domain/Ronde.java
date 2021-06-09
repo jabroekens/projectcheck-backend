@@ -8,15 +8,12 @@ public class Ronde {
 	@Transient
 	private KaartToelichting gehighlighteKaart;
 
-
 	public void setGehighlighteKaart(KaartToelichting kaartOmTeHighlighten) {
 		this.gehighlighteKaart = kaartOmTeHighlighten;
-
 	}
 
 	public Optional<KaartToelichting> getGehighlighteKaart() {
 		return Optional.ofNullable(this.gehighlighteKaart);
-
 	}
 
 }
