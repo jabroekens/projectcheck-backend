@@ -18,8 +18,8 @@ public class EventResponse {
 
 	static {
 		GSON = new GsonBuilder().enableComplexMapKeySerialization()
-		                        .excludeFieldsWithoutExposeAnnotation()
-		                        .create();
+								.excludeFieldsWithoutExposeAnnotation()
+								.create();
 	}
 
 	@Expose
@@ -96,7 +96,8 @@ public class EventResponse {
 		INVALIDE,
 		KAMER_NIET_GEVONDEN,
 		ROL_NIET_GEVONDEN,
-		SELECTIE_VOL
+		SELECTIE_VOL,
+		RONDE_NIET_GEVONDEN
 	}
 
 }

@@ -1,7 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import com.google.gson.annotations.Expose;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;

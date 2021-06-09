@@ -1,5 +1,6 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import com.google.gson.annotations.Expose;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,6 +19,7 @@ public class KaartToelichting {
 	 * De primary key van {@link KaartToelichting}.
 	 * De id is auto incremented, en kan niet worden aangepast.
 	 */
+	@Expose
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -26,6 +28,7 @@ public class KaartToelichting {
 	 * De relevante {@link Kaart} waar de toelichting bij hoort.
 	 * Het is notnull en kan niet worden aangepast.
 	 */
+	@Expose
 	@OneToOne
 	@Column(nullable = false, updatable = false)
 	private Kaart kaart;
@@ -34,6 +37,7 @@ public class KaartToelichting {
 	 * De relevante toelichting voor de {@link Kaart}.
 	 * Het is notnull en kan worden aangepast.
 	 */
+	@Expose
 	@Column(nullable = false)
 	private String toelichting;
 
