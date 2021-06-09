@@ -55,6 +55,7 @@ public abstract class Event {
 		CompletableFuture.runAsync(() -> {
 			EventResponse response = voerUit(deelnemer, session).antwoordOp(this);
 
+			handelAf(kamerDAO, deelnemer.getKamer());
 			if (response.isStuurNaarAlleClients()) {
 				/*
 				 * foreach loop zodat er geen try/catch-statement
@@ -68,8 +69,6 @@ public abstract class Event {
 			} else if (session.isOpen()) {
 				session.getAsyncRemote().sendText(response.asJson());
 			}
-
-			handelAf(kamerDAO, deelnemer.getKamer());
 		});
 	}
 
