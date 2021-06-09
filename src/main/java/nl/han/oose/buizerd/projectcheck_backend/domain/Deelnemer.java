@@ -5,15 +5,11 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
-import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
-import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 
 /**
@@ -24,7 +20,9 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 @Entity
 public class Deelnemer {
 
-	@Transient
+	@Expose
+	@Valid
+	@ManyToOne(cascade = CascadeType.ALL)
 	private KaartenSelectie selectie;
 
 	/**

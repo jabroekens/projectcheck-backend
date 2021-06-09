@@ -8,8 +8,8 @@ import java.util.Set;
 @Entity
 public class KaartenSelectie {
 
-    private final int MAX_KAARTEN = 3;
-    // lijkt me niet ideaal om voor ieder item een ID te hebben? Ik wil eigenlijk gewoon dat een deelnemer een selectie bezit waar 0-3 kaarten in kunnen zitten
+    private static final int MAX_KAARTEN = 3;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
