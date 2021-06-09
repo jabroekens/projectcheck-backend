@@ -49,7 +49,7 @@ public abstract class Event {
 			       .supplyAsync(() -> voerUit(deelnemer, session))
 			       .thenApply(result -> {
 				       handelAf(dao, deelnemer.getKamer());
-				       return result;
+				       return result.antwoordOp(this);
 			       });
 	}
 

@@ -64,12 +64,13 @@ public class AppService {
 
 			var deelnemerId = kamer.get().genereerDeelnemerId();
 			var deelnemer = new Deelnemer(
-				new DeelnemerId(deelnemerId, kamer.get().getKamerCode()),
+				new DeelnemerId(deelnemerId, kamerCode),
 				deelnemerNaam
 			);
 
 			kamer.get().addDeelnemer(deelnemer);
 			dao.update(kamer.get());
+
 			return Response.ok(getKamerInfo(kamerCode, deelnemerId)).build();
 		} else {
 			throw new KamerNietGevondenException(kamerCode);
