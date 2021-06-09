@@ -10,8 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class
-EventResponseTest {
+class EventResponseTest {
 
 	@Mock
 	private EventResponse.Status status;

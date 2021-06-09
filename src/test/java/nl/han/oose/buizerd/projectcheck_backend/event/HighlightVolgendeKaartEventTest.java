@@ -61,4 +61,18 @@ public class HighlightVolgendeKaartEventTest {
 
 	}
 
+	@Test
+	void testRondeNietGevonden() {
+		//Arrange
+		highlightVolgendeKaartEvent = new HighlightVolgendeKaartEvent();
+		Mockito.when(deelnemer.getKamer()).thenReturn(kamer);
+
+		//Act
+		EventResponse response = highlightVolgendeKaartEvent.voerUit(deelnemer, session);
+
+		//Assert
+		Assertions.assertEquals(response.getStatus(), EventResponse.Status.RONDE_NIET_GEVONDEN);
+
+	}
+
 }

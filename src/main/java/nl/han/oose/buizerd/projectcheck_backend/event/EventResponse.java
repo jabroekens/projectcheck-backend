@@ -96,6 +96,7 @@ public class EventResponse {
 		INVALIDE,
 		KAMER_NIET_GEVONDEN,
 		ROL_NIET_GEVONDEN,
+		RONDE_NIET_GEVONDEN
 	}
 
 }

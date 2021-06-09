@@ -56,4 +56,18 @@ public class HighlightKaartEventTest {
 
 	}
 
+	@Test
+	void testRondeNietGevonden() {
+		//Arrange
+		highlightenKaartEvent = new HighlightenKaartEvent();
+		Mockito.when(deelnemer.getKamer()).thenReturn(kamer);
+
+		//Act
+		EventResponse response = highlightenKaartEvent.voerUit(deelnemer, session);
+
+		//Assert
+		Assertions.assertEquals(response.getStatus(), EventResponse.Status.RONDE_NIET_GEVONDEN);
+
+	}
+
 }

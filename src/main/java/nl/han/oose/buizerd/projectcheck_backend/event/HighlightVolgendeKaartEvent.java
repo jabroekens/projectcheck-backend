@@ -14,11 +14,17 @@ public class HighlightVolgendeKaartEvent extends Event {
 		if (deelnemer instanceof Begeleider) {
 			Kamer huidigeKamer = deelnemer.getKamer();
 			Optional<Ronde> huidigeRonde = huidigeKamer.getHuidigeRonde();
-			huidigeRonde.get().setGehighlighteKaart(null);
-			return new EventResponse(EventResponse.Status.OK)
-				.metContext("gehighlighteKaart", null).stuurNaarAlleClients();
+			if (huidigeRonde.isPresent()) {
+				huidigeRonde.get().setGehighlighteKaart(null);
+				return new EventResponse(EventResponse.Status.OK)
+					.metContext("gehighlighteKaart", null).stuurNaarAlleClients();
+			} else {
+				return new EventResponse(EventResponse.Status.RONDE_NIET_GEVONDEN);
+
+			}
 		} else {
 			return new EventResponse(EventResponse.Status.VERBODEN);
+
 		}
 	}
 
