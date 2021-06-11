@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
+import java.util.Objects;
 import nl.han.oose.buizerd.projectcheck_backend.ExcludeFromGeneratedCoverageReport;
 
 /**
@@ -60,6 +61,23 @@ public class Kaart {
 
 	public String getText() {
 		return text;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof Kaart)) {
+			return false;
+		}
+		var that = (Kaart) o;
+		return Objects.equals(getCode(), that.getCode()) && Objects.equals(getText(), that.getText());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(code, text);
 	}
 
 }
