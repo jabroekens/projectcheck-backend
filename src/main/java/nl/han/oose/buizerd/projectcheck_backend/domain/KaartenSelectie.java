@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
+import nl.han.oose.buizerd.projectcheck_backend.ExcludeFromGeneratedCoverageReport;
 
 @Entity
 public class KaartenSelectie {
