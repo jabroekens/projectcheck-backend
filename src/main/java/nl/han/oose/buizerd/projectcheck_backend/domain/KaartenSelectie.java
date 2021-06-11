@@ -2,8 +2,7 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.Valid;
@@ -14,14 +13,15 @@ import java.util.Set;
 @Entity
 public class KaartenSelectie {
 
+	private static int aantalKaartenSelecties = 0;
+
 	static final int MAX_KAARTEN = 3;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false, updatable = false)
 	private int selectieCode;
 
-	@OneToMany
+	@OneToMany(fetch = FetchType.EAGER)
 	private Set<Kaart> kaarten = new HashSet<>();
 
 	/**
@@ -34,6 +34,7 @@ public class KaartenSelectie {
 
 	public KaartenSelectie(@NotNull @Valid Set<Kaart> kaarten) {
 		this.kaarten = kaarten;
+		this.selectieCode = aantalKaartenSelecties++;
 	}
 
 	public boolean kaartIsGeselecteerd(Kaart kaart) {
