@@ -18,8 +18,8 @@ public class EventResponse {
 
 	static {
 		GSON = new GsonBuilder().enableComplexMapKeySerialization()
-								.excludeFieldsWithoutExposeAnnotation()
-								.create();
+		                        .excludeFieldsWithoutExposeAnnotation()
+		                        .create();
 	}
 
 	@Expose

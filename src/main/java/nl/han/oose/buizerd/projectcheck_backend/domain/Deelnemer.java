@@ -1,6 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import com.google.gson.annotations.Expose;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -22,7 +23,7 @@ public class Deelnemer {
 	@Expose
 	@Valid
 	@ManyToOne(cascade = CascadeType.ALL)
-	private KaartenSelectie selectie;
+	private KaartenSelectie kaartenSelectie;
 
 	/**
 	 * De identifier van de deelnemer.
@@ -155,13 +156,11 @@ public class Deelnemer {
 		this.rol = rol;
 	}
 
-	public KaartenSelectie getSelectie() {
-		return selectie;
+	public KaartenSelectie getKaartenSelectie() {
+		return kaartenSelectie;
 	}
 
-	public void setSelectie(KaartenSelectie selectie) {
-		this.selectie = selectie;
+	public void setKaartenSelectie(@NotNull @Valid KaartenSelectie selectie) {
+		this.kaartenSelectie = selectie;
 	}
 }
-
-
