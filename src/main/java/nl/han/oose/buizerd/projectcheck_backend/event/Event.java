@@ -11,6 +11,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
 import jakarta.websocket.DecodeException;
+import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Session;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -115,6 +116,16 @@ public abstract class Event {
 		@Override
 		public boolean willDecode(String s) {
 			return s != null && !s.isEmpty();
+		}
+
+		@Override
+		public void init(EndpointConfig config) {
+			// Wordt niet gebruikt
+		}
+
+		@Override
+		public void destroy() {
+			// Wordt niet gebruikt
 		}
 
 	}
