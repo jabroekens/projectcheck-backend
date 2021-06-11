@@ -1,17 +1,21 @@
 package nl.han.oose.buizerd.projectcheck_backend.domain;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,124 +24,95 @@ class KamerTest {
 	private static final String KAMER_CODE = "123456";
 
 	@Mock
-	private LocalDateTime datum;
-
-	@Mock
-	private KamerFase kamerFase;
-
-	/*
-	 * Er wordt gebruikt gemaakt van @Spy voor Collection-objecten,
-	 * omdat deze niets 'bijhouden' als deze gemockt zijn.
-	 */
-	@Spy
-	private Set<Rol> relevanteRollen;
-
-	@Spy
-	private Set<Deelnemer> deelnemers;
-
-	@Mock
 	private Begeleider begeleider;
 
-	private Kamer kamer;
+	private Kamer sut;
 
 	@BeforeEach
 	void setUp() {
-		deelnemers = new HashSet<>();
-		relevanteRollen = new HashSet<>();
-		kamer = new Kamer(KamerTest.KAMER_CODE, datum, kamerFase, begeleider, deelnemers, relevanteRollen);
+		sut = new Kamer(KAMER_CODE, begeleider);
 	}
 
 	@Test
-	void geeftJuisteKamerCode() {
-		Assertions.assertEquals(KamerTest.KAMER_CODE, kamer.getKamerCode());
+	void new_voegtBegeleiderToeAanDeelnemers() {
+		assertTrue(sut.getDeelnemers().contains(begeleider));
 	}
 
 	@Test
-	void geeftJuisteDatum() {
-		Assertions.assertEquals(datum, kamer.getDatum());
+	void getKamerCode_geeftJuisteWaarde() {
+		assertEquals(KAMER_CODE, sut.getKamerCode());
 	}
 
 	@Test
-	void geeftJuisteKamerFase() {
-		Assertions.assertEquals(kamerFase, kamer.getKamerFase());
+	void getDatum_isInHetVerledenOfHeden() {
+		assertTrue(sut.getDatum().compareTo(LocalDateTime.now()) <= 0);
 	}
 
 	@Test
-	void zetJuisteKamerFase(@Mock KamerFase kamerFase) {
-		kamer.setKamerFase(kamerFase);
-		Assertions.assertEquals(kamerFase, kamer.getKamerFase());
+	void setEnGetKamerFase_zetEnGeeftJuisteWaarde(@Mock KamerFase kamerFase) {
+		sut.setKamerFase(kamerFase);
+		assertEquals(kamerFase, sut.getKamerFase());
 	}
 
 	@Test
-	void geeftJuisteBegeleider() {
-		Assertions.assertEquals(begeleider, kamer.getBegeleider());
-	}
+	void getDeelnemers_geeftJuisteWaardenEnVerbiedtToevoegenEnVerwijderen() {
+		var expected = Set.<Deelnemer>of(begeleider);
 
-	@Test
-	void geeftJuisteDeelnemers() {
-		Set<Deelnemer> actual = kamer.getDeelnemers();
+		var actual = sut.getDeelnemers();
 
 		// Eerst controleren of ze gelijk zijn, anders riskeer je een NPE bij de andere assertions
-		Assertions.assertIterableEquals(actual, deelnemers);
-
-		Assertions.assertAll(
-			() -> Assertions.assertTrue(actual.contains(begeleider)),
-			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> actual.add(null)),
-			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> actual.remove(null))
+		assertIterableEquals(expected, actual);
+		assertAll(
+			() -> assertThrows(UnsupportedOperationException.class, () -> actual.add(null)),
+			() -> assertThrows(UnsupportedOperationException.class, () -> actual.remove(null))
 		);
 	}
 
 	@Test
-	void getDeelnemer_geeftJuisteDeelnemer(@Mock DeelnemerId deelnemerId) {
-		Mockito.when(begeleider.getDeelnemerId()).thenReturn(deelnemerId);
-		Assertions.assertEquals(Optional.of(begeleider), kamer.getDeelnemer(begeleider.getDeelnemerId()));
+	void getDeelnemer_geeftJuisteWaarde(@Mock DeelnemerId deelnemerId) {
+		var expected = Optional.of(begeleider);
+		when(begeleider.getDeelnemerId()).thenReturn(deelnemerId);
+
+		var actual = sut.getDeelnemer(begeleider.getDeelnemerId());
+
+		assertEquals(expected, actual);
 	}
 
 	@Test
-	void kamerGeeftJuisteDeelnemerId() {
-		//Arrange
-		Long expectedId = 2L;
-
-		//Act
-		Long actualId = kamer.genereerDeelnemerId();
-
-		//Assert
-		Assertions.assertEquals(expectedId, actualId);
+	void genereerDeelnemerId_geeftJuisteWaarde(@Mock Deelnemer deelnemer) {
+		for (long expected = 2L; expected < 4L; expected++) {
+			var actual = sut.genereerDeelnemerId();
+			sut.addDeelnemer(deelnemer);
+			assertEquals(expected, actual);
+		}
 	}
 
 	@Test
-	void getRelevanteRollen_geeftJuisteRollen() {
-		Set<Rol> actualRelevanteRollen = kamer.getRelevanteRollen();
+	void getRelevanteRollen_geeftJuisteWaarden() {
+		var expected = Set.<Rol>of();
 
-		Assertions.assertIterableEquals(actualRelevanteRollen, relevanteRollen);
+		var actual = sut.getRelevanteRollen();
 
-		Assertions.assertAll(
-			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> actualRelevanteRollen.add(null)),
-			() -> Assertions.assertThrows(UnsupportedOperationException.class, () -> actualRelevanteRollen.remove(null))
+		assertIterableEquals(expected, actual);
+		assertAll(
+			() -> assertThrows(UnsupportedOperationException.class, () -> actual.add(null)),
+			() -> assertThrows(UnsupportedOperationException.class, () -> actual.remove(null))
 		);
 	}
 
 	@Test
-	void activeerRelevanteRollen_zetEnGeeftJuisteRelevanteRollen() {
-		Set<Rol> expectedRelevanteRollen = Mockito.spy(new HashSet<>());
-		kamer.activeerRelevanteRollen(expectedRelevanteRollen);
-		Assertions.assertIterableEquals(expectedRelevanteRollen, kamer.getRelevanteRollen());
+	void setRelevanteRollen_zetEnGeeftJuisteWaarden() {
+		var expected = spy(new HashSet<Rol>());
+
+		sut.setRelevanteRollen(expected);
+		var actual = sut.getRelevanteRollen();
+
+		assertIterableEquals(expected, actual);
 	}
 
-	@Nested
-	class getBegeleider {
-
-		@Test
-		void begeleiderAanwezig_geeftJuisteBegeleider() {
-			Assertions.assertEquals(begeleider, kamer.getBegeleider());
-		}
-
-		@Test
-		void begeleiderAfwezig_gooitIllegalStateException() {
-			deelnemers.remove(begeleider);
-			Assertions.assertThrows(IllegalStateException.class, () -> kamer.getBegeleider());
-		}
-
+	@Test
+	void begeleiderAanwezig_geeftJuisteWaarde() {
+		assertEquals(begeleider, sut.getBegeleider());
 	}
 
 }

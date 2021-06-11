@@ -5,66 +5,54 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.executable.ValidateOnExecution;
 import java.util.HashSet;
 import java.util.Set;
+import nl.han.oose.buizerd.projectcheck_backend.ExcludeFromGeneratedCoverageReport;
 
 /**
- * Een rol is een set van rechten die een {@link Deelnemer} aangewezen kan krijgen of kan kiezen binnen een {@link Kamer}.
+ * Een rol wordt vertegenwoordigd door een {@link Deelnemer}.
  * <p>
- * Elke rol heeft een naam.
+ * Elke rol heeft een naam en een beschrijving.
  */
 @Entity
 public class Rol {
 
-	/**
-	 * De naam van de rol.
-	 */
 	@Expose
-	@NotNull
+	@NotEmpty
 	@Id
 	private String rolNaam;
 
-	/**
-	 * Alle {@link KaartenSet}'s die bij deze rol horen.
-	 */
+	@Expose
+	@NotEmpty
+	private String beschrijving;
+
 	@OneToMany(mappedBy = "rol", fetch = FetchType.EAGER)
-	private Set<KaartenSet> kaartenSets;
+	private Set<KaartenSet> kaartenSets = new HashSet<>();
 
 	/**
-	 * Construeert een {@link Rol}.
-	 * <p>
-	 * <b>Deze constructor wordt gebruikt door JPA en mag niet aangeroepen worden.</b>
+	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
-	public Rol() {
+	@ExcludeFromGeneratedCoverageReport(reason = "wordt gebruikt door JPA en mag niet aangeroepen worden")
+	@Deprecated
+	protected Rol() {
 	}
 
-	/**
-	 * Construeert een {@link Rol}.
-	 *
-	 * @param rolNaam De naam van de rol.
-	 */
 	@ValidateOnExecution
-	public Rol(@NotNull String rolNaam) {
+	public Rol(@NotEmpty String rolNaam, @NotEmpty String beschrijving) {
 		this.rolNaam = rolNaam;
-		this.kaartenSets = new HashSet<>();
+		this.beschrijving = beschrijving;
 	}
 
-	/**
-	 * Haal de naam van de rol op.
-	 *
-	 * @return De naam van de rol.
-	 */
 	public String getRolNaam() {
 		return rolNaam;
 	}
 
-	/**
-	 * Geeft de kaartenset die bij de rol past terug.
-	 *
-	 * @return De kaartensets.
-	 */
+	public String getBeschrijving() {
+		return beschrijving;
+	}
+
 	public Set<KaartenSet> getKaartenSets() {
 		return kaartenSets;
 	}

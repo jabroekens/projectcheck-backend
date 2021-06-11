@@ -10,6 +10,11 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
 
+/**
+ * Zet de relevante rollen van de {@link Kamer} waaraan de {@link Deelnemer} deelneemt.
+ * <p>
+ * Als de deelnemer geen begeleider is, dan wordt er een {@link EventResponse.Status#VERBODEN VERBODEN} status teruggegeven.
+ */
 public class KiesRelevanteRollenEvent extends Event {
 
 	@NotNull
@@ -18,20 +23,16 @@ public class KiesRelevanteRollenEvent extends Event {
 	@Override
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
 		if (deelnemer instanceof Begeleider) {
-			deelnemer.getKamer().activeerRelevanteRollen(relevanteRollen);
-
-			return new EventResponse(EventResponse.Status.OK).metContext(
-				"bericht",
-				String.format("de rollen %s zijn ingeschakeld voor de kamer %s", relevanteRollen, deelnemer.getKamer().getKamerCode())
-			);
+			deelnemer.getKamer().setRelevanteRollen(relevanteRollen);
+			return new EventResponse(EventResponse.Status.OK);
 		} else {
-			return new EventResponse(EventResponse.Status.VERBODEN).metContext("deelnemer", deelnemer.getDeelnemerId());
+			return new EventResponse(EventResponse.Status.VERBODEN);
 		}
 	}
 
 	@Override
-	protected void handelAf(DAO<Kamer, String> kamerDAO, Kamer kamer) {
-		kamerDAO.update(kamer);
+	protected void handelAf(DAO dao, Kamer kamer) {
+		dao.update(kamer);
 	}
 
 }

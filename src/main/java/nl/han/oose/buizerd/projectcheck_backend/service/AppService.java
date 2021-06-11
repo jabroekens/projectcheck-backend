@@ -9,9 +9,9 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
+import nl.han.oose.buizerd.projectcheck_backend.domain.CodeGenerator;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
@@ -24,78 +24,77 @@ import nl.han.oose.buizerd.projectcheck_backend.validation.constraints.Naam;
 @Path("/")
 public class AppService {
 
-	@Inject
-	private DAO<Kamer, String> kamerDAO;
-
-	/**
-	 * Construeert een {@link AppService}.
-	 * <p>
-	 * <b>Deze constructor wordt gebruikt door JAX-RS en mag niet aangeroepen worden.</b>
-	 */
-	public AppService() {
-	}
-
-	/**
-	 * Construeert een {@link AppService}.
-	 *
-	 * <b>Deze constructor mag alleen aangeroepen worden binnen tests.</b>
-	 *
-	 * @param kamerDAO Een {@link DAO} voor {@link Kamer}.
-	 */
-	AppService(DAO<Kamer, String> kamerDAO) {
-		this.kamerDAO = kamerDAO;
-	}
+	private DAO dao;
+	private CodeGenerator codeGenerator;
 
 	/**
 	 * Maakt een een kamer aan onder begeleiding van een begeleider genaamd {@code begeleiderNaam}.
 	 *
-	 * @param begeleiderNaam De naam van de {@link Begeleider}.
-	 * @return Een JSON string met de WebSocket URL van de {@link Kamer} gewikkelt in {@link Response}.
+	 * @return een {@link Response OK Response} met daarin de kamercode van de aangemaakte kamer
+	 *         en het ID van de begeleider in JSON
 	 */
 	@Path("kamer/nieuw")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response maakKamer(@FormParam("begeleiderNaam") @Naam String begeleiderNaam) {
-		String kamerCode = Kamer.genereerCode();
+		var kamerCode = codeGenerator.genereerCode(Kamer.KAMER_CODE_MAX_LENGTE);
 
-		DeelnemerId deelnemerId = new DeelnemerId(1L, kamerCode);
-		Begeleider begeleider = new Begeleider(deelnemerId, begeleiderNaam);
-		Kamer kamer = new Kamer(kamerCode, begeleider);
+		var deelnemerId = new DeelnemerId(1L, kamerCode);
+		var begeleider = new Begeleider(deelnemerId, begeleiderNaam);
+		var kamer = new Kamer(kamerCode, begeleider);
 
-		kamerDAO.create(kamer);
+		dao.create(kamer);
 		return Response.ok(getKamerInfo(kamer.getKamerCode(), deelnemerId.getId())).build();
 	}
 
+	/**
+	 * Voegt een deelnemer met de naam {@code deelnemerNaam} toe aan de kamer met kamercode {@code kamerCode}
+	 * als de kamer bestaat en open is.
+	 */
 	@Path("kamer/neemdeel/{kamerCode}")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response neemDeel(@PathParam("kamerCode") @KamerCode String kamerCode, @FormParam("deelnemerNaam") @Naam String deelnemerNaam) {
-		Optional<Kamer> kamer = kamerDAO.read(Kamer.class, kamerCode);
+		var kamer = dao.read(Kamer.class, kamerCode);
 
 		if (kamer.isPresent()) {
 			if (kamer.get().getKamerFase() != KamerFase.OPEN) {
 				throw new KamerGeslotenException(kamerCode);
 			}
 
-			Long deelnemerId = kamer.get().genereerDeelnemerId();
-			Deelnemer deelnemer = new Deelnemer(
-				new DeelnemerId(deelnemerId, kamer.get().getKamerCode()),
+			var deelnemerId = kamer.get().genereerDeelnemerId();
+			var deelnemer = new Deelnemer(
+				new DeelnemerId(deelnemerId, kamerCode),
 				deelnemerNaam
 			);
 
-			kamer.get().voegDeelnemerToe(deelnemer);
-			kamerDAO.update(kamer.get());
+			kamer.get().addDeelnemer(deelnemer);
+			dao.update(kamer.get());
+
 			return Response.ok(getKamerInfo(kamerCode, deelnemerId)).build();
 		} else {
 			throw new KamerNietGevondenException(kamerCode);
 		}
 	}
 
+	/**
+	 * @return een JSON-string met de waarden {@code kamerCode} en {@code delenemerId}
+	 */
 	public String getKamerInfo(String kamerCode, Long deelnemerId) {
-		JsonObject json = new JsonObject();
+		var json = new JsonObject();
 		json.addProperty("kamerCode", kamerCode);
 		json.addProperty("deelnemerId", deelnemerId);
 		return json.toString();
+	}
+
+	@Inject
+	void setDao(DAO dao) {
+		this.dao = dao;
+	}
+
+	@Inject
+	void setCodeGenerator(CodeGenerator codeGenerator) {
+		this.codeGenerator = codeGenerator;
 	}
 
 }

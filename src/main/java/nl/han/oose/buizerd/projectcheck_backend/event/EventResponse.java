@@ -36,16 +36,11 @@ public class EventResponse {
 
 	private boolean stuurNaarAlleClients;
 
-	/**
-	 * Construeert een {@link EventResponse}.
-	 *
-	 * @param status De responsestatus.
-	 */
 	@ValidateOnExecution
 	public EventResponse(@NotNull EventResponse.Status status) {
 		this.status = status;
-		this.context = new HashMap<>();
-		this.datum = LocalDateTime.now();
+		context = new HashMap<>();
+		datum = LocalDateTime.now();
 	}
 
 	public Status getStatus() {
@@ -56,6 +51,11 @@ public class EventResponse {
 		return context;
 	}
 
+	/**
+	 * Voegt {@code waarde} toe aan de context onder {@code sleutel}.
+	 *
+	 * @return zichzelf
+	 */
 	public EventResponse metContext(String sleutel, Object waarde) {
 		context.put(sleutel, waarde);
 		return this;
@@ -69,6 +69,11 @@ public class EventResponse {
 		return antwoordOp;
 	}
 
+	/**
+	 * Zet de event waarop antwoord wordt gegeven.
+	 *
+	 * @return zichzelf
+	 */
 	public EventResponse antwoordOp(Event event) {
 		antwoordOp = Event.getEventNaam(event.getClass());
 		return this;
@@ -78,13 +83,21 @@ public class EventResponse {
 		return stuurNaarAlleClients;
 	}
 
+	/**
+	 * Markeert dat dit {@link EventResponse} naar alle clients gestuurd moet worden.
+	 *
+	 * @return zichzelf
+	 */
 	public EventResponse stuurNaarAlleClients() {
-		this.stuurNaarAlleClients = true;
+		stuurNaarAlleClients = true;
 		return this;
 	}
 
+	/**
+	 * @return een JSON-string representatie van dit {@link EventResponse}
+	 */
 	public String asJson() {
-		return EventResponse.GSON.toJson(this);
+		return GSON.toJson(this);
 	}
 
 	/**
@@ -93,7 +106,7 @@ public class EventResponse {
 	public enum Status {
 		OK,
 		VERBODEN,
-		INVALIDE,
+		ONGELDIG,
 		KAMER_NIET_GEVONDEN,
 		ROL_NIET_GEVONDEN,
 		SELECTIE_VOL,

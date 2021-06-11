@@ -1,55 +1,46 @@
 package nl.han.oose.buizerd.projectcheck_backend.dao;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.executable.ValidateOnExecution;
 import java.io.Serializable;
 import java.util.Optional;
 
-/**
- * Een DAO volgens het DAO pattern.
- *
- * @param <T> De domeinklasse waarmee gewerkt moet worden.
- * @param <K> De identifier van de domeinklasse.
- */
-public interface DAO<T, K extends Serializable> {
+public interface DAO {
 
 	/**
-	 * Sla de staat van {@code t} op.
+	 * Slaat de entiteit {@code t} op.
 	 *
-	 * @param t De instantie die opgeslagen moet worden.
-	 * @see jakarta.persistence.EntityManager#persist(Object)
+	 * @param t de entiteit die opgeslagen moet worden
+	 * @param <T> het type van de entiteit
 	 */
-	@ValidateOnExecution
-	void create(@NotNull @Valid T t);
+	<T> void create(T t);
 
 	/**
-	 * Haal een instantie van {@code T} op met de identifier {@code k}.
+	 * Haalt een entiteit {@link T} op met de primaire sleutel {@code k}.
 	 *
-	 * @param klasseType Het klassetype van {@link T}.
-	 * @param k De identifier van de op te halen instantie.
-	 * @return Een nullable instantie van {@link T} gewikkelt in {@link Optional}.
-	 * @see jakarta.persistence.EntityManager#find(Class, Object)
+	 * @param klasseType de klasse van {@link T}
+	 * @param k de primaire sleutel
+	 * @param <T> het type van de entiteit
+	 * @param <K> het type van de primaire sleutel
+	 * @return een {@link Optional} met daarin een instantie van {@link T} met
+	 *         de primaire sleutel {@code k} of een lege {@link Optional}
+	 *         als er geen entiteit van het type {@link T} is gevonden
+	 *         met de primaire sleutel {@code k}
 	 */
-	@ValidateOnExecution
-	Optional<@Valid T> read(@NotNull Class<T> klasseType, @NotNull @Valid K k);
+	<T, K extends Serializable> Optional<T> read(Class<T> klasseType, K k);
 
 	/**
-	 * Update de opgeslagen staat van {@code t}.
+	 * Updatet de opgeslagen staat van de entiteit {@code t}.
 	 *
-	 * @param t De instantie waarmee de opgeslagen instantie van {@link T} vervangen moet worden.
-	 * @see jakarta.persistence.EntityManager#merge(Object)
+	 * @param t de entiteit die geüpdatet moet worden
+	 * @param <T> het type van de entiteit
 	 */
-	@ValidateOnExecution
-	void update(@NotNull @Valid T t);
+	<T> T update(T t);
 
 	/**
-	 * Verwijder de opgeslagen staat van een instantie van {@code T} met de identifier {@code k}.
+	 * Verwijdert de entiteit {@code t}.
 	 *
-	 * @param k De identifier van de opgeslagen staat die verwijderd moet worden.
-	 * @see jakarta.persistence.EntityManager#remove(Object)
+	 * @param t de entiteit die verwijdert moet worden
+	 * @param <T> het type van de entiteit
 	 */
-	@ValidateOnExecution
-	void delete(@NotNull @Valid K k);
+	<T> void delete(T t);
 
 }

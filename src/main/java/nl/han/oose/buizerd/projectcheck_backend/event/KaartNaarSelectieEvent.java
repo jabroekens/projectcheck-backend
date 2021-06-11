@@ -17,17 +17,17 @@ public class KaartNaarSelectieEvent extends Event {
 
 	@Override
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
-		KaartenSelectie ks = deelnemer.getKaartenSelectie();
-		if (ks == null) {
-			ks = new KaartenSelectie();
-			deelnemer.setKaartenSelectie(ks);
+		var kaartenSelectie = deelnemer.getKaartenSelectie();
+		if (kaartenSelectie == null) {
+			kaartenSelectie = new KaartenSelectie();
+			deelnemer.setKaartenSelectie(kaartenSelectie);
 		}
 
-		if (ks.kaartIsGeselecteerd(geselecteerdeKaart)) {
-			ks.removeKaart(geselecteerdeKaart);
+		if (kaartenSelectie.kaartIsGeselecteerd(geselecteerdeKaart)) {
+			kaartenSelectie.removeKaart(geselecteerdeKaart);
 			return new EventResponse(EventResponse.Status.OK).metContext("verwijderdeKaart", geselecteerdeKaart);
-		} else if (!ks.isVol()) {
-			ks.addKaart(geselecteerdeKaart);
+		} else if (!kaartenSelectie.isVol()) {
+			kaartenSelectie.addKaart(geselecteerdeKaart);
 			return new EventResponse(EventResponse.Status.OK).metContext("toegevoegdeKaart", geselecteerdeKaart);
 		} else {
 			return new EventResponse(EventResponse.Status.SELECTIE_VOL).metContext("ongebruikteKaart", geselecteerdeKaart);
@@ -35,8 +35,8 @@ public class KaartNaarSelectieEvent extends Event {
 	}
 
 	@Override
-	protected void handelAf(DAO<Kamer, String> kamerDAO, Kamer kamer) {
-		kamerDAO.update(kamer);
+	protected void handelAf(DAO dao, Kamer kamer) {
+		dao.update(kamer);
 	}
 
 }

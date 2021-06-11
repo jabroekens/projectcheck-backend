@@ -7,91 +7,60 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotEmpty;
+import nl.han.oose.buizerd.projectcheck_backend.ExcludeFromGeneratedCoverageReport;
 
 /**
- * De {@link KaartToelichting} is een onderdeel van de ProjectCheck
- * die hoort bij een {@link Kaart}.
+ * Een {@link KaartToelichting} is de toelichting die een {@link Deelnemer}
+ * geeft bij de door hen gekozen {@link Kaart Kaart(en)}.
  */
 @Entity
 public class KaartToelichting {
 
-	/**
-	 * De primary key van {@link KaartToelichting}.
-	 * De id is auto incremented, en kan niet worden aangepast.
-	 */
 	@Expose
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	/**
-	 * De relevante {@link Kaart} waar de toelichting bij hoort.
-	 * Het is notnull en kan niet worden aangepast.
-	 */
 	@Expose
 	@OneToOne
 	@Column(nullable = false, updatable = false)
 	private Kaart kaart;
 
-	/**
-	 * De relevante toelichting voor de {@link Kaart}.
-	 * Het is notnull en kan worden aangepast.
-	 */
 	@Expose
+	@NotEmpty
 	@Column(nullable = false)
 	private String toelichting;
 
 	/**
-	 * Genereert een {@link KaartToelichting}.
-	 * Deze constructor zal alleen gebruikt worden door JPA.
+	 * @deprecated wordt gebruikt door JPA en mag niet aangeroepen worden
 	 */
-	public KaartToelichting() {
+	@ExcludeFromGeneratedCoverageReport(reason = "wordt gebruikt door JPA en mag niet aangeroepen worden")
+	@Deprecated
+	protected KaartToelichting() {
 	}
 
-	/**
-	 * Genereert een {@link KaartToelichting}.
-	 *
-	 * @param kaart De relevante kaart voor de toelichting.
-	 * @param toelichting De toelichting.
-	 */
 	public KaartToelichting(Kaart kaart, String toelichting) {
 		this.kaart = kaart;
 		this.toelichting = toelichting;
 	}
 
 	/**
-	 * Geeft de unieke autoincrement id terug.
-	 *
-	 * @return De unieke id.
+	 * @return het ID van de kaart of {@code null} als deze nog niet gegenereerd is
 	 */
 	public Integer getId() {
 		return id;
 	}
 
-	/**
-	 * Geeft de relevante kaart die bij de toelichting hoort terug.
-	 *
-	 * @return De relevante kaart.
-	 */
 	public Kaart getKaart() {
 		return kaart;
 	}
 
-	/**
-	 * Geeft de toelichting voor de relevante kaart terug.
-	 *
-	 * @return De toelichgting.
-	 */
 	public String getToelichting() {
 		return toelichting;
 	}
 
-	/**
-	 * Zet de toelichting voor de relevante kaart.
-	 *
-	 * @param toelichting De nieuwe toelichting.
-	 */
-	public void setToelichting(String toelichting) {
+	public void setToelichting(@NotEmpty String toelichting) {
 		this.toelichting = toelichting;
 	}
 

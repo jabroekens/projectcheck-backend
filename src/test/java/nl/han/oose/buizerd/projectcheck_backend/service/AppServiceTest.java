@@ -1,14 +1,24 @@
 package nl.han.oose.buizerd.projectcheck_backend.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import jakarta.ws.rs.core.Response;
 import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
+import nl.han.oose.buizerd.projectcheck_backend.domain.CodeGenerator;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KamerFase;
 import nl.han.oose.buizerd.projectcheck_backend.exception.KamerGeslotenException;
 import nl.han.oose.buizerd.projectcheck_backend.exception.KamerNietGevondenException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,29 +26,35 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class AppServiceTest {
 
 	@Mock
-	private DAO<Kamer, String> kamerDAO;
+	private DAO dao;
 
-	private AppService appService;
+	@Mock
+	private CodeGenerator codeGenerator;
+
+	private AppService sut;
 
 	@BeforeEach
 	void setUp() {
-		appService = new AppService(kamerDAO);
+		sut = new AppService();
+		sut.setDao(dao);
+		sut.setCodeGenerator(codeGenerator);
 	}
 
 	@Test
 	void getKamerInfo_geeftJuisteJson() {
-		String kamerCode = "123456";
-		Long deelnemerId = 12L;
+		var kamerCode = "123456";
+		var deelnemerId = 12L;
+		var expected = "{\"kamerCode\":\"" + kamerCode + "\",\"deelnemerId\":" + deelnemerId + "}";
 
-		String expected = "{\"kamerCode\":\"" + kamerCode + "\",\"deelnemerId\":" + deelnemerId + "}";
-		Assertions.assertEquals(expected, appService.getKamerInfo(kamerCode, deelnemerId));
+		var actual = sut.getKamerInfo(kamerCode, deelnemerId);
+
+		assertEquals(expected, actual);
 	}
 
 	/*
@@ -47,42 +63,39 @@ class AppServiceTest {
 	 * cannot be found" gegooit wordt.
 	 */
 	private void metGemockteResponseBuilder(Runnable runnable) {
-		Response.ResponseBuilder responseBuilder = Mockito.mock(Response.ResponseBuilder.class);
+		Response.ResponseBuilder responseBuilder = mock(Response.ResponseBuilder.class);
 
-		try (MockedStatic<Response> mock = Mockito.mockStatic(Response.class)) {
-			mock.when(() -> Response.ok(Mockito.anyString())).thenReturn(responseBuilder);
+		try (MockedStatic<Response> mock = mockStatic(Response.class)) {
+			mock.when(() -> Response.ok(anyString())).thenReturn(responseBuilder);
 			runnable.run();
-			mock.verify(() -> Response.ok(Mockito.anyString()));
+			mock.verify(() -> Response.ok(anyString()));
 		}
 	}
 
 	@Nested
 	class maakKamer {
 
+		private static final String BEGELEIDER_NAAM = "Joost";
+
 		@Test
 		void genereertCode() {
-			String begeleiderNaam = "Joost";
-
-			try (MockedStatic<Kamer> mock = Mockito.mockStatic(Kamer.class)) {
-				mock.when(Kamer::genereerCode).thenThrow(RuntimeException.class);
-				Assertions.assertThrows(RuntimeException.class, () -> appService.maakKamer(begeleiderNaam));
-				mock.verify(Kamer::genereerCode);
-			}
+			metGemockteResponseBuilder(() -> {
+				sut.maakKamer(BEGELEIDER_NAAM);
+				verify(codeGenerator).genereerCode(anyInt());
+			});
 		}
 
 		@Test
-		void slaatKamerOp() {
-			String kamerCode = "123456";
-			String begeleiderNaam = "Joost";
-
+		void maaktBegeleiderAanMetJuisteWaardenEnSlaatKamerOp() {
+			var kamerCode = "123456";
 			ArgumentCaptor<Kamer> kamerCaptor = ArgumentCaptor.forClass(Kamer.class);
 
 			metGemockteResponseBuilder(() -> {
-				appService.maakKamer(begeleiderNaam);
+				sut.maakKamer(BEGELEIDER_NAAM);
 
-				Mockito.verify(kamerDAO).create(kamerCaptor.capture());
-				Assertions.assertNotNull(kamerCaptor.getValue().getBegeleider());
-				Assertions.assertEquals(begeleiderNaam, kamerCaptor.getValue().getBegeleider().getNaam());
+				verify(dao).create(kamerCaptor.capture());
+				assertNotNull(kamerCaptor.getValue().getBegeleider());
+				assertEquals(BEGELEIDER_NAAM, kamerCaptor.getValue().getBegeleider().getNaam());
 			});
 		}
 
@@ -91,49 +104,45 @@ class AppServiceTest {
 	@Nested
 	class neemDeel {
 
+		private static final String KAMER_CODE = "123456";
+		private static final String DEELNEMER_NAAM = "Joost";
+
 		@Test
 		void kamerAfwezig_gooitKamerNietGevondenException() {
-			String kamerCode = "123456";
-			String deelnemerNaam = "Joost";
-
-			Mockito.when(kamerDAO.read(Kamer.class, kamerCode)).thenReturn(Optional.empty());
-			Assertions.assertThrows(KamerNietGevondenException.class, () -> appService.neemDeel(kamerCode, deelnemerNaam));
-			Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
+			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
+			assertThrows(KamerNietGevondenException.class, () -> sut.neemDeel(KAMER_CODE, DEELNEMER_NAAM));
+			verify(dao).read(Kamer.class, KAMER_CODE);
 		}
 
 		@Nested
 		class kamerAanwezig {
 
-			@Test
-			void kamerOpen_voegtDeelnemerToe(@Mock Kamer kamer) {
-				String kamerCode = "123456";
-				String deelnemerNaam = "Joost";
+			@Mock
+			private Kamer kamer;
 
-				ArgumentCaptor<Deelnemer> deelnemerCaptor = ArgumentCaptor.forClass(Deelnemer.class);
+			@Test
+			void kamerOpen_voegtDeelnemerMetJuisteWaardenToe() {
+				var deelnemerCaptor = ArgumentCaptor.forClass(Deelnemer.class);
 
 				metGemockteResponseBuilder(() -> {
-					Mockito.when(kamerDAO.read(Kamer.class, kamerCode)).thenReturn(Optional.of(kamer));
-					Mockito.when(kamer.getKamerFase()).thenReturn(KamerFase.OPEN);
+					when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
+					when(kamer.getKamerFase()).thenReturn(KamerFase.OPEN);
 
-					appService.neemDeel(kamerCode, deelnemerNaam);
+					sut.neemDeel(KAMER_CODE, DEELNEMER_NAAM);
 
-					Mockito.verify(kamer).voegDeelnemerToe(deelnemerCaptor.capture());
-					Mockito.verify(kamerDAO).update(kamer);
-					Assertions.assertEquals(deelnemerNaam, deelnemerCaptor.getValue().getNaam());
+					verify(kamer).addDeelnemer(deelnemerCaptor.capture());
+					verify(dao).update(kamer);
+					assertEquals(DEELNEMER_NAAM, deelnemerCaptor.getValue().getNaam());
 				});
 			}
 
 			@Test
-			void kamerNietOpen_gooitKamerGeslotenException(@Mock Kamer kamer, @Mock KamerFase kamerFase) {
-				String kamerCode = "123456";
-				String deelnemerNaam = "Joost";
+			void kamerNietOpen_gooitKamerGeslotenException(@Mock KamerFase kamerFase) {
+				when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
+				when(kamer.getKamerFase()).thenReturn(kamerFase);
 
-				Mockito.when(kamerDAO.read(Kamer.class, kamerCode)).thenReturn(Optional.of(kamer));
-				Mockito.when(kamer.getKamerFase()).thenReturn(kamerFase);
-
-				Assertions.assertThrows(KamerGeslotenException.class, () -> appService.neemDeel(kamerCode, deelnemerNaam));
-
-				Mockito.verify(kamerDAO).read(Kamer.class, kamerCode);
+				assertThrows(KamerGeslotenException.class, () -> sut.neemDeel(KAMER_CODE, DEELNEMER_NAAM));
+				verify(dao).read(Kamer.class, KAMER_CODE);
 			}
 
 		}

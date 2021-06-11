@@ -1,6 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend.exception;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +9,7 @@ abstract class ExceptionTest<T extends Throwable> {
 
 	private final String message;
 
-	private T t;
+	private T sut;
 
 	protected ExceptionTest(String message) {
 		this.message = message;
@@ -16,17 +17,14 @@ abstract class ExceptionTest<T extends Throwable> {
 
 	@BeforeEach
 	void setUp() {
-		t = setUpImpl();
+		sut = setUpImpl();
 	}
 
 	protected abstract T setUpImpl();
 
 	@Test
-	void geeftJuisteMessage() {
-		Assertions.assertEquals(
-			message,
-			t.getMessage()
-		);
+	void getMessage_geeftJuisteWaarde() {
+		assertEquals(message, sut.getMessage());
 	}
 
 }

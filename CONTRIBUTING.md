@@ -122,13 +122,13 @@ ChatEvent.java
 ```
 public class ChatEvent extends Event {
 
-	// package-private zodat het getest kan worden.
+	// Package-private zodat het getest kan worden
 	@NotNull
 	String woord;
 
 	@Override
 	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
-		String bericht = String.format("%s zegt: \"%s\"", deelnemer.get().getNaam(), woord);
+		var bericht = String.format("%s zegt: \"%s\"", deelnemer.get().getNaam(), woord);
 		return new EventResponse(EventResponse.Status.OK).metContext("bericht", bericht).stuurNaarAlleClients();
 	}
 
@@ -140,24 +140,24 @@ ChatEventTest.java
 @ExtendWith(MockitoExtension.class)
 class ChatEventTest {
 
-	private ChatEvent chatEvent;
+	private ChatEvent sut;
 
 	@BeforeEach
 	void setUp() {
-		chatEvent = new ChatEvent();
-		chatEvent.woord = "Hallo!";
+		sut = new ChatEvent();
+		sut.woord = "Hallo!";
 	}
 
 	@Test
 	void voerUit_stuurtJuisteBerichtNaarAlleClients(@Mock Deelnemer deelnemer, @Mock Session session) {
-		String expectedBericht = String.format("%s zegt: \"%s\"", deelnemer.getNaam(), chatEvent.woord);
+		var expectedBericht = String.format("%s zegt: \"%s\"", deelnemer.getNaam(), sut.woord);
 
-		EventResponse response = chatEvent.voerUit(kamer, session);
+		var eventResponse = sut.voerUit(kamer, session);
 
-		Assertions.assertAll(
-			() -> Assertions.assertTrue(response.isStuurNaarAlleClients()),
-			() -> Assertions.assertEquals(EventResponse.Status.OK, response.getStatus()),
-			() -> Assertions.assertEquals(expectedBericht, response.getContext().get("bericht"))
+		assertAll(
+			() -> assertTrue(eventResponse.isStuurNaarAlleClients()),
+			() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),
+			() -> assertEquals(expectedBericht, eventResponse.getContext().get("bericht"))
 		);
 	}
 
