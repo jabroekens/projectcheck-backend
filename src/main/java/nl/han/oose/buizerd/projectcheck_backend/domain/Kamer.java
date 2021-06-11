@@ -51,7 +51,7 @@ public class Kamer {
 	@Transient
 	private Ronde huidigeRonde;
 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER)
 	private Set<@NotNull @Valid Rol> relevanteRollen;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "kamer", orphanRemoval = true)
