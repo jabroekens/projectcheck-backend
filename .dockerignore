@@ -1,0 +1,5 @@
+*
+!docker/backend/
+!src/
+!LICENSE
+!pom.xml

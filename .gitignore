@@ -1,6 +1,9 @@
 .idea/
 .settings/
 target/
+docker/secrets/
+docker/backend/*.pfx
+docker/backend/*.cert
 *.iml
 .classpath
 .project

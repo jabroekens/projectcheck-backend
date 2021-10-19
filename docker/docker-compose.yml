@@ -1,0 +1,33 @@
+version: '2.4'
+services:
+  db:
+    build: db/
+    secrets:
+      - sa_password
+      - projectcheck_backend_password
+    ports:
+      - 1433:1433
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -U sa -P "$$(cat "$$MSSQL_SA_PASSWORD_FILE")" -d ProjectCheck -Q ''
+  backend:
+    build:
+      context: ../
+      dockerfile: docker/backend/Dockerfile
+    environment:
+      JAVA_OPTS: >-
+        -DProjectCheckDb.password="$$(cat /run/secrets/projectcheck_backend_password)"
+        -DProjectCheckDbUnmanaged.password="$$(cat /run/secrets/projectcheck_backend_password)"
+      CATALINA_OPTS: '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'
+    secrets:
+      - projectcheck_backend_password
+    ports:
+      - 8443:8443
+      - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
+secrets:
+  sa_password:
+    file: secrets/sa_password
+  projectcheck_backend_password:
+    file: secrets/projectcheck_backend_password
