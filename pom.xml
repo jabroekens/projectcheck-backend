@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>jakarta.platform</groupId>
 			<artifactId>jakarta.jakartaee-api</artifactId>
-			<version>9.0.0</version>
+			<version>9.1.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -96,6 +96,7 @@
 							<rules>
 								<rule>
 									<excludes>
+										<exclude>**.ProjectCheckApp</exclude>
 										<exclude>**.event.Event</exclude>
 										<exclude>**.event.Event.Decoder</exclude>
 									</excludes>
