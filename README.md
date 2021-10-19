@@ -54,30 +54,30 @@ deelnemers via bijvoorbeeld Zoom of Microsoft Teams bijeenkomen en hun bevinding
     1. Zorgt dat de volgende tekst tussen `<tomee>` en `</tomee>` staat:
         ```
         <Resource id="ProjectCheckDb" type="DataSource">
-          JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
-          JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
-          UserName = backend
-          Password = 3jsdolD$aev9%xzAbRnA4FuBb
+          jdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
+          jdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
+          userName = projectcheck_backend
+          password = 3jsdolD$aev9%xzAbRnA4FuBb
         </Resource>
         <Resource id="ProjectCheckDbUnmanaged" type="DataSource">
-          JdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
-          JdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
-          UserName = backend
-          Password = 3jsdolD$aev9%xzAbRnA4FuBb
-          JtaManaged = false
+          jdbcDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
+          jdbcUrl = jdbc:sqlserver://localhost:1433;databaseName=ProjectCheck
+          userName = projectcheck_backend
+          password = 3jsdolD$aev9%xzAbRnA4FuBb
+          jtaManaged = false
         </Resource>
         ```
     2. Sla het geopende bestand op
 7. Voer de volgende SQL-code voor SQL Server uit:
     ```
     USE master;
-    CREATE LOGIN backend WITH PASSWORD = '3jsdolD$aev9%xzAbRnA4FuBb';
+    CREATE LOGIN projectcheck_backend WITH PASSWORD = '3jsdolD$aev9%xzAbRnA4FuBb';
     CREATE DATABASE ProjectCheck;
     GO
 
     USE ProjectCheck;
-    CREATE USER backend FROM LOGIN backend;
-    ALTER ROLE db_owner ADD MEMBER backend;
+    CREATE USER projectcheck_backend FROM LOGIN projectcheck_backend;
+    ALTER ROLE db_owner ADD MEMBER projectcheck_backend;
     GO
     ```
 8. Stel de Server Authentication Mode voor SQL Server in op `SQL Server and Windows Authentication mode` door de stappen te volgen zoals hier beschreven:
