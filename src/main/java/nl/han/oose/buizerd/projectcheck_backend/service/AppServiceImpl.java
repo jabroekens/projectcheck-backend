@@ -1,6 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend.service;
 
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.CodeGenerator;
@@ -27,6 +28,7 @@ public class AppServiceImpl implements AppService {
 		return deelnemerId;
 	}
 
+	@Transactional
 	public DeelnemerId neemDeel(String kamerCode, String deelnemerNaam)
 	throws KamerNietGevondenException, KamerGeslotenException {
 		var kamer = dao.read(Kamer.class, kamerCode);

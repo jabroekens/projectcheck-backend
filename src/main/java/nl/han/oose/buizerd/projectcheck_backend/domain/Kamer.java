@@ -3,7 +3,6 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
@@ -51,10 +50,10 @@ public class Kamer {
 	@Transient
 	private Ronde huidigeRonde;
 
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany
 	private Set<@NotNull @Valid Rol> relevanteRollen;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "kamer", orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "kamer", orphanRemoval = true)
 	private Set<@NotNull @Valid Deelnemer> deelnemers;
 
 	/**

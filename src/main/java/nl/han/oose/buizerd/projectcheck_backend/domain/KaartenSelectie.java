@@ -2,7 +2,6 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.Valid;
@@ -22,7 +21,7 @@ public class KaartenSelectie {
 	@Column(nullable = false, updatable = false)
 	private int selectieCode;
 
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany
 	private Set<Kaart> kaarten = new HashSet<>();
 
 	/**

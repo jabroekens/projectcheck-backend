@@ -1,6 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend.service;
 
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import java.util.concurrent.CompletableFuture;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
@@ -19,6 +20,7 @@ public class KamerServiceImpl implements KamerService {
 		return kamer.isPresent() && kamer.get().getKamerFase() != KamerFase.GESLOTEN;
 	}
 
+	@Transactional
 	public CompletableFuture<EventResponse> voerEventUit(Event event)
 	throws DeelnemerNietGevondenException, KamerNietGevondenException {
 		var kamer = dao.read(Kamer.class, event.getDeelnemerId().getKamerCode());

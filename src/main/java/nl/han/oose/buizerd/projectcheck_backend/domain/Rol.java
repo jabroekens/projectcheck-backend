@@ -2,7 +2,6 @@ package nl.han.oose.buizerd.projectcheck_backend.domain;
 
 import com.google.gson.annotations.Expose;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotEmpty;
@@ -28,7 +27,7 @@ public class Rol {
 	@NotEmpty
 	private String beschrijving;
 
-	@OneToMany(mappedBy = "rol", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "rol")
 	private Set<KaartenSet> kaartenSets = new HashSet<>();
 
 	/**
