@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.websocket.Session;
 import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KaartToelichting;
@@ -34,11 +33,11 @@ class HighlightKaartEventTest {
 	}
 
 	@Test
-	void voerUit_huidigeRondeAfwezig_stuurtJuisteEventResponse(@Mock Deelnemer deelnemer, @Mock Session session, @Mock Kamer kamer) {
+	void voerUit_huidigeRondeAfwezig_stuurtJuisteEventResponse(@Mock Deelnemer deelnemer, @Mock Kamer kamer) {
 		when(deelnemer.getKamer()).thenReturn(kamer);
 		when(kamer.getHuidigeRonde()).thenReturn(Optional.empty());
 
-		var eventResponse = sut.voerUit(deelnemer, session);
+		var eventResponse = sut.voerUit(deelnemer);
 
 		assertEquals(EventResponse.Status.RONDE_NIET_GEVONDEN, eventResponse.getStatus());
 	}
@@ -48,9 +47,6 @@ class HighlightKaartEventTest {
 
 		@Mock
 		private Deelnemer deelnemer;
-
-		@Mock
-		private Session session;
 
 		@Mock
 		private Ronde ronde;
@@ -65,7 +61,7 @@ class HighlightKaartEventTest {
 		void magNietHighlighten_geeftJuisteEventResponse(@Mock KaartToelichting kaartToelichting) {
 			when(ronde.getGehighlighteKaart()).thenReturn(Optional.of(kaartToelichting));
 
-			var eventResponse = sut.voerUit(deelnemer, session);
+			var eventResponse = sut.voerUit(deelnemer);
 
 			assertEquals(EventResponse.Status.VERBODEN, eventResponse.getStatus());
 		}
@@ -74,7 +70,7 @@ class HighlightKaartEventTest {
 		void magHighlighten_zetGehighlighteKaart() {
 			when(ronde.getGehighlighteKaart()).thenReturn(Optional.empty());
 
-			var eventResponse = sut.voerUit(deelnemer, session);
+			var eventResponse = sut.voerUit(deelnemer);
 
 			assertAll(
 				() -> verify(ronde).setGehighlighteKaart(kaartToelichting),

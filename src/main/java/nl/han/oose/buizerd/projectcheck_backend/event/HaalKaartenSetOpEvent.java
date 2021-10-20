@@ -1,6 +1,5 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
-import jakarta.websocket.Session;
 import java.util.HashSet;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KaartenSet;
@@ -20,7 +19,7 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.StandaardRol;
 public class HaalKaartenSetOpEvent extends Event {
 
 	@Override
-	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
+	protected EventResponse voerUit(Deelnemer deelnemer) {
 		if (deelnemer.getRol() == null) {
 			return new EventResponse(EventResponse.Status.ROL_NIET_GEVONDEN);
 		}

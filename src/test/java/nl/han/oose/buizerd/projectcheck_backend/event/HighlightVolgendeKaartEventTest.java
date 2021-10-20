@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.websocket.Session;
 import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
@@ -31,8 +30,8 @@ class HighlightVolgendeKaartEventTest {
 	}
 
 	@Test
-	void voerUit_deelnemerIsGeenBegeleider_stuurtJuisteEventResponse(@Mock Deelnemer deelnemer, @Mock Session session) {
-		var eventResponse = sut.voerUit(deelnemer, session);
+	void voerUit_deelnemerIsGeenBegeleider_stuurtJuisteEventResponse(@Mock Deelnemer deelnemer) {
+		var eventResponse = sut.voerUit(deelnemer);
 		assertEquals(EventResponse.Status.VERBODEN, eventResponse.getStatus());
 	}
 
@@ -41,9 +40,6 @@ class HighlightVolgendeKaartEventTest {
 
 		@Mock
 		private Begeleider begeleider;
-
-		@Mock
-		private Session session;
 
 		@Mock
 		private Kamer kamer;
@@ -57,7 +53,7 @@ class HighlightVolgendeKaartEventTest {
 		void huidigeRondeAfwezig_stuurtJuisteEventResponse() {
 			when(kamer.getHuidigeRonde()).thenReturn(Optional.empty());
 
-			var eventResponse = sut.voerUit(begeleider, session);
+			var eventResponse = sut.voerUit(begeleider);
 
 			assertEquals(EventResponse.Status.RONDE_NIET_GEVONDEN, eventResponse.getStatus());
 		}
@@ -66,7 +62,7 @@ class HighlightVolgendeKaartEventTest {
 		void huidigeRondeAanwezig_stuurtJuisteEventResponse(@Mock Ronde ronde) {
 			when(kamer.getHuidigeRonde()).thenReturn(Optional.of(ronde));
 
-			var eventResponse = sut.voerUit(begeleider, session);
+			var eventResponse = sut.voerUit(begeleider);
 
 			assertAll(
 				() -> verify(ronde).setGehighlighteKaart(null),

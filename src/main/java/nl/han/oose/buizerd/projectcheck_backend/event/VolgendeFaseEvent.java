@@ -1,6 +1,5 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
-import jakarta.websocket.Session;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
@@ -14,7 +13,7 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 public class VolgendeFaseEvent extends Event {
 
 	@Override
-	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
+	protected EventResponse voerUit(Deelnemer deelnemer) {
 		if (deelnemer instanceof Begeleider) {
 			var kamer = deelnemer.getKamer();
 			var kamerFase = kamer.getKamerFase();

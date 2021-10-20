@@ -2,7 +2,6 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.websocket.Session;
 import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
@@ -21,7 +20,7 @@ public class KiesRelevanteRollenEvent extends Event {
 	Set<@NotNull @Valid Rol> relevanteRollen;
 
 	@Override
-	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
+	protected EventResponse voerUit(Deelnemer deelnemer) {
 		if (deelnemer instanceof Begeleider) {
 			deelnemer.getKamer().setRelevanteRollen(relevanteRollen);
 			return new EventResponse(EventResponse.Status.OK);

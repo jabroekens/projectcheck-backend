@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.websocket.Session;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Begeleider;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
@@ -37,9 +36,6 @@ class VolgendeFaseEventTest {
 	@Nested
 	class voerUit {
 
-		@Mock
-		private Session session;
-
 		@Test
 		void deelnemerIsBegeleider_zetKamerFaseNaarVolgendeFaseEnGeeftJuisteEventResponseTerug(
 			@Mock Begeleider begeleider, @Mock Kamer kamer, @Mock KamerFase kamerFase
@@ -47,7 +43,7 @@ class VolgendeFaseEventTest {
 			when(begeleider.getKamer()).thenReturn(kamer);
 			when(kamer.getKamerFase()).thenReturn(kamerFase);
 
-			var eventResponse = sut.voerUit(begeleider, session);
+			var eventResponse = sut.voerUit(begeleider);
 
 			assertAll(
 				() -> {
@@ -61,7 +57,7 @@ class VolgendeFaseEventTest {
 
 		@Test
 		void deelnemerIsNietBegeleider_geeftJuisteEventResponseTerug(@Mock Deelnemer deelnemer) {
-			assertEquals(EventResponse.Status.VERBODEN, sut.voerUit(deelnemer, session).getStatus());
+			assertEquals(EventResponse.Status.VERBODEN, sut.voerUit(deelnemer).getStatus());
 		}
 
 	}

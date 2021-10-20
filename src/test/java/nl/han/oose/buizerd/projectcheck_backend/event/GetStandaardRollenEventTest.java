@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import jakarta.websocket.Session;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,8 @@ class GetStandaardRollenEventTest {
 	}
 
 	@Test
-	void voerUit_geeftJuisteEventResponseTerug(@Mock Deelnemer deelnemer, @Mock Session session) {
-		var eventResponse = sut.voerUit(deelnemer, session);
+	void voerUit_geeftJuisteEventResponseTerug(@Mock Deelnemer deelnemer) {
+		var eventResponse = sut.voerUit(deelnemer);
 
 		assertAll(
 			() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),

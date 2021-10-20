@@ -4,13 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.ws.rs.core.Response;
 import java.util.Optional;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.CodeGenerator;
@@ -25,11 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class AppServiceTest {
+class AppServiceImplTest {
 
 	@Mock
 	private DAO dao;
@@ -37,39 +32,13 @@ class AppServiceTest {
 	@Mock
 	private CodeGenerator codeGenerator;
 
-	private AppService sut;
+	private AppServiceImpl sut;
 
 	@BeforeEach
 	void setUp() {
-		sut = new AppService();
+		sut = new AppServiceImpl();
 		sut.setDao(dao);
 		sut.setCodeGenerator(codeGenerator);
-	}
-
-	@Test
-	void getKamerInfo_geeftJuisteJson() {
-		var kamerCode = "123456";
-		var deelnemerId = 12L;
-		var expected = "{\"kamerCode\":\"" + kamerCode + "\",\"deelnemerId\":" + deelnemerId + "}";
-
-		var actual = sut.getKamerInfo(kamerCode, deelnemerId);
-
-		assertEquals(expected, actual);
-	}
-
-	/*
-	 * Het is nodig een gemockte ResponseBuilder terug te geven, omdat er anders
-	 * "ClassNotFoundException: Provider for jakarta.ws.rs.ext.RuntimeDelegate
-	 * cannot be found" gegooit wordt.
-	 */
-	private void metGemockteResponseBuilder(Runnable runnable) {
-		Response.ResponseBuilder responseBuilder = mock(Response.ResponseBuilder.class);
-
-		try (MockedStatic<Response> mock = mockStatic(Response.class)) {
-			mock.when(() -> Response.ok(anyString())).thenReturn(responseBuilder);
-			runnable.run();
-			mock.verify(() -> Response.ok(anyString()));
-		}
 	}
 
 	@Nested
@@ -79,24 +48,20 @@ class AppServiceTest {
 
 		@Test
 		void genereertCode() {
-			metGemockteResponseBuilder(() -> {
-				sut.maakKamer(BEGELEIDER_NAAM);
-				verify(codeGenerator).genereerCode(anyInt());
-			});
+			sut.maakKamer(BEGELEIDER_NAAM);
+			verify(codeGenerator).genereerCode(anyInt());
 		}
 
 		@Test
 		void maaktBegeleiderAanMetJuisteWaardenEnSlaatKamerOp() {
 			var kamerCode = "123456";
-			ArgumentCaptor<Kamer> kamerCaptor = ArgumentCaptor.forClass(Kamer.class);
+			var kamerCaptor = ArgumentCaptor.forClass(Kamer.class);
 
-			metGemockteResponseBuilder(() -> {
-				sut.maakKamer(BEGELEIDER_NAAM);
+			sut.maakKamer(BEGELEIDER_NAAM);
 
-				verify(dao).create(kamerCaptor.capture());
-				assertNotNull(kamerCaptor.getValue().getBegeleider());
-				assertEquals(BEGELEIDER_NAAM, kamerCaptor.getValue().getBegeleider().getNaam());
-			});
+			verify(dao).create(kamerCaptor.capture());
+			assertNotNull(kamerCaptor.getValue().getBegeleider());
+			assertEquals(BEGELEIDER_NAAM, kamerCaptor.getValue().getBegeleider().getNaam());
 		}
 
 	}
@@ -124,16 +89,14 @@ class AppServiceTest {
 			void kamerOpen_voegtDeelnemerMetJuisteWaardenToe() {
 				var deelnemerCaptor = ArgumentCaptor.forClass(Deelnemer.class);
 
-				metGemockteResponseBuilder(() -> {
-					when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
-					when(kamer.getKamerFase()).thenReturn(KamerFase.OPEN);
+				when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
+				when(kamer.getKamerFase()).thenReturn(KamerFase.OPEN);
 
-					sut.neemDeel(KAMER_CODE, DEELNEMER_NAAM);
+				sut.neemDeel(KAMER_CODE, DEELNEMER_NAAM);
 
-					verify(kamer).addDeelnemer(deelnemerCaptor.capture());
-					verify(dao).update(kamer);
-					assertEquals(DEELNEMER_NAAM, deelnemerCaptor.getValue().getNaam());
-				});
+				verify(kamer).addDeelnemer(deelnemerCaptor.capture());
+				verify(dao).update(kamer);
+				assertEquals(DEELNEMER_NAAM, deelnemerCaptor.getValue().getNaam());
 			}
 
 			@Test

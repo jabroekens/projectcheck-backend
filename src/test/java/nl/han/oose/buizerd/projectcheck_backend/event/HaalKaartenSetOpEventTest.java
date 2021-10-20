@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import jakarta.websocket.Session;
 import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KaartenSet;
@@ -37,12 +36,9 @@ class HaalKaartenSetOpEventTest {
 		@Mock
 		private Deelnemer deelnemer;
 
-		@Mock
-		private Session session;
-
 		@Test
 		void deelnemerHeeftGeenRol_geeftJuisteEventResponseTerug() {
-			var eventResponse = sut.voerUit(deelnemer, session);
+			var eventResponse = sut.voerUit(deelnemer);
 			assertEquals(EventResponse.Status.ROL_NIET_GEVONDEN, eventResponse.getStatus());
 		}
 
@@ -52,7 +48,7 @@ class HaalKaartenSetOpEventTest {
 			when(deelnemer.getRol()).thenReturn(rol);
 			when(rol.getKaartenSets()).thenReturn(expectedKaartenSets);
 
-			var eventResponse = sut.voerUit(deelnemer, session);
+			var eventResponse = sut.voerUit(deelnemer);
 
 			assertAll(
 				() -> assertTrue(eventResponse.getContext().get("kaartensets") instanceof Iterable<?>),
@@ -66,7 +62,6 @@ class HaalKaartenSetOpEventTest {
 		@Test
 		void deelnemerHeeftRolProjectBurea_geeftJuisteRollenTerug(
 			@Mock Deelnemer deelnemer,
-			@Mock Session session,
 			@Mock Rol rol,
 			@Mock Kamer kamer
 		) {
@@ -76,7 +71,7 @@ class HaalKaartenSetOpEventTest {
 			when(deelnemer.getRol()).thenReturn(StandaardRol.PROJECTBUREAU.getRol());
 			when(rol.getKaartenSets()).thenReturn(expectedKaartenSets);
 
-			var eventResponse = sut.voerUit(deelnemer, session);
+			var eventResponse = sut.voerUit(deelnemer);
 
 			assertAll(
 				() -> assertTrue(eventResponse.getContext().get("kaartensets") instanceof Iterable<?>),

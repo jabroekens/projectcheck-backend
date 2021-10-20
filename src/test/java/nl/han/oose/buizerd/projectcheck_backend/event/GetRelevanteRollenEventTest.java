@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.websocket.Session;
 import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
@@ -29,14 +28,13 @@ class GetRelevanteRollenEventTest {
 	@Test
 	void voerUit_geeftJuisteEventResponseTerug(
 		@Mock Deelnemer deelnemer,
-		@Mock Session session,
 		@Mock Kamer kamer,
 		@Mock Set<Rol> rollen
 	) {
 		when(deelnemer.getKamer()).thenReturn(kamer);
 		when(kamer.getRelevanteRollen()).thenReturn(rollen);
 
-		var eventResponse = sut.voerUit(deelnemer, session);
+		var eventResponse = sut.voerUit(deelnemer);
 
 		assertAll(
 			() -> verify(kamer).getRelevanteRollen(),

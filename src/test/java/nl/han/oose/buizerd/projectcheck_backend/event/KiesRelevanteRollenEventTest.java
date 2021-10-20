@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import jakarta.websocket.Session;
 import java.util.HashSet;
 import java.util.Set;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
@@ -44,16 +43,13 @@ class KiesRelevanteRollenEventTest {
 	@Nested
 	class voerUit {
 
-		@Mock
-		private Session session;
-
 		@Test
 		void deelnemerIsBegeleider_activeertRelevanteRollenEnGeeftJuisteEventResponseTerug(
 			@Mock Begeleider begeleider, @Mock Kamer kamer
 		) {
 			when(begeleider.getKamer()).thenReturn(kamer);
 
-			var eventResponse = sut.voerUit(begeleider, session);
+			var eventResponse = sut.voerUit(begeleider);
 
 			assertAll(
 				() -> verify(kamer).setRelevanteRollen(relevanteRollen),
@@ -65,7 +61,7 @@ class KiesRelevanteRollenEventTest {
 		void deelnemerIsNietBegeleider_geeftJuisteEventResponseTerug(@Mock Deelnemer deelnemer) {
 			var expected = deelnemer.getDeelnemerId();
 
-			var eventResponse = sut.voerUit(deelnemer, session);
+			var eventResponse = sut.voerUit(deelnemer);
 
 			assertAll(
 				() -> assertEquals(EventResponse.Status.VERBODEN, eventResponse.getStatus()),

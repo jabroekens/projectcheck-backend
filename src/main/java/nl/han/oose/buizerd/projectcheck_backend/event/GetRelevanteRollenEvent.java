@@ -1,6 +1,5 @@
 package nl.han.oose.buizerd.projectcheck_backend.event;
 
-import jakarta.websocket.Session;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 
@@ -10,7 +9,7 @@ import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
 public class GetRelevanteRollenEvent extends Event {
 
 	@Override
-	protected EventResponse voerUit(Deelnemer deelnemer, Session session) {
+	protected EventResponse voerUit(Deelnemer deelnemer) {
 		var kamer = deelnemer.getKamer();
 		var rollen = kamer.getRelevanteRollen();
 		return new EventResponse(EventResponse.Status.OK).metContext("geefRollen", rollen);

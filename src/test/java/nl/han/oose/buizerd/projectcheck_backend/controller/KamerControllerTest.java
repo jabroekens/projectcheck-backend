@@ -1,4 +1,4 @@
-package nl.han.oose.buizerd.projectcheck_backend.service;
+package nl.han.oose.buizerd.projectcheck_backend.controller;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,18 +18,15 @@ import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.RemoteEndpoint;
 import jakarta.websocket.Session;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.KamerFase;
 import nl.han.oose.buizerd.projectcheck_backend.event.Event;
 import nl.han.oose.buizerd.projectcheck_backend.event.EventResponse;
-import org.junit.jupiter.api.AfterEach;
+import nl.han.oose.buizerd.projectcheck_backend.exception.DeelnemerNietGevondenException;
+import nl.han.oose.buizerd.projectcheck_backend.exception.KamerNietGevondenException;
+import nl.han.oose.buizerd.projectcheck_backend.service.KamerService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -40,7 +37,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class KamerServiceTest {
+class KamerControllerTest {
 
 	private static final String KAMER_CODE = "123456";
 
@@ -49,60 +46,38 @@ class KamerServiceTest {
 	@BeforeAll
 	static void setUpAll() {
 		logger = mock(Logger.class);
-		KamerService.logger = logger;
+		KamerController.logger = logger;
 	}
 
 	@Mock
-	private DAO dao;
+	private KamerService kamerService;
 
-	private KamerService sut;
+	private KamerController sut;
 
 	@BeforeEach
 	void setUp() {
-		sut = new KamerService();
-		sut.setDao(dao);
+		sut = new KamerController();
+		sut.setKamerService(kamerService);
 	}
 
-	@Nested
-	class open_sluitVerbindingMetReden {
+	@Test
+	void open_kanNietDeelnemen_sluitVerbindingMetReden(@Mock Session session, @Mock EndpointConfig config)
+	throws IOException {
+		var closeReason = new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kan niet deelnemen aan kamer.");
+		var closeReasonCaptor = ArgumentCaptor.forClass(CloseReason.class);
 
-		@Mock
-		private Session session;
+		sut.open(session, config, KAMER_CODE);
+		verify(kamerService).kanDeelnemen(KAMER_CODE);
+		verify(session).close(closeReasonCaptor.capture());
 
-		@Mock
-		private EndpointConfig config;
-
-		void sluitVerbindingMetReden() throws IOException {
-			var closeReason = new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Kamer is gesloten of niet gevonden.");
-			var closeReasonCaptor = ArgumentCaptor.forClass(CloseReason.class);
-
-			sut.open(session, config, KAMER_CODE);
-
-			verify(dao).read(Kamer.class, KAMER_CODE);
-			verify(session).close(closeReasonCaptor.capture());
-
-			/*
-			 * We moeten handmatig te relevante gegevens controleren omdat CloseReason
-			 * niet zelf `equals` en `hashCode` implementeert maar deze erft van Object.
-			 */
-			assertAll(
-				() -> assertEquals(closeReason.getCloseCode(), closeReasonCaptor.getValue().getCloseCode()),
-				() -> assertEquals(closeReason.getReasonPhrase(), closeReasonCaptor.getValue().getReasonPhrase())
-			);
-		}
-
-		@Test
-		void kamerAfwezig_sluitVerbindingMetReden() throws IOException {
-			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
-			sluitVerbindingMetReden();
-		}
-
-		@Test
-		void kamerAanwezig_kamerFaseGesloten_sluitVerbindingMetReden(@Mock Kamer kamer) throws IOException {
-			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
-			when(kamer.getKamerFase()).thenReturn(KamerFase.GESLOTEN);
-			sluitVerbindingMetReden();
-		}
+		/*
+		 * We moeten handmatig te relevante gegevens controleren omdat CloseReason
+		 * niet zelf `equals` en `hashCode` implementeert maar deze erft van Object.
+		 */
+		assertAll(
+			() -> assertEquals(closeReason.getCloseCode(), closeReasonCaptor.getValue().getCloseCode()),
+			() -> assertEquals(closeReason.getReasonPhrase(), closeReasonCaptor.getValue().getReasonPhrase())
+		);
 
 	}
 
@@ -115,16 +90,11 @@ class KamerServiceTest {
 		@Mock
 		private Session session;
 
-		@AfterEach
-		void tearDown() {
-			verify(dao).read(Kamer.class, KAMER_CODE);
-		}
-
 		@Test
-		void kamerAfwezig_stuurtEventResponse(@Mock RemoteEndpoint.Basic remote) throws IOException {
-			var eventResponse = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
-				                    .metContext("kamerCode", KAMER_CODE).antwoordOp(event);
-			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.empty());
+		void kamerAanwezig_verbodenToegang_stuurtEventResponse(@Mock RemoteEndpoint.Basic remote)
+		throws IOException {
+			var eventResponse = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
+			when(kamerService.voerEventUit(event)).thenThrow(DeelnemerNietGevondenException.class);
 			when(session.getBasicRemote()).thenReturn(remote);
 
 			sut.message(event, KAMER_CODE, session);
@@ -133,34 +103,37 @@ class KamerServiceTest {
 		}
 
 		@Test
-		void kamerAanwezig_deelnemerAfwezig_stuurtEventResponse(@Mock Kamer kamer, @Mock RemoteEndpoint.Basic remote) throws IOException {
-			var eventResponse = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
-			when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
-			when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.empty());
+		void kamerAfwezig_stuurtEventResponse(@Mock RemoteEndpoint.Basic remote) throws IOException {
+			var eventResponse = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
+				.metContext("kamerCode", KAMER_CODE).antwoordOp(event);
+			when(kamerService.voerEventUit(event)).thenThrow(KamerNietGevondenException.class);
 			when(session.getBasicRemote()).thenReturn(remote);
 
 			sut.message(event, KAMER_CODE, session);
 
-			verify(kamer).getDeelnemer(event.getDeelnemerId());
 			verify(remote).sendText(eventResponse.asJson());
 		}
 
 		@Nested
 		class kamerAanwezig_deelnemerAanwezig {
 
-			@Mock
-			private Deelnemer deelnemer;
-
-			@BeforeEach
-			void setUp(@Mock Kamer kamer) {
-				when(dao.read(Kamer.class, KAMER_CODE)).thenReturn(Optional.of(kamer));
-				when(kamer.getDeelnemer(event.getDeelnemerId())).thenReturn(Optional.of(deelnemer));
+			@Test
+			void voertEventUit(@Mock CompletableFuture<EventResponse> completableFuture) throws IOException {
+				when(kamerService.voerEventUit(event)).thenReturn(completableFuture);
+				sut.message(event, KAMER_CODE, session);
+				verify(kamerService).voerEventUit(event);
 			}
 
 			@Test
-			void voertEventUit_logtBijException(@Mock Throwable throwable, @Mock EventResponse eventResponse) throws IOException {
-				when(event.voerUit(dao, deelnemer, session)).thenReturn(CompletableFuture.failedStage(new RuntimeException()));
+			void voertEventUit_logtBijException(@Mock Throwable throwable)
+			throws IOException {
+				when(kamerService.voerEventUit(event)).thenReturn(CompletableFuture.failedFuture(throwable));
 				sut.message(event, KAMER_CODE, session);
+				/*
+				 * Het is niet mogelijk om te controleren of de error-methode aangeroepen wordt
+				 * zonder de error-methode zelf te testen, wat al in een andere unit test
+				 * gedaan wordt.
+				 */
 			}
 
 			@Test
@@ -168,7 +141,7 @@ class KamerServiceTest {
 				@Mock EventResponse eventResponse,
 				@Mock RemoteEndpoint.Async remoteEndpoint
 			) throws IOException {
-				when(event.voerUit(dao, deelnemer, session)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
+				when(kamerService.voerEventUit(event)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
 				when(eventResponse.isStuurNaarAlleClients()).thenReturn(true);
 
 				var openSessions = spy(Set.of(mock(Session.class), mock(Session.class)));
@@ -188,7 +161,7 @@ class KamerServiceTest {
 				@Mock EventResponse eventResponse,
 				@Mock RemoteEndpoint.Async remoteEndpoint
 			) throws IOException {
-				when(event.voerUit(dao, deelnemer, session)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
+				when(kamerService.voerEventUit(event)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
 				when(eventResponse.isStuurNaarAlleClients()).thenReturn(false);
 				when(session.isOpen()).thenReturn(true);
 				when(session.getAsyncRemote()).thenReturn(remoteEndpoint);
@@ -200,8 +173,10 @@ class KamerServiceTest {
 			}
 
 			@Test
-			void voertEventUit_isNietStuurNaarAlleClients_doetNietsAlsSessionGeslotenIs(@Mock EventResponse eventResponse) throws IOException {
-				when(event.voerUit(dao, deelnemer, session)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
+			void voertEventUit_isNietStuurNaarAlleClients_doetNietsAlsSessionGeslotenIs(
+				@Mock EventResponse eventResponse
+			) throws IOException {
+				when(kamerService.voerEventUit(event)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
 				when(eventResponse.isStuurNaarAlleClients()).thenReturn(false);
 				when(session.isOpen()).thenReturn(false);
 

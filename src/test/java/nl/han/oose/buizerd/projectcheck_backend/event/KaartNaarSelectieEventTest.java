@@ -4,13 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
-import jakarta.websocket.Session;
 import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kaart;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KaartenSelectie;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,9 +44,6 @@ class KaartNaarSelectieEventTest {
 		private Deelnemer deelnemer;
 
 		@Mock
-		private Session session;
-
-		@Mock
 		private KaartenSelectie kaartenSelectie;
 
 		@BeforeEach
@@ -59,7 +54,7 @@ class KaartNaarSelectieEventTest {
 		@Test
 		void kaartenSelectieBestaatNiet_maaktKaartenSelectie() {
 			Mockito.when(deelnemer.getKaartenSelectie()).thenReturn(null);
-			kaartNaarSelectieEvent.voerUit(deelnemer, session);
+			kaartNaarSelectieEvent.voerUit(deelnemer);
 			verify(deelnemer).setKaartenSelectie(Mockito.any());
 		}
 
@@ -68,7 +63,7 @@ class KaartNaarSelectieEventTest {
 			Mockito.when(deelnemer.getKaartenSelectie()).thenReturn(kaartenSelectie);
 			Mockito.when(kaartenSelectie.kaartIsGeselecteerd(geselecteerdeKaart)).thenReturn(true);
 
-			EventResponse eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer, session);
+			EventResponse eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer);
 
 			assertAll(
 				() -> verify(kaartenSelectie).removeKaart(geselecteerdeKaart),
@@ -82,7 +77,7 @@ class KaartNaarSelectieEventTest {
 			Mockito.when(deelnemer.getKaartenSelectie()).thenReturn(kaartenSelectie);
 			Mockito.when(kaartenSelectie.kaartIsGeselecteerd(geselecteerdeKaart)).thenReturn(false);
 
-			var eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer, session);
+			var eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer);
 
 			assertAll(
 				() -> verify(kaartenSelectie).addKaart(geselecteerdeKaart),
@@ -97,7 +92,7 @@ class KaartNaarSelectieEventTest {
 			Mockito.when(kaartenSelectie.kaartIsGeselecteerd(geselecteerdeKaart)).thenReturn(false);
 			Mockito.when(kaartenSelectie.isVol()).thenReturn(true);
 
-			var eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer, session);
+			var eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer);
 
 			assertAll(
 				() -> assertEquals(geselecteerdeKaart, eventResponse.getContext().get("ongebruikteKaart")),
