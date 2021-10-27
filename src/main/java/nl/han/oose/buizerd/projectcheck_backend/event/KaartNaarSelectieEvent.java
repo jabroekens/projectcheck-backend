@@ -2,12 +2,9 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.util.HashSet;
-import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kaart;
-import nl.han.oose.buizerd.projectcheck_backend.domain.KaartenSelectie;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.exception.KaartenSelectieVolException;
+import nl.han.oose.buizerd.projectcheck_backend.service.KamerService;
 
 public class KaartNaarSelectieEvent extends Event {
 
@@ -16,27 +13,19 @@ public class KaartNaarSelectieEvent extends Event {
 	Kaart geselecteerdeKaart;
 
 	@Override
-	protected EventResponse voerUit(Deelnemer deelnemer) {
-		var kaartenSelectie = deelnemer.getKaartenSelectie();
-		if (kaartenSelectie == null) {
-			kaartenSelectie = new KaartenSelectie(new HashSet<>());
-			deelnemer.setKaartenSelectie(kaartenSelectie);
-		}
+	public EventResponse voerUit(KamerService kamerService) {
+		try {
+			if (kamerService.kaartNaarSelectie(super.getDeelnemerId(), geselecteerdeKaart)) {
+				return new EventResponse(EventResponse.Status.OK).metContext("toegevoegdeKaart", geselecteerdeKaart);
+			}
 
-		if (kaartenSelectie.kaartIsGeselecteerd(geselecteerdeKaart)) {
-			kaartenSelectie.removeKaart(geselecteerdeKaart);
 			return new EventResponse(EventResponse.Status.OK).metContext("verwijderdeKaart", geselecteerdeKaart);
-		} else if (!kaartenSelectie.isVol()) {
-			kaartenSelectie.addKaart(geselecteerdeKaart);
-			return new EventResponse(EventResponse.Status.OK).metContext("toegevoegdeKaart", geselecteerdeKaart);
-		} else {
-			return new EventResponse(EventResponse.Status.SELECTIE_VOL).metContext("ongebruikteKaart", geselecteerdeKaart);
+		} catch (KaartenSelectieVolException e) {
+			return new EventResponse(EventResponse.Status.SELECTIE_VOL).metContext(
+				"ongebruikteKaart",
+				geselecteerdeKaart
+			);
 		}
-	}
-
-	@Override
-	protected void handelAf(DAO dao, Kamer kamer) {
-		dao.update(kamer);
 	}
 
 }

@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
+import nl.han.oose.buizerd.projectcheck_backend.service.KamerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,11 +27,10 @@ class KiesRolEventTest {
 	}
 
 	@Test
-	void voerUit_deelnemerKrijgtRol(@Mock Deelnemer deelnemer) {
-		var eventResponse = sut.voerUit(deelnemer);
-
+	void voerUit_geeftJuisteEventResponseTerug(@Mock KamerService kamerService) {
+		var eventResponse = sut.voerUit(kamerService);
 		assertAll(
-			() -> verify(deelnemer).setRol(rol),
+			() -> verify(kamerService).kiesRol(sut.getDeelnemerId(), rol),
 			() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),
 			() -> assertEquals(rol, eventResponse.getContext().get("gekozenRol"))
 		);

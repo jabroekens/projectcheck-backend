@@ -1,5 +1,7 @@
 package nl.han.oose.buizerd.projectcheck_backend.controller;
 
+import jakarta.annotation.Resource;
+import jakarta.enterprise.concurrent.ManagedExecutorService;
 import jakarta.inject.Inject;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.EndpointConfig;
@@ -11,6 +13,7 @@ import jakarta.websocket.Session;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nl.han.oose.buizerd.projectcheck_backend.event.Event;
@@ -27,6 +30,8 @@ public class KamerController {
 
 	private KamerService kamerService;
 
+	private ManagedExecutorService managedExecutorService;
+
 	@OnOpen
 	public void open(Session session, EndpointConfig config, @PathParam("kamerCode") String kamerCode)
 	throws IOException {
@@ -41,38 +46,38 @@ public class KamerController {
 	}
 
 	@OnMessage
-	public void message(Event event, @PathParam("kamerCode") String kamerCode, Session session) throws IOException {
-		try {
-			kamerService.voerEventUit(event)
-			            .whenComplete((response, exception) -> {
-				            if (exception != null) {
-					            /*
-					             * We moeten de methode zelf aanroepen omdat de exception
-					             * wordt gegooit in een andere thread, waardoor deze
-					             * niet automatisch wordt aangeroepen.
-					             */
-					            error(session, exception, kamerCode);
-					            return;
-				            }
-
-				            if (response.isStuurNaarAlleClients()) {
-					            session.getOpenSessions().stream()
-					                   .filter(Session::isOpen)
-					                   .forEach(s -> s.getAsyncRemote().sendText(response.asJson()));
-				            } else if (session.isOpen()) {
-					            session.getAsyncRemote().sendText(response.asJson());
-				            }
-			            });
-		} catch (DeelnemerNietGevondenException vte) {
-			session.getBasicRemote().sendText(
-				new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event).asJson()
-			);
-		} catch (KamerNietGevondenException kne) {
-			session.getBasicRemote().sendText(
-				new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
-					.metContext("kamerCode", kamerCode).antwoordOp(event).asJson()
-			);
-		}
+	public void message(Event event, @PathParam("kamerCode") String kamerCode, Session session) {
+		CompletableFuture
+			.supplyAsync(() -> event.voerUit(kamerService), managedExecutorService)
+			.whenComplete((response, exception) -> {
+				if (exception != null) {
+					if (exception.getCause() instanceof DeelnemerNietGevondenException) {
+						session.getAsyncRemote().sendText(
+							new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event).asJson()
+						);
+					} else if (exception.getCause() instanceof KamerNietGevondenException) {
+						session.getAsyncRemote().sendText(
+							new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
+								.metContext("kamerCode", kamerCode).antwoordOp(event).asJson()
+						);
+					} else {
+						/*
+						 * We moeten de methode zelf aanroepen omdat de exception
+						 * wordt gegooit in een andere thread, waardoor deze
+						 * niet automatisch wordt aangeroepen.
+						 */
+						error(session, exception, kamerCode);
+					}
+				} else {
+					if (response.isStuurNaarAlleClients()) {
+						session.getOpenSessions().stream()
+						       .filter(Session::isOpen)
+						       .forEach(s -> s.getAsyncRemote().sendText(response.antwoordOp(event).asJson()));
+					} else if (session.isOpen()) {
+						session.getAsyncRemote().sendText(response.antwoordOp(event).asJson());
+					}
+				}
+			});
 	}
 
 	@OnError
@@ -100,6 +105,11 @@ public class KamerController {
 	@Inject
 	public void setKamerService(KamerService kamerService) {
 		this.kamerService = kamerService;
+	}
+
+	@Resource
+	public void setManagedExecutorService(ManagedExecutorService managedExecutorService) {
+		this.managedExecutorService = managedExecutorService;
 	}
 
 }

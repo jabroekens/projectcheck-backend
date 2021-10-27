@@ -3,16 +3,14 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.util.Optional;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.KaartToelichting;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Ronde;
+import nl.han.oose.buizerd.projectcheck_backend.exception.RondeNietGevondenException;
+import nl.han.oose.buizerd.projectcheck_backend.exception.VerbodenToegangException;
+import nl.han.oose.buizerd.projectcheck_backend.service.KamerService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -33,53 +31,45 @@ class HighlightKaartEventTest {
 	}
 
 	@Test
-	void voerUit_huidigeRondeAfwezig_stuurtJuisteEventResponse(@Mock Deelnemer deelnemer, @Mock Kamer kamer) {
-		when(deelnemer.getKamer()).thenReturn(kamer);
-		when(kamer.getHuidigeRonde()).thenReturn(Optional.empty());
+	void voerUit_rondeNietGevonden_geeftJuisteEventResponseTerug(@Mock KamerService kamerService) {
+		doThrow(RondeNietGevondenException.class).when(kamerService).highlightKaart(
+			sut.getDeelnemerId(),
+			kaartToelichting
+		);
 
-		var eventResponse = sut.voerUit(deelnemer);
+		var eventResponse = sut.voerUit(kamerService);
 
-		assertEquals(EventResponse.Status.RONDE_NIET_GEVONDEN, eventResponse.getStatus());
+		assertAll(
+			() -> verify(kamerService).highlightKaart(sut.getDeelnemerId(), kaartToelichting),
+			() -> assertEquals(EventResponse.Status.RONDE_NIET_GEVONDEN, eventResponse.getStatus())
+		);
 	}
 
-	@Nested
-	class voerUit_huidigeRondeAanwezig {
+	@Test
+	void voerUit_verbodenToegang_geeftJuisteEventResponseTerug(@Mock KamerService kamerService) {
+		doThrow(VerbodenToegangException.class).when(kamerService).highlightKaart(
+			sut.getDeelnemerId(),
+			kaartToelichting
+		);
 
-		@Mock
-		private Deelnemer deelnemer;
+		var eventResponse = sut.voerUit(kamerService);
 
-		@Mock
-		private Ronde ronde;
+		assertAll(
+			() -> verify(kamerService).highlightKaart(sut.getDeelnemerId(), kaartToelichting),
+			() -> assertEquals(EventResponse.Status.VERBODEN, eventResponse.getStatus())
+		);
+	}
 
-		@BeforeEach
-		void setUp(@Mock Kamer kamer) {
-			when(deelnemer.getKamer()).thenReturn(kamer);
-			when(kamer.getHuidigeRonde()).thenReturn(Optional.of(ronde));
-		}
+	@Test
+	void voerUit_geeftJuisteEventResponseTerug(@Mock KamerService kamerService) {
+		var eventResponse = sut.voerUit(kamerService);
 
-		@Test
-		void magNietHighlighten_geeftJuisteEventResponse(@Mock KaartToelichting kaartToelichting) {
-			when(ronde.getGehighlighteKaart()).thenReturn(Optional.of(kaartToelichting));
-
-			var eventResponse = sut.voerUit(deelnemer);
-
-			assertEquals(EventResponse.Status.VERBODEN, eventResponse.getStatus());
-		}
-
-		@Test
-		void magHighlighten_zetGehighlighteKaart() {
-			when(ronde.getGehighlighteKaart()).thenReturn(Optional.empty());
-
-			var eventResponse = sut.voerUit(deelnemer);
-
-			assertAll(
-				() -> verify(ronde).setGehighlighteKaart(kaartToelichting),
-				() -> assertEquals(kaartToelichting, eventResponse.getContext().get("gehighlighteKaart")),
-				() -> assertTrue(eventResponse.isStuurNaarAlleClients()),
-				() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus())
-			);
-		}
-
+		assertAll(
+			() -> verify(kamerService).highlightKaart(sut.getDeelnemerId(), kaartToelichting),
+			() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),
+			() -> assertEquals(kaartToelichting, eventResponse.getContext().get("gehighlighteKaart")),
+			() -> assertTrue(eventResponse.isStuurNaarAlleClients())
+		);
 	}
 
 }

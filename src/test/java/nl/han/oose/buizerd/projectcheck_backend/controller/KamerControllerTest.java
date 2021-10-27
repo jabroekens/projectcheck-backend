@@ -5,21 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import jakarta.enterprise.concurrent.ManagedExecutorService;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.RemoteEndpoint;
 import jakarta.websocket.Session;
 import java.io.IOException;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nl.han.oose.buizerd.projectcheck_backend.event.Event;
@@ -52,12 +52,16 @@ class KamerControllerTest {
 	@Mock
 	private KamerService kamerService;
 
+	@Mock
+	private ManagedExecutorService managedExecutorService;
+
 	private KamerController sut;
 
 	@BeforeEach
 	void setUp() {
 		sut = new KamerController();
 		sut.setKamerService(kamerService);
+		sut.setManagedExecutorService(managedExecutorService);
 	}
 
 	@Test
@@ -90,44 +94,46 @@ class KamerControllerTest {
 		@Mock
 		private Session session;
 
-		@Test
-		void kamerAanwezig_verbodenToegang_stuurtEventResponse(@Mock RemoteEndpoint.Basic remote)
-		throws IOException {
-			var eventResponse = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
-			when(kamerService.voerEventUit(event)).thenThrow(DeelnemerNietGevondenException.class);
-			when(session.getBasicRemote()).thenReturn(remote);
-
-			sut.message(event, KAMER_CODE, session);
-
-			verify(remote).sendText(eventResponse.asJson());
+		@BeforeEach
+		void setUp() {
+			doAnswer((invocation -> {
+				invocation.getArgument(0, Runnable.class).run();
+				return null;
+			})).when(managedExecutorService).execute(any());
 		}
 
 		@Test
-		void kamerAfwezig_stuurtEventResponse(@Mock RemoteEndpoint.Basic remote) throws IOException {
-			var eventResponse = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
-				.metContext("kamerCode", KAMER_CODE).antwoordOp(event);
-			when(kamerService.voerEventUit(event)).thenThrow(KamerNietGevondenException.class);
-			when(session.getBasicRemote()).thenReturn(remote);
+		void deelnemerNietGevonden_stuurtEventResponse(@Mock RemoteEndpoint.Async remoteEndpoint) {
+			when(event.voerUit(kamerService)).thenThrow(DeelnemerNietGevondenException.class);
+			when(session.getAsyncRemote()).thenReturn(remoteEndpoint);
 
 			sut.message(event, KAMER_CODE, session);
 
-			verify(remote).sendText(eventResponse.asJson());
+			verify(event).voerUit(kamerService);
+			var eventResponse = new EventResponse(EventResponse.Status.VERBODEN).antwoordOp(event);
+			verify(remoteEndpoint).sendText(eventResponse.asJson());
+		}
+
+		@Test
+		void kamerNietGevonden_stuurtEventResponse(@Mock RemoteEndpoint.Async remoteEndpoint) {
+			when(event.voerUit(kamerService)).thenThrow(KamerNietGevondenException.class);
+			when(session.getAsyncRemote()).thenReturn(remoteEndpoint);
+
+			sut.message(event, KAMER_CODE, session);
+
+			verify(event).voerUit(kamerService);
+			var eventResponse = new EventResponse(EventResponse.Status.KAMER_NIET_GEVONDEN)
+				.metContext("kamerCode", KAMER_CODE).antwoordOp(event);
+			verify(remoteEndpoint).sendText(eventResponse.asJson());
 		}
 
 		@Nested
-		class kamerAanwezig_deelnemerAanwezig {
+		class deelnemerEnKamerGevonden {
 
 			@Test
-			void voertEventUit(@Mock CompletableFuture<EventResponse> completableFuture) throws IOException {
-				when(kamerService.voerEventUit(event)).thenReturn(completableFuture);
-				sut.message(event, KAMER_CODE, session);
-				verify(kamerService).voerEventUit(event);
-			}
+			void voertEventUit_logtBijException(@Mock RuntimeException exception) {
+				when(event.voerUit(kamerService)).thenThrow(exception);
 
-			@Test
-			void voertEventUit_logtBijException(@Mock Throwable throwable)
-			throws IOException {
-				when(kamerService.voerEventUit(event)).thenReturn(CompletableFuture.failedFuture(throwable));
 				sut.message(event, KAMER_CODE, session);
 				/*
 				 * Het is niet mogelijk om te controleren of de error-methode aangeroepen wordt
@@ -140,49 +146,62 @@ class KamerControllerTest {
 			void voertEventUit_isStuurNaarAlleClients_stuurtEventResponseNaarAlleOpenSessions(
 				@Mock EventResponse eventResponse,
 				@Mock RemoteEndpoint.Async remoteEndpoint
-			) throws IOException {
-				when(kamerService.voerEventUit(event)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
+			) {
+				when(event.voerUit(kamerService)).thenReturn(eventResponse);
 				when(eventResponse.isStuurNaarAlleClients()).thenReturn(true);
+				when(eventResponse.antwoordOp(event)).thenReturn(eventResponse);
 
-				var openSessions = spy(Set.of(mock(Session.class), mock(Session.class)));
+				var openSessions = Set.of(mock(Session.class), mock(Session.class));
+				when(session.getOpenSessions()).thenReturn(openSessions);
 				openSessions.forEach(s -> {
 					when(s.isOpen()).thenReturn(true);
 					when(s.getAsyncRemote()).thenReturn(remoteEndpoint);
 				});
-				when(session.getOpenSessions()).thenReturn(openSessions);
 
 				sut.message(event, KAMER_CODE, session);
 
-				verify(remoteEndpoint, times(2)).sendText(eventResponse.asJson());
+				verify(event).voerUit(kamerService);
+				verify(eventResponse).isStuurNaarAlleClients();
+				verify(session).getOpenSessions();
+				openSessions.forEach(s -> verify(s).isOpen());
+				verify(eventResponse, times(openSessions.size())).antwoordOp(event);
+				verify(remoteEndpoint, times(openSessions.size())).sendText(eventResponse.asJson());
 			}
 
 			@Test
 			void voertEventUit_isNietStuurNaarAlleClients_stuurtEventResponseAlsSessionOpenIs(
 				@Mock EventResponse eventResponse,
 				@Mock RemoteEndpoint.Async remoteEndpoint
-			) throws IOException {
-				when(kamerService.voerEventUit(event)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
+			) {
+				when(event.voerUit(kamerService)).thenReturn(eventResponse);
 				when(eventResponse.isStuurNaarAlleClients()).thenReturn(false);
 				when(session.isOpen()).thenReturn(true);
 				when(session.getAsyncRemote()).thenReturn(remoteEndpoint);
+				when(eventResponse.antwoordOp(event)).thenReturn(eventResponse);
 
 				sut.message(event, KAMER_CODE, session);
 
+				verify(event).voerUit(kamerService);
+				verify(eventResponse).isStuurNaarAlleClients();
+				verify(session).isOpen();
+				verify(eventResponse).antwoordOp(event);
 				verify(remoteEndpoint).sendText(eventResponse.asJson());
-				verifyNoMoreInteractions(session);
 			}
 
 			@Test
 			void voertEventUit_isNietStuurNaarAlleClients_doetNietsAlsSessionGeslotenIs(
 				@Mock EventResponse eventResponse
-			) throws IOException {
-				when(kamerService.voerEventUit(event)).thenReturn(CompletableFuture.supplyAsync(() -> eventResponse));
+			) {
+				when(event.voerUit(kamerService)).thenReturn(eventResponse);
 				when(eventResponse.isStuurNaarAlleClients()).thenReturn(false);
 				when(session.isOpen()).thenReturn(false);
 
 				sut.message(event, KAMER_CODE, session);
 
-				verifyNoMoreInteractions(session);
+				verify(event).voerUit(kamerService);
+				verify(eventResponse).isStuurNaarAlleClients();
+				verify(session).isOpen();
+				verifyNoMoreInteractions(event, session, eventResponse);
 			}
 
 		}

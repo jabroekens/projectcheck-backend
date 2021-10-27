@@ -2,9 +2,14 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
+import java.util.Set;
+import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
+import nl.han.oose.buizerd.projectcheck_backend.service.KamerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,12 +27,16 @@ class GetStandaardRollenEventTest {
 	}
 
 	@Test
-	void voerUit_geeftJuisteEventResponseTerug(@Mock Deelnemer deelnemer) {
-		var eventResponse = sut.voerUit(deelnemer);
+	void voerUit_geeftJuisteEventResponseTerug(@Mock KamerService kamerService, @Mock Set<Rol> standaardRollen) {
+		when(kamerService.getStandaardRollen()).thenReturn(standaardRollen);
+
+		var eventResponse = sut.voerUit(kamerService);
 
 		assertAll(
+			() -> verify(kamerService).getStandaardRollen(),
 			() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),
-			() -> assertNotNull(eventResponse.getContext().get("standaardRollen"))
+			() -> assertTrue(eventResponse.getContext().get("standaardRollen") instanceof Iterable<?>),
+			() -> assertIterableEquals(standaardRollen, (Iterable<?>) eventResponse.getContext().get("standaardRollen"))
 		);
 	}
 

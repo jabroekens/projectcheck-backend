@@ -2,13 +2,15 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Rol;
+import nl.han.oose.buizerd.projectcheck_backend.service.KamerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,26 +22,26 @@ class GetRelevanteRollenEventTest {
 
 	private GetRelevanteRollenEvent sut;
 
+	@Mock
+	private DeelnemerId deelnemerId;
+
 	@BeforeEach
 	void setUp() {
 		sut = new GetRelevanteRollenEvent();
+		sut.deelnemerId = deelnemerId;
 	}
 
 	@Test
-	void voerUit_geeftJuisteEventResponseTerug(
-		@Mock Deelnemer deelnemer,
-		@Mock Kamer kamer,
-		@Mock Set<Rol> rollen
-	) {
-		when(deelnemer.getKamer()).thenReturn(kamer);
-		when(kamer.getRelevanteRollen()).thenReturn(rollen);
+	void voerUit_geeftJuisteEventResponseTerug(@Mock KamerService kamerService, @Mock Set<Rol> relevanteRollen) {
+		when(kamerService.getRelevanteRollen(sut.getDeelnemerId().getKamerCode())).thenReturn(relevanteRollen);
 
-		var eventResponse = sut.voerUit(deelnemer);
+		var eventResponse = sut.voerUit(kamerService);
 
 		assertAll(
-			() -> verify(kamer).getRelevanteRollen(),
-			() -> assertEquals(rollen, eventResponse.getContext().get("geefRollen")),
-			() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus())
+			() -> verify(kamerService).getRelevanteRollen(sut.getDeelnemerId().getKamerCode()),
+			() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),
+			() -> assertTrue(eventResponse.getContext().get("geefRollen") instanceof Iterable<?>),
+			() -> assertIterableEquals(relevanteRollen, (Iterable<?>) eventResponse.getContext().get("geefRollen"))
 		);
 	}
 

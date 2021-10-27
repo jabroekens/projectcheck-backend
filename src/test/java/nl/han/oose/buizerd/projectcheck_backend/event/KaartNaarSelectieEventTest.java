@@ -3,18 +3,15 @@ package nl.han.oose.buizerd.projectcheck_backend.event;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.Kaart;
-import nl.han.oose.buizerd.projectcheck_backend.domain.KaartenSelectie;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.exception.KaartenSelectieVolException;
+import nl.han.oose.buizerd.projectcheck_backend.service.KamerService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,83 +20,55 @@ class KaartNaarSelectieEventTest {
 	@Mock
 	private Kaart geselecteerdeKaart;
 
-	private KaartNaarSelectieEvent kaartNaarSelectieEvent;
+	@Mock
+	private KamerService kamerService;
+
+	private KaartNaarSelectieEvent sut;
 
 	@BeforeEach
 	void setUp() {
-		kaartNaarSelectieEvent = new KaartNaarSelectieEvent();
-		kaartNaarSelectieEvent.geselecteerdeKaart = geselecteerdeKaart;
+		sut = new KaartNaarSelectieEvent();
+		sut.geselecteerdeKaart = geselecteerdeKaart;
 	}
 
 	@Test
-	void handelAf_updateKamer(@Mock DAO dao, @Mock Kamer kamer) {
-		kaartNaarSelectieEvent.handelAf(dao, kamer);
-		verify(dao).update(kamer);
+	void voerUit_geselecteerdeKaartToegevoegd_geeftJuisteEventResponseTerug() {
+		when(kamerService.kaartNaarSelectie(sut.getDeelnemerId(), geselecteerdeKaart)).thenReturn(true);
+
+		var eventResponse = sut.voerUit(kamerService);
+
+		assertAll(
+			() -> verify(kamerService).kaartNaarSelectie(sut.getDeelnemerId(), geselecteerdeKaart),
+			() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),
+			() -> assertEquals(geselecteerdeKaart, eventResponse.getContext().get("toegevoegdeKaart"))
+		);
 	}
 
-	@Nested
-	class voerUit {
+	@Test
+	void voerUit_geselecteerdeKaartVerwijdert_geeftJuisteEventResponseTerug() {
+		when(kamerService.kaartNaarSelectie(sut.getDeelnemerId(), geselecteerdeKaart)).thenReturn(false);
 
-		@Mock
-		private Deelnemer deelnemer;
+		var eventResponse = sut.voerUit(kamerService);
 
-		@Mock
-		private KaartenSelectie kaartenSelectie;
+		assertAll(
+			() -> verify(kamerService).kaartNaarSelectie(sut.getDeelnemerId(), geselecteerdeKaart),
+			() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus()),
+			() -> assertEquals(geselecteerdeKaart, eventResponse.getContext().get("verwijderdeKaart"))
+		);
+	}
 
-		@BeforeEach
-		void setUp() {
-			Mockito.when(deelnemer.getKaartenSelectie()).thenReturn(kaartenSelectie);
-		}
+	@Test
+	void voerUit_kaartenSelectieIsVol_geeftJuisteEventResponseTerug() {
+		when(kamerService.kaartNaarSelectie(sut.getDeelnemerId(), geselecteerdeKaart))
+			.thenThrow(KaartenSelectieVolException.class);
 
-		@Test
-		void kaartenSelectieBestaatNiet_maaktKaartenSelectie() {
-			Mockito.when(deelnemer.getKaartenSelectie()).thenReturn(null);
-			kaartNaarSelectieEvent.voerUit(deelnemer);
-			verify(deelnemer).setKaartenSelectie(Mockito.any());
-		}
+		var eventResponse = sut.voerUit(kamerService);
 
-		@Test
-		void kaartIsGeselecteerd_verwijdertKaartEnGeeftJuisteEventResponse() {
-			Mockito.when(deelnemer.getKaartenSelectie()).thenReturn(kaartenSelectie);
-			Mockito.when(kaartenSelectie.kaartIsGeselecteerd(geselecteerdeKaart)).thenReturn(true);
-
-			EventResponse eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer);
-
-			assertAll(
-				() -> verify(kaartenSelectie).removeKaart(geselecteerdeKaart),
-				() -> assertEquals(geselecteerdeKaart, eventResponse.getContext().get("verwijderdeKaart")),
-				() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus())
-			);
-		}
-
-		@Test
-		void kaartenSelectieIsNietVol_voegtKaartToeEnGeeftJuisteEventResponse() {
-			Mockito.when(deelnemer.getKaartenSelectie()).thenReturn(kaartenSelectie);
-			Mockito.when(kaartenSelectie.kaartIsGeselecteerd(geselecteerdeKaart)).thenReturn(false);
-
-			var eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer);
-
-			assertAll(
-				() -> verify(kaartenSelectie).addKaart(geselecteerdeKaart),
-				() -> assertEquals(geselecteerdeKaart, eventResponse.getContext().get("toegevoegdeKaart")),
-				() -> assertEquals(EventResponse.Status.OK, eventResponse.getStatus())
-			);
-		}
-
-		@Test
-		void kaartenSelectieIsVol_geeftJuisteEventResponse() {
-			Mockito.when(deelnemer.getKaartenSelectie()).thenReturn(kaartenSelectie);
-			Mockito.when(kaartenSelectie.kaartIsGeselecteerd(geselecteerdeKaart)).thenReturn(false);
-			Mockito.when(kaartenSelectie.isVol()).thenReturn(true);
-
-			var eventResponse = kaartNaarSelectieEvent.voerUit(deelnemer);
-
-			assertAll(
-				() -> assertEquals(geselecteerdeKaart, eventResponse.getContext().get("ongebruikteKaart")),
-				() -> assertEquals(EventResponse.Status.SELECTIE_VOL, eventResponse.getStatus())
-			);
-		}
-
+		assertAll(
+			() -> verify(kamerService).kaartNaarSelectie(sut.getDeelnemerId(), geselecteerdeKaart),
+			() -> assertEquals(EventResponse.Status.SELECTIE_VOL, eventResponse.getStatus()),
+			() -> assertEquals(geselecteerdeKaart, eventResponse.getContext().get("ongebruikteKaart"))
+		);
 	}
 
 }

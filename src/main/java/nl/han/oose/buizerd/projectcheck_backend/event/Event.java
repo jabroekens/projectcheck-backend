@@ -12,11 +12,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.executable.ValidateOnExecution;
 import jakarta.websocket.DecodeException;
 import jakarta.websocket.EndpointConfig;
-import java.util.concurrent.CompletableFuture;
-import nl.han.oose.buizerd.projectcheck_backend.dao.DAO;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Deelnemer;
 import nl.han.oose.buizerd.projectcheck_backend.domain.DeelnemerId;
-import nl.han.oose.buizerd.projectcheck_backend.domain.Kamer;
+import nl.han.oose.buizerd.projectcheck_backend.service.KamerService;
 import org.reflections.Reflections;
 
 /**
@@ -41,33 +38,10 @@ public abstract class Event {
 	}
 
 	/**
-	 * Voert het event in kwestie uit.
-	 */
-	public final CompletableFuture<EventResponse> voerUit(DAO dao, Deelnemer deelnemer) {
-		return CompletableFuture
-			.supplyAsync(() -> voerUit(deelnemer))
-			.thenApply(result -> {
-				handelAf(dao, deelnemer.getKamer());
-				return result.antwoordOp(this);
-			});
-	}
-
-	/**
-	 * Wordt aangeroepen bij het uitvoeren van een event.
+	 * Voert het event uit.
 	 */
 	@ValidateOnExecution
-	protected abstract @NotNull @Valid EventResponse voerUit(Deelnemer deelnemer);
-
-	/**
-	 * Wordt aangeroepen bij het afhandelen van een event.
-	 * <p>
-	 * Als de staat van {@code kamer} is veranderd, dan moet
-	 * dit doorgevoerd worden aan de datastore met behulp
-	 * van de {@code dao}.
-	 */
-	protected void handelAf(DAO dao, Kamer kamer) {
-		// Doe niets
-	}
+	public abstract @NotNull @Valid EventResponse voerUit(KamerService kamerService);
 
 	public static final class Decoder implements jakarta.websocket.Decoder.Text<Event> {
 
